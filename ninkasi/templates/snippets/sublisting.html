@@ -1,0 +1,47 @@
+{% load i18n ninkasi_tags %}
+
+<section class="listing">
+  <h2>
+    {% trans title %}
+    {% if submodel %}
+    {% if user|push:submodel|has_model_perm:'add' %}
+    {% inline_add_action submodel object extra_args %}
+    {% endif %}
+    {% endif %}
+  </h2>
+
+  <form class="input-group listingfilter" role="form">
+    <input type="text" class="form-control input-sm"
+           placeholder="{% trans 'Filter' %}"
+           name="filter">
+  </form>
+
+  <ul class="list-group">
+    {% for item in items %}
+    <li class="list-group-item">
+
+      {% icon item %}
+      
+      <a href="{{ item|detail_url }}">{{ item }}</a>
+
+      {% if item.status %}
+      <span class="badge badge-pill badge-{{ item.status|status_class }}">
+        {{ item|status_label }}
+      </span>
+      {% endif %}
+
+      <div class="float-right">
+        {% if user|push:item|has_obj_perm:'change' %}
+        {% inline_edit_action item object %}
+        {% endif %}
+        {% if user|push:item|has_obj_perm:'delete' %}
+        {% inline_delete_action item object %}
+        {% endif %}
+      </div>
+
+      {% byline item %}
+
+    </li>
+    {% endfor %}
+  </ul>
+</section>

@@ -1,0 +1,114 @@
+{% extends 'bootstrap4/bootstrap4.html' %}
+
+{% load i18n bootstrap4 static %}
+
+{% block bootstrap4_title %}Ninkasi - Beer QA{% endblock %}
+
+{% block bootstrap4_extra_head %}
+<link rel="stylesheet"
+      xxhref="https://use.fontawesome.com/releases/v5.6.3/css/all.css"
+      href="/static/fontawesome/css/all.css"
+      xxintegrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/"
+      crossorigin="anonymous">
+<link rel="stylesheet"
+      href="{% static 'ninkasi.css' %}" type="text/css">
+{% endblock %}
+
+{% block bootstrap4_extra_script %}
+<script type="text/javascript" src="{% static 'ninkasi.js' %}"></script>
+{% endblock %}
+
+{% block bootstrap4_content %}
+<nav class="navbar navbar-dark bg-dark navbar-expand-lg">
+  <a class="navbar-brand" href="{% url 'home' %}">
+    <i class="fas fa-beer-mug-empty"></i>
+    Ninkasi
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse"
+          data-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent" aria-expanded="false"
+          aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item {% if view.view_name.0 == 'batch' %}active{% endif %}">
+        <a class="nav-link" href="{% url 'list' model='batch' %}">
+          {% trans 'Batches' %}
+        </a>
+      </li>
+      <li class="nav-item {% if view.view_name.0 == 'tank' %}active{% endif %}">
+        <a class="nav-link" href="{% url 'list' model='tank' %}">
+          {% trans 'Tanks' %}
+        </a>
+      </li>
+      <li class="nav-item {% if view.view_name.0 == 'phase' %}active{% endif %}">
+        <a class="nav-link" href="{% url 'list' model='phase' %}">
+          {% trans 'Phases' %}
+        </a>
+      </li>
+      <li class="nav-item {% if view.view_name.0 == 'sample' %}active{% endif %}">
+        <a class="nav-link" href="{% url 'list' model='sample' %}">
+          {% trans 'Samples' %}
+        </a>
+      </li>                  
+    </ul>
+
+    <ul class="navbar-nav navbar-right">
+
+      <!--li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="toolMenu"
+           role="button" data-toggle="dropdown" aria-haspopup="true"
+           aria-expanded="false">
+          {% trans 'Tools' %}
+        </a>
+        <div class="dropdown-menu" aria-labelledby="toolMenu">
+          <a class="dropdown-item" href="{-% url 'odd_conversions' %-}">
+            {% trans 'Find odd conversions' %}
+          </a>
+        </div>
+      </li-->
+
+
+      {% if request.user.is_authenticated %}
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle"
+           data-toggle="dropdown">
+          {{ request.user }}
+          <span class="caret"></span>
+        </a>
+        <div class="dropdown-menu">
+          <a class="dropdown-item" href="{% url 'logout' %}">
+            {% trans 'Logout' %}
+          </a>
+        </div>
+      </li>
+      {% else %}
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'login' %}">
+          {% trans 'Login' %}
+        </a>
+      </li>
+      {% endif %}
+  </div>
+</nav>
+
+<div class="container">
+  {% autoescape off %}{% bootstrap_messages %}{% endautoescape %}
+
+  {% block breadcrumbs %}{% endblock %}
+
+  <h1>
+    {% block title %}{% endblock %}
+    <div role="toolbar" class="d-inline">
+      {% block actions %}{% endblock %}
+    </div>
+    <div class="status float-right">
+      {% block status %}{% endblock %}
+    </div>
+  </h1>
+
+  {% block content %}{% endblock %}
+</div>
+
+{% endblock %}

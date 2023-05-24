@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% load i18n ninkasi_tags %}
+
+{% block actions %}
+{% if user|push:view.ctype|has_model_perm:'add' %}
+{% add_action view.model %}
+{% endif %}
+{% endblock %}
+
+
+{% block breadcrumbs %}
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{% url 'home' %}">{% trans "Home" %}</a></li>
+    <li class="breadcrumb-item active">{{ view.listing_label }}</li>
+  </ol>
+</nav>
+{% endblock %}
+
+
+{% block title %}
+{% blocktrans with label=view.listing_label %}{{label}}{% endblocktrans %}
+{% endblock %}
+
+
+{% block content %}
+{% listing '' view.list_items %}
+{% endblock content %}

@@ -1,0 +1,28 @@
+{% extends 'base_detail.html' %}
+
+{% load i18n ninkasi_tags %}
+
+{% block content %}
+
+<h2>Racking history</h2>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Tank</th>
+      <th>From</th>
+      <th>To</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for tank in object.list_tanks %}  
+  <tr>
+    <td>{{ tank.tank }}</td>
+    <td>{{ tank.date_from|date:"d-m-Y H:i " }}</td>
+    <td>{{ tank.date_to|date:"d-m-Y H:i " }}</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+{% endblock content %}
