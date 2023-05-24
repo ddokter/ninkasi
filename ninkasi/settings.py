@@ -39,7 +39,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_extensions',
     'bootstrap4',
-    'bootstrap_datepicker_plus',
     'ninkasi'
 ]
 

@@ -1,7 +1,6 @@
 from django.utils.translation import gettext_lazy as _
 from django.http import HttpResponseRedirect
 from django.forms import inlineformset_factory
-from bootstrap_datepicker_plus.widgets import DateTimePickerInput
 from .base import CreateView, UpdateView
 from ..models.batch import Batch
 from ..forms.batchtank import DateTimeInput
