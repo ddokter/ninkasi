@@ -1,0 +1,43 @@
+{% extends 'base_detail.html' %}
+
+{% load i18n ninkasi_tags %}
+
+{% block content %}
+
+
+<dl class="row">
+  <dt class="col-sm-3">Parent</dt>
+  <dd class="col-sm-9">{{ object.parent }}</dd>
+  <dt class="col-sm-3">Time</dt>
+  <dd class="col-sm-9">{{ object.date|date:"d-m-Y H:i " }}</dd>
+  <dt class="col-sm-3">Phase</dt>
+  <dd class="col-sm-9">{{ object.step }}</dd>
+</dl>
+
+<h2>Notes</h2>
+
+<p>{{ object.notes }}</p>
+
+
+<h2>Measurements</h2>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>{% include "snippets/icon/measurement.html" %} Quantity</th>
+      <th>Unit</th>
+      <th>Value</th>      
+    </tr>
+  </thead>
+  <tbody>
+  {% for measurement in object.list_measurements %}  
+  <tr>
+    <td>{{ measurement.get_quantity_display }}</td>
+    <td>{{ measurement.get_unit_display }}</td>
+    <td>{{ measurement.value }}</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+{% endblock content %}

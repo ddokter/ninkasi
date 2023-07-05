@@ -1,0 +1,66 @@
+{% extends 'base_detail.html' %}
+
+{% load i18n ninkasi_tags %}
+
+{% block extra_actions %}
+{% if user|push:object|has_obj_perm:'manage' %}
+<a class="btn btn-outline-success btn-sm"
+   href="{% url 'create_batch' %}{{ object.pk }}"
+   data-toggle="tooltip" data-placement="right" title="{% trans 'Add batch' %}">
+  <span class="fas fa-plus" />
+  <span class="fas fa-hashtag" />
+</a>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+
+<h2>Ingredients</h2>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>Amount</th>
+      <th>Unit</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for ingredient in object.list_ingredients %}
+  <tr>
+    <td>{{ ingredient.ingredient }}
+      {% for cat in ingredient.ingredient.categories %}
+      <span class="badge badge-pill badge-info">{{ cat }}</span>
+      {% endfor %}
+    </td>
+    <td>{{ ingredient.amount }}</td>
+    <td>{{ ingredient.unit }} </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+
+<h2>Schema</h2>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Phase</th>      
+      <th>Temperature (in &deg;C)</th>
+      <th>Duration</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for step in object.list_steps %}
+  <tr>
+    <td>{{ step.get_phase_display }}</td>
+    <td>{{ step.temperature }}</td>
+    <td>{{ step.duration }} {{ step.get_duration_unit_display }}</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+{% sublisting 'Batches' object.list_batches 'batch' %}
+
+{% endblock content %}

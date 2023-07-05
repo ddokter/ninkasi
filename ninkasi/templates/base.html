@@ -25,69 +25,101 @@
     Ninkasi
   </a>
   <button class="navbar-toggler" type="button" data-toggle="collapse"
-          data-target="#navbarSupportedContent"
-          aria-controls="navbarSupportedContent" aria-expanded="false"
-          aria-label="Toggle navigation">
+	  data-target="#navbarSupportedContent"
+	  aria-controls="navbarSupportedContent" aria-expanded="false"
+	  aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
   <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
     <ul class="navbar-nav mr-auto">
-      <li class="nav-item {% if view.view_name.0 == 'batch' %}active{% endif %}">
-        <a class="nav-link" href="{% url 'list' model='batch' %}">
-          {% trans 'Batches' %}
-        </a>
-      </li>
-      <li class="nav-item {% if view.view_name.0 == 'tank' %}active{% endif %}">
-        <a class="nav-link" href="{% url 'list' model='tank' %}">
-          {% trans 'Tanks' %}
-        </a>
-      </li>
-      <li class="nav-item {% if view.view_name.0 == 'phase' %}active{% endif %}">
-        <a class="nav-link" href="{% url 'list' model='phase' %}">
-          {% trans 'Phases' %}
-        </a>
-      </li>
-      <li class="nav-item {% if view.view_name.0 == 'sample' %}active{% endif %}">
-        <a class="nav-link" href="{% url 'list' model='sample' %}">
-          {% trans 'Samples' %}
-        </a>
+      <li class="nav-item {% if view.view_name.0 == 'unit' %}active{% endif %}">
+	<a class="nav-link" href="{% url 'list' model='unit' %}">
+	  {% trans 'Units' %}
+	</a>
+      </li>                        
+      <li class="nav-item {% if view.view_name.0 == 'category' %}active{% endif %}">
+	<a class="nav-link" href="{% url 'list' model='category' %}">
+	  {% trans 'Categories' %}
+	</a>
       </li>                  
+      <li class="nav-item dropdown {% if view.view_name.0 == 'asset' %}active{% endif %}">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
+	   role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+	  {% trans 'Assets' %}	  
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+	  <a class="dropdown-item" href="{% url 'list' model='asset' %}">
+	    {% trans 'General' %}
+	  </a>
+	  <a class="dropdown-item" href="{% url 'list' model='ingredient' %}">
+	    {% trans 'Ingredients' %}
+	  </a>
+        </div>
+      </li>
+
+
+      
+      <li class="nav-item {% if view.view_name.0 == 'recipe' %}active{% endif %}">
+	<a class="nav-link" href="{% url 'list' model='recipe' %}">
+	  {% trans 'Recipes' %}
+	</a>
+      </li>      
+      <li class="nav-item {% if view.view_name.0 == 'batch' %}active{% endif %}">
+	<a class="nav-link" href="{% url 'list' model='batch' %}">
+	  {% trans 'Batches' %}
+	</a>
+      </li>
+      <!--li class="nav-item {% if view.view_name.0 == 'tank' %}active{% endif %}">
+	<a class="nav-link" href="{% url 'list' model='tank' %}">
+	  {% trans 'Tanks' %}
+	</a>
+      </li-->
+      <!--li class="nav-item {% if view.view_name.0 == 'phase' %}active{% endif %}">
+	<a class="nav-link" href="{% url 'list' model='phase' %}">
+	  {% trans 'Phases' %}
+	</a>
+      </li-->
+      <li class="nav-item {% if view.view_name.0 == 'sample' %}active{% endif %}">
+	<a class="nav-link" href="{% url 'list' model='sample' %}">
+	  {% trans 'Samples' %}
+	</a>
+      </li>
     </ul>
 
     <ul class="navbar-nav navbar-right">
 
       <!--li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" id="toolMenu"
-           role="button" data-toggle="dropdown" aria-haspopup="true"
-           aria-expanded="false">
-          {% trans 'Tools' %}
-        </a>
-        <div class="dropdown-menu" aria-labelledby="toolMenu">
-          <a class="dropdown-item" href="{-% url 'odd_conversions' %-}">
-            {% trans 'Find odd conversions' %}
-          </a>
-        </div>
+	<a class="nav-link dropdown-toggle" href="#" id="toolMenu"
+	   role="button" data-toggle="dropdown" aria-haspopup="true"
+	   aria-expanded="false">
+	  {% trans 'Tools' %}
+	</a>
+	<div class="dropdown-menu" aria-labelledby="toolMenu">
+	  <a class="dropdown-item" href="{-% url 'odd_conversions' %-}">
+	    {% trans 'Find odd conversions' %}
+	  </a>
+	</div>
       </li-->
 
 
       {% if request.user.is_authenticated %}
       <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle"
-           data-toggle="dropdown">
-          {{ request.user }}
-          <span class="caret"></span>
-        </a>
-        <div class="dropdown-menu">
-          <a class="dropdown-item" href="{% url 'logout' %}">
-            {% trans 'Logout' %}
-          </a>
-        </div>
+	<a class="nav-link dropdown-toggle"
+	   data-toggle="dropdown">
+	  {{ request.user }}
+	  <span class="caret"></span>
+	</a>
+	<div class="dropdown-menu">
+	  <a class="dropdown-item" href="{% url 'logout' %}">
+	    {% trans 'Logout' %}
+	  </a>
+	</div>
       </li>
       {% else %}
       <li class="nav-item">
-        <a class="nav-link" href="{% url 'login' %}">
-          {% trans 'Login' %}
-        </a>
+	<a class="nav-link" href="{% url 'login' %}">
+	  {% trans 'Login' %}
+	</a>
       </li>
       {% endif %}
   </div>
@@ -107,6 +139,10 @@
       {% block status %}{% endblock %}
     </div>
   </h1>
+
+  <p class="text-info">
+    {% block doc %}{% endblock %}
+  </p>
 
   {% block content %}{% endblock %}
 </div>

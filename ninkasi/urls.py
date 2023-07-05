@@ -5,7 +5,9 @@ from .views.base import (DeleteView, ListingView, DetailView, CreateView,
                          UpdateView, InlineCreateView, InlineUpdateView,
                          InlineDeleteView)
 from ninkasi.views.batch import BatchCreateView, BatchUpdateView
-from ninkasi.views.sample import SampleCreateView
+from ninkasi.views.recipe import RecipeCreateView, RecipeUpdateView
+from ninkasi.views.sample import SampleCreateView, SampleUpdateView
+from ninkasi.views.brew import BrewCreateView, BrewUpdateView
 from .views.home import Home
 
 
@@ -28,13 +30,41 @@ urlpatterns = [
          BatchCreateView.as_view(),
          name="create_batch"),
 
+    path('batch/add/<int:recipe>',
+         BatchCreateView.as_view(),
+         name="create_batch"),
+    
     path('batch/<int:pk>/edit',
          BatchUpdateView.as_view(),
          name="edit_batch"),
 
+    path('recipe/add/',
+         RecipeCreateView.as_view(),
+         name="create_recipe"),
+
+    path('recipe/<int:pk>/edit',
+         RecipeUpdateView.as_view(),
+         name="edit_recipe"),
+    
     path('sample/add/',
          SampleCreateView.as_view(),
          name="create_sample"),
+
+    path('sample/<int:pk>/edit',
+         SampleUpdateView.as_view(),
+         name="edit_sample"),
+    
+    path('sample/add/<int:batch>',
+         SampleCreateView.as_view(),
+         name="create_sample"),
+
+    path('brew/add/',
+         BrewCreateView.as_view(),
+         name="create_brew"),
+    
+    path('brew/add/<int:batch>',
+         BrewCreateView.as_view(),
+         name="create_brew"),
 
     # Generic delete view
     #

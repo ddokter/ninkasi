@@ -1,45 +1,35 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from .batch import Batch
-from .phase import Phase
-
-
-Q_VOCAB = [
-    (0, _("Acidity")),
-    (1, _("DO")),
-    (2, _("Gravity")),
-    (3, _("CO2")),
-    (4, _("FAN"))
-]
-
-
-U_VOCAB = [
-    (0, "Ph"),
-    (1, "PPM"),
-    (2, "SG")
-]
+from .step import Step
 
 
 class Sample(models.Model):
 
-    """ Sample of any kind
+    """Samples are taken from specific stages in the brew process and
+    may be related to a batch or a brew. A sample may (and should)
+    express a number of measurements.
+
     """
 
-    batch = models.ForeignKey(Batch, on_delete=models.CASCADE)
-    date = models.DateTimeField(_("Time"))
-    phase = models.ForeignKey(Phase, on_delete=models.CASCADE)
-    quantity = models.SmallIntegerField(_("Quantity"),
-                                        choices=Q_VOCAB
-                                        )
-    unit = models.SmallIntegerField(_("Unit"),
-                                    choices=U_VOCAB)
-    value = models.FloatField(_("Value"))
+    parent = GenericForeignKey("content_type", "object_id")
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
 
+    date = models.DateTimeField(_("Time"))
+    step = models.ForeignKey(Step, on_delete=models.CASCADE)
+    notes = models.CharField(_("Notes"), max_length=200, null=True,
+                             blank=True)
+
+    def list_measurements(self):
+
+        return self.measurement_set.all()
+    
     def __str__(self):
 
-        return (f"{self.batch} {self.date} {self.get_quantity_display()}"
-                f" {self.get_unit_display()} {self.value}"
-                )
+        return f"{self.parent} {self.step}"
 
     class Meta:
 

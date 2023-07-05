@@ -34,20 +34,28 @@
     {{ form.media }}
     {% bootstrap_form form %}
 
-    {% if view.formset %}
+    {% for formset in view.formsets %}
     <h2>
-      {{ view.formset_label }}
+      {{ formset.model.label }}
+
       <button class="btn btn-primary" type="button"
-              data-toggle="collapse" data-target="#formset_collapse"
-              aria-expanded="false" aria-controls="formset_collapse"
+              data-toggle="collapse"
+	      data-target="#formset_collapse_{{ forloop.counter0 }}"
+	      {% if view.expanded_formset %}
+              aria-expanded="true"
+	      {% else %}
+              aria-expanded="false"	      
+	      {% endif %}
+	      aria-controls="formset_collapse"
               title="{% trans 'Show subformset' %}">
         <span class="fas fa-angle-down" />
       </button>
     </h2>
-    <section class="collapse" id="formset_collapse">
-      {% bootstrap_formset view.formset layout='horizontal' %}
+    <section class="collapse {% if view.expanded_formset %}show{% endif %}"
+	     id="formset_collapse_{{ forloop.counter0 }}">
+      {% bootstrap_formset formset layout='horizontal' %}
     </section>
-    {% endif %}
+    {% endfor %}
         
     {% buttons %}
     <button type="submit" class="btn btn-primary">

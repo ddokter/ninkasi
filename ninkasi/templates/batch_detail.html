@@ -2,9 +2,81 @@
 
 {% load i18n ninkasi_tags %}
 
+{% block extra_actions %}
+{% if user|push:'sample'|has_obj_perm:'add' %}
+<a class="btn btn-outline-success btn-sm"
+   href="{% url 'create_sample' %}{{ object.pk }}"
+   data-toggle="tooltip" data-placement="right" title="{% trans 'Add sample' %}">
+  <span class="fas fa-plus" />
+  <span class="fas fa-vial" />
+</a>
+{% endif %}
+
+{% if user|push:'brew'|has_model_perm:'add' %}
+<a class="btn btn-outline-success btn-sm"
+   href="{% url 'create_brew' %}{{ object.pk }}"
+   data-toggle="tooltip" data-placement="right" title="{% trans 'Add brew' %}">
+  <span class="fas fa-plus" />
+  <span class="fas fa-beer-mug-empty" />
+</a>
+{% endif %}
+
+{% endblock %}
+
 {% block content %}
 
-<h2>Racking history</h2>
+
+<dl class="row">
+  <dt class="col-sm-3">Volume</dt>
+  <dd class="col-sm-9">{{ object.volume }}</dd>
+</dl>
+
+
+<h2>Brews</h2>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Volume</th>      
+    </tr>
+  </thead>
+  <tbody>
+  {% for brew in object.list_brews %}  
+  <tr>
+    <td>{{ brew.date|date:"d-m-Y H:i " }}</td>
+    <td>{{ brew.volume }}</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+
+<h2>Assets</h2>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Asset</th>
+      <th>Unit</th>      
+      <th>Amount</th>
+      <th>Batch Nr.</th>      
+    </tr>
+  </thead>
+  <tbody>
+  {% for asset in object.list_assets %}  
+  <tr>
+    <td>{{ asset.asset }}</td>
+    <td>{{ asset.unit }}</td>
+    <td>{{ asset.amount }}</td>
+    <td>{{ asset.batchnr }}</td>    
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+
+<!--h2>Racking history</h2>
 
 <table class="table table-striped">
   <thead>
@@ -23,6 +95,6 @@
   </tr>
   {% endfor %}
   </tbody>
-</table>
+</table-->
 
 {% endblock content %}

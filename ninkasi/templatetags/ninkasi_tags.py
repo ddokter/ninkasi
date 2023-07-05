@@ -120,6 +120,14 @@ def detail_url(obj):
 
 
 @register.filter
+def doc(model):
+
+    """ Return object class docstring """
+
+    return mark_safe(markdown(model.__class__.__doc__))
+
+
+@register.filter
 def get(iterable, idx):
 
     return iterable.get(idx, None)

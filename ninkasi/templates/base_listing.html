@@ -24,6 +24,11 @@
 {% endblock %}
 
 
+{% block doc %}
+{{ view.model|doc }}
+{% endblock %}
+
 {% block content %}
+
 {% listing '' view.list_items %}
 {% endblock content %}

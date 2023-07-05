@@ -1,0 +1,10 @@
+* use doc string of class for page listing
+* make phase more clear: phases for measurement/phases in brewing.
+* add schema model for brew
+* each beer has own scheme, but abstract:
+    - glucanrest
+    - ferularest
+    - proteinrest
+    - saccharification
+    - mash out
+

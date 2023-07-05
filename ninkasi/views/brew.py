@@ -1,9 +1,11 @@
 from django.utils.translation import gettext_lazy as _
 from django.http import HttpResponseRedirect
 from django.forms import inlineformset_factory
+from django.contrib.contenttypes.forms import generic_inlineformset_factory
 from .base import CreateView, UpdateView
+from ..models.brew import Brew
 from ..models.batch import Batch
-from ..models.recipe import Recipe
+from ..models.step import Step
 from ..forms.batchtank import DateTimeInput
 
 
@@ -13,8 +15,12 @@ class FormSetMixin:
 
         form = super().get_form(form_class=form_class)
 
+        form.fields.pop('batch')
         form.fields.pop('asset')
+        form.fields.pop('step')
 
+        form.fields['date'].widget = DateTimeInput()
+        
         return form
 
     @property
@@ -25,11 +31,13 @@ class FormSetMixin:
     @property
     def formsets(self):
 
-        factory = inlineformset_factory(
-            Batch, Batch.asset.through, exclude=[],
-            #widgets={'date_from': DateTimeInput(),
-            #         'date_to': DateTimeInput()}
-            )
+        factory1 = inlineformset_factory(
+            Brew, Brew.asset.through, exclude=[],
+        )
+
+        factory2 = generic_inlineformset_factory(
+            Step, exclude=[]
+        )
 
         kwargs = {}
 
@@ -39,32 +47,31 @@ class FormSetMixin:
         if self.object:
             kwargs['instance'] = self.object
 
-        return [factory(**kwargs)]
+        return [factory1(**kwargs), factory2(**kwargs)]
 
     def form_valid(self, form):
 
         self.object = form.save()
 
-        _formset = self.formset
-
-        if _formset.is_valid():
-            _formset.save()
+        for _formset in self.formsets:
+            if _formset.is_valid():
+                _formset.save()
 
         return HttpResponseRedirect(self.get_success_url())
 
 
-class BatchCreateView(FormSetMixin, CreateView):
+class BrewCreateView(FormSetMixin, CreateView):
 
-    model = Batch
+    model = Brew
 
     def get_initial(self):
 
-        if self.kwargs.get('recipe'):
-            return {'recipe': Recipe.objects.get(pk=self.kwargs['recipe'])}
+        if self.kwargs.get('batch'):
+            return {'batch': Batch.objects.get(pk=self.kwargs['batch'])}
         else:
             return {}
 
 
-class BatchUpdateView(FormSetMixin, UpdateView):
+class BrewUpdateView(FormSetMixin, UpdateView):
 
-    model = Batch
+    model = Brew
