@@ -9,7 +9,7 @@ from django.urls.exceptions import NoReverseMatch
 from django.utils.translation import gettext_lazy as _
 from django.apps import apps
 from ..utils import get_model_name
-from ..forms.batchtank import DateTimeInput
+from ..forms.dtinput import DateTimeInput
 
 
 class SearchForm(forms.Form):

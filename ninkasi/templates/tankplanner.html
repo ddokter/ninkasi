@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% load ninkasi_tags i18n %}
+
+{% block content %}
+{% with month=view.month %}
+
+<h1>Tank planner</h1>
+
+<hr>
+
+<h2 style="width: 200px;" class="mx-auto">
+  <a class="btn btn-outline-secondary btn-sm rounded-circle"
+     href=".?go={{ month.prev }}"
+     data-toggle="tooltip" data-placement="right"
+     title="{% trans 'Previous' %}">
+    <span class="fas fa-caret-left" />
+  </a>    
+  {{ month.title }}
+  <a class="btn btn-outline-secondary btn-sm rounded-circle"
+     href=".?go={{ month.next }}"
+     data-toggle="tooltip" data-placement="right"
+     title="{% trans 'Next' %}">
+    <span class="fas fa-caret-right" />
+  </a>
+</h2>
+
+<table class="table table-bordered table-sm">
+  <thead>
+    <tr>
+      <th scope="col" />
+      {% for day in month.days %}
+      <th scope="col">{{ day|stringformat:'02i' }}</th>
+      {% endfor %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for tank in view.list_tanks %}
+    <tr>
+      <th scope="row">{{ tank }}</th>
+      {% for day in month.days %}
+      <td style="background-color: {% tankcontent tank day month.month month.year %}" />
+      {% endfor %}
+    </tr>
+    {% endfor %}
+    {% for brewhouse in view.list_brewhouses %}
+    <tr>
+      <th scope="row">{{ brewhouse }}</th>
+      {% for day in month.days %}
+      <td style="background-color: {% brewhousecontent brewhouse day month.month month.year %}" />
+      {% endfor %}
+    </tr>
+    {% endfor %}    
+  </tbody>
+</table>
+
+{% endwith %}
+{% endblock %}

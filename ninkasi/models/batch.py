@@ -1,3 +1,4 @@
+from random import choice
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.contrib.contenttypes.fields import GenericRelation
@@ -14,15 +15,17 @@ class Batch(models.Model):
     nr = models.CharField(_("Nr"), max_length=100, unique=True)
     recipe = models.ForeignKey("Recipe", on_delete=models.CASCADE)
     asset = models.ManyToManyField(Asset, through="BatchAsset")
-    # tank = models.ManyToManyField(Tank, through="BatchTank")
-    step = models.ManyToManyField(Step)  #, through="RecipeStep")    
+    tank = models.ManyToManyField(Tank, through="Transfer")
+    step = models.ManyToManyField(Step)  #, through="RecipeStep")
     sample = GenericRelation("Sample")
-    
+    deliverydate = models.DateTimeField(_("Delivery date"))
+    color = models.CharField(_("Color"), max_length=7, null=True, blank=True)
+
     @property
     def volume(self):
 
         return sum([brew.volume for brew in self.list_brews()])
-    
+
     def __str__(self):
 
         return f"{self.recipe.name} - #{self.nr}"
@@ -35,6 +38,16 @@ class Batch(models.Model):
 
         return self.batchasset_set.all()
 
+    def list_transfers(self):
+
+        return self.transfer_set.all()
+
+    def get_color(self):
+
+        return self.color or choice(
+            '#d9ed92', '#b5e48c', '#99d98c', '#76c893', '#52b69a',
+            '#34a0a4', '#168aad', '#1a759f', '#1e6091', '#184e77')
+    
     class Meta:
 
         app_label = "ninkasi"
@@ -42,12 +55,19 @@ class Batch(models.Model):
         verbose_name_plural = _("Batches")
 
 
-class BatchTank(models.Model):
+class Transfer(models.Model):
+
+    """ Represent racking from one tank to the other """
 
     batch = models.ForeignKey(Batch, on_delete=models.CASCADE)
     tank = models.ForeignKey(Tank, on_delete=models.CASCADE)
-    date_from = models.DateTimeField(_("Date from"))
-    date_to = models.DateTimeField(_("Date to"))
+    date = models.DateTimeField(_("Date from"))
+    end_date = models.DateTimeField(_("Date to"), editable=False)
+
+    class Meta:
+
+        app_label = "ninkasi"
+        ordering = ["date"]
 
 
 class BatchAsset(models.Model):
@@ -65,7 +85,7 @@ class BatchAsset(models.Model):
     def label(self):
 
         return _("Assets")
-    
+
     def __str__(self):
 
         return "%s %s" % (self.asset, self.amount)

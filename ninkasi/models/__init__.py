@@ -5,3 +5,4 @@ from .recipe import Recipe  # noqa
 from .asset import Asset  # noqa
 from .step import Step  # noqa
 from .brew import Brew  # noqa
+from .signal_processors import *  # noqa

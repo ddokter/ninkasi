@@ -21,6 +21,13 @@
 </a>
 {% endif %}
 
+<a class="btn btn-outline-success btn-sm"
+   href="{% url 'transfer' %}{{ object.pk }}"
+   data-toggle="tooltip" data-placement="right" title="{% trans 'Transfer' %}">
+  <span class="fas fa-left-right" />
+</a>
+
+
 {% endblock %}
 
 {% block content %}
@@ -29,6 +36,8 @@
 <dl class="row">
   <dt class="col-sm-3">Volume</dt>
   <dd class="col-sm-9">{{ object.volume }}</dd>
+  <dt class="col-sm-3">Delivery date</dt>
+  <dd class="col-sm-9">{{ object.deliverydate|date:"d-m-Y H:i" }}</dd>
 </dl>
 
 
@@ -37,6 +46,7 @@
 <table class="table table-striped">
   <thead>
     <tr>
+      <th />
       <th>Date</th>
       <th>Volume</th>      
     </tr>
@@ -44,6 +54,14 @@
   <tbody>
   {% for brew in object.list_brews %}  
   <tr>
+    <td>
+      <a class="btn btn-outline-secondary btn-sm rounded-circle"
+	 href="{{ brew|detail_url }}"
+	 data-toggle="tooltip"
+	 title="{% trans 'View' %}">
+	<span class="fas fa-eye" />
+      </a>
+    </td>
     <td>{{ brew.date|date:"d-m-Y H:i " }}</td>
     <td>{{ brew.volume }}</td>
   </tr>
@@ -76,25 +94,35 @@
 </table>
 
 
-<!--h2>Racking history</h2>
+<h2>Transfer history</h2>
 
 <table class="table table-striped">
   <thead>
     <tr>
+      <th />
       <th>Tank</th>
-      <th>From</th>
-      <th>To</th>
+      <th>Date</th>
+      <th>To</th>      
     </tr>
   </thead>
   <tbody>
-  {% for tank in object.list_tanks %}  
+  {% for transfer in object.list_transfers %}  
   <tr>
-    <td>{{ tank.tank }}</td>
-    <td>{{ tank.date_from|date:"d-m-Y H:i " }}</td>
-    <td>{{ tank.date_to|date:"d-m-Y H:i " }}</td>
+    <td>
+      <a class="btn btn-outline-secondary btn-sm rounded-circle"
+	 href="{% url 'edit' 'transfer' transfer.id %}"
+	 data-toggle="tooltip" data-placement="right" title="{% trans 'Edit' %}">
+	<span class="fas fa-pen" />
+      </a>
+    </td>
+    <td>{{ transfer.tank }}</td>
+    <td>{{ transfer.date|date:"d-m-Y H:i " }}</td>
+    <td>
+      {{ transfer.end_date|date:"d-m-Y H:i " }}
+    </td>    
   </tr>
   {% endfor %}
   </tbody>
-</table-->
+</table>
 
 {% endblock content %}

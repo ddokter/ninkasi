@@ -9,6 +9,8 @@ from ninkasi.views.recipe import RecipeCreateView, RecipeUpdateView
 from ninkasi.views.sample import SampleCreateView, SampleUpdateView
 from ninkasi.views.brew import BrewCreateView, BrewUpdateView
 from .views.home import Home
+from .views.tankplanner import TankPlannerView
+from .views.transfer import TransferView
 
 
 urlpatterns = [
@@ -22,6 +24,18 @@ urlpatterns = [
          LogoutView.as_view(),
          name="logout"),
 
+    path('tankplanner/',
+         TankPlannerView.as_view(),
+         name="tankplanner"),
+
+    path('transfer/<int:batch>',
+         TransferView.as_view(),
+         name="transfer"),
+
+    path('transfer/',
+         TransferView.as_view(),
+         name="transfer"),
+    
     path('admin/', admin.site.urls),
 
     path('', Home.as_view(), name="home"),

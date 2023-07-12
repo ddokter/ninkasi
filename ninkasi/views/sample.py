@@ -7,7 +7,7 @@ from .base import CreateView, UpdateView
 from ..models.sample import Sample
 from ..models.batch import Batch
 from ..models.measurement import Measurement
-from ..forms.batchtank import DateTimeInput
+from ..forms.dtinput import DateTimeInput
 
 
 class FormSetMixin:

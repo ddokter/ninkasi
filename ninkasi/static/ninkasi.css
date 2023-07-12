@@ -1,0 +1,10 @@
+td.tank.full {
+    background-color: red;
+}
+
+td.brewhouse.full {
+    background-color: blue;
+}
+
+td.empty {
+}

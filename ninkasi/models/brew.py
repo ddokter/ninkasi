@@ -2,7 +2,6 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.contrib.contenttypes.fields import GenericRelation
 from .asset import Asset
-from .unit import Unit
 from .step import Step
 
 
@@ -20,14 +19,14 @@ class Brew(models.Model):
                                    blank=True)
     step = models.ManyToManyField(Step, null=True, blank=True)
     sample = GenericRelation("Sample")
-    
+
     def __str__(self):
 
         return f"{self.batch.nr} - {self.batch.recipe}"
 
     def list_assets(self):
 
-        return self.batchasset_set.all()
+        return self.brewasset_set.all()
 
     class Meta:
 

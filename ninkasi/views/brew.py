@@ -1,12 +1,12 @@
 from django.utils.translation import gettext_lazy as _
 from django.http import HttpResponseRedirect
-from django.forms import inlineformset_factory
+from django.forms import inlineformset_factory, HiddenInput
 from django.contrib.contenttypes.forms import generic_inlineformset_factory
 from .base import CreateView, UpdateView
 from ..models.brew import Brew
 from ..models.batch import Batch
 from ..models.step import Step
-from ..forms.batchtank import DateTimeInput
+from ..forms.dtinput import DateTimeInput
 
 
 class FormSetMixin:
@@ -15,7 +15,8 @@ class FormSetMixin:
 
         form = super().get_form(form_class=form_class)
 
-        form.fields.pop('batch')
+        form.fields['batch'].widget = HiddenInput()
+        
         form.fields.pop('asset')
         form.fields.pop('step')
 

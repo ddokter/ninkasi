@@ -1,8 +1,10 @@
+from datetime import datetime
 from django.template import Library
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
 from django.utils.safestring import mark_safe
+from django.utils import timezone
 from markdown import markdown
 from ninkasi.utils import get_model_name
 
@@ -228,3 +230,32 @@ def status(obj):
 def txt2html(txt):
 
     return mark_safe(markdown(txt))
+
+
+@register.simple_tag
+def tankcontent(tank, day, month, year):
+    
+    """ Provide tank availability """
+
+    batch = tank.content(datetime(year, month, day,
+                                  tzinfo=timezone.get_current_timezone()))
+
+    if batch:
+        return batch.get_color()
+
+    return ""
+
+
+@register.simple_tag
+def brewhousecontent(brewhouse, day, month, year):
+
+    """ Provide tank availability """
+
+    brew = brewhouse.content(datetime(year, month, day,
+                                      tzinfo=timezone.get_current_timezone()))
+
+    if brew:
+
+        return brew.batch.color
+
+    return ""

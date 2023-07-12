@@ -27,6 +27,20 @@ class Tank(models.Model):
 
         return self.name
 
+    def content(self, date):
+
+        """Return the batch that is in the tank on the given date, if
+        at all
+
+        """
+
+        if self.transfer_set.filter(
+                date__date__lte=date, end_date__date__gte=date).exists():
+            return self.transfer_set.filter(
+                date__date__lte=date, end_date__date__gte=date).first().batch
+
+        return None
+
     class Meta:
 
         app_label = "ninkasi"

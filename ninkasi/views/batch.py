@@ -2,9 +2,10 @@ from django.utils.translation import gettext_lazy as _
 from django.http import HttpResponseRedirect
 from django.forms import inlineformset_factory
 from .base import CreateView, UpdateView
+from ..forms.dtinput import DateTimeInput
+from ..forms.colorpicker import ColorInput
 from ..models.batch import Batch
 from ..models.recipe import Recipe
-from ..forms.batchtank import DateTimeInput
 
 
 class FormSetMixin:
@@ -13,6 +14,9 @@ class FormSetMixin:
 
         form = super().get_form(form_class=form_class)
 
+        form.fields['deliverydate'].widget = DateTimeInput()
+        form.fields['color'].widget = ColorInput()        
+        
         form.fields.pop('asset')
 
         return form
@@ -26,10 +30,7 @@ class FormSetMixin:
     def formsets(self):
 
         factory = inlineformset_factory(
-            Batch, Batch.asset.through, exclude=[],
-            #widgets={'date_from': DateTimeInput(),
-            #         'date_to': DateTimeInput()}
-            )
+            Batch, Batch.asset.through, exclude=[])
 
         kwargs = {}
 
@@ -45,10 +46,9 @@ class FormSetMixin:
 
         self.object = form.save()
 
-        _formset = self.formset
-
-        if _formset.is_valid():
-            _formset.save()
+        for _formset in self.formsets:
+            if _formset.is_valid():
+                _formset.save()
 
         return HttpResponseRedirect(self.get_success_url())
 
@@ -57,6 +57,7 @@ class BatchCreateView(FormSetMixin, CreateView):
 
     model = Batch
 
+    
     def get_initial(self):
 
         if self.kwargs.get('recipe'):
