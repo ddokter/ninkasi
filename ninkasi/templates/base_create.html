@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% load i18n bootstrap4 %}
+{% load i18n bootstrap4 ninkasi_tags %}
 
 {% block title %}
 <h1>{% blocktrans with label=view.ct_label %}Add {{label}}{% endblocktrans %} </h1>
@@ -36,22 +36,26 @@
 
     {% for formset in view.formsets %}
     <h2>
-      {{ formset.model.label }}
+      {{ formset|fslabel }}
 
-      <button class="btn btn-primary" type="button"
+      <button class="btn btn-primary btn-sm" type="button"
               data-toggle="collapse"
 	      data-target="#formset_collapse_{{ forloop.counter0 }}"
-	      {% if view.expanded_formset %}
+	      {% if formset.expanded %}
               aria-expanded="true"
 	      {% else %}
               aria-expanded="false"	      
 	      {% endif %}
 	      aria-controls="formset_collapse"
               title="{% trans 'Show subformset' %}">
+	{% if formset.expanded %}
+	<span class="fas fa-angle-up" />
+	{% else %}
         <span class="fas fa-angle-down" />
+	{% endif %}
       </button>
     </h2>
-    <section class="collapse {% if view.expanded_formset %}show{% endif %}"
+    <section class="collapse {% if formset.expanded %}show{% endif %}"
 	     id="formset_collapse_{{ forloop.counter0 }}">
       {% bootstrap_formset formset layout='horizontal' %}
     </section>

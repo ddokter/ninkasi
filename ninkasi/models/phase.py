@@ -5,8 +5,7 @@ from django.utils.translation import gettext_lazy as _
 class Phase(models.Model):
 
     """ Phases in the production process, from brewing until sale.
-    The phases are meant as markers for measurements, so 'end of boil'
-    is as valid a phase as boil itself.
+    This could be anything, from 'boil' to 'maturation'.
     """
 
     name = models.CharField(_("Name"), unique=True, max_length=100)

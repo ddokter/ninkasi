@@ -15,14 +15,23 @@
 
 {% block content %}
 
-<h2>Ingredients</h2>
+{% if object.descr %}
+<p>{{ object.descr }}</p>
+{% endif %}
+
+<dl class="row">
+  <dt class="col-sm-3">Volume</dt>
+  <dd class="col-sm-9">{{ object.volume }}</dd>
+</dl>
+
+<h2>{% trans 'Ingredients' %}</h2>
 
 <table class="table table-striped">
   <thead>
     <tr>
       <th></th>
-      <th>Amount</th>
-      <th>Unit</th>
+      <th>{% trans 'Amount' %}</th>
+      <th>{% trans 'Unit' %}</th>
     </tr>
   </thead>
   <tbody>
@@ -40,24 +49,28 @@
 </table>
 
 
-<h2>Schema</h2>
+<h2>{% trans 'Schema' %}</h2>
 
 <table class="table table-striped">
   <thead>
     <tr>
-      <th>Phase</th>      
-      <th>Temperature (in &deg;C)</th>
-      <th>Duration</th>
+      <th>{% trans 'Phase' %}</th>
+      <th>{% trans 'Temperature (in &deg;C)' %}</th>
+      <th>{% trans 'Duration' %}</th>
     </tr>
   </thead>
   <tbody>
   {% for step in object.list_steps %}
   <tr>
-    <td>{{ step.get_phase_display }}</td>
+    <td><span class="badge badge-pill badge-success">{{ step.phase }}</span></td>
     <td>{{ step.temperature }}</td>
     <td>{{ step.duration }} {{ step.get_duration_unit_display }}</td>
   </tr>
   {% endfor %}
+  <tr>
+    <th colspan="2" scope="row">{% trans 'Total' %}</th>
+    <td>{{ object.get_total_duration }} {% trans 'Days' %}</td>
+  </tr>
   </tbody>
 </table>
 

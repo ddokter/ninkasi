@@ -30,18 +30,44 @@
 
 {% endblock %}
 
+
+{% block warnings %}
+{% with status=object.get_status %}
+{% if status %}
+{% for mesg in status %}
+<div class="alert alert-{{ mesg.0 }}" role="alert">
+  {{ mesg.1 }}
+</div>
+{% endfor %}
+{% endif %}
+{% endwith %}
+{% endblock %}
+
+
 {% block content %}
 
 
 <dl class="row">
   <dt class="col-sm-3">Volume</dt>
   <dd class="col-sm-9">{{ object.volume }}</dd>
-  <dt class="col-sm-3">Delivery date</dt>
-  <dd class="col-sm-9">{{ object.deliverydate|date:"d-m-Y H:i" }}</dd>
+  <dt class="col-sm-3">{% trans 'Start date' %}</dt>
+  <dd class="col-sm-9">{{ object.start_date|date:"d-m-Y" }}</dd>
+  <dt class="col-sm-3">{% trans 'End date (planned)' %}</dt>
+  <dd class="col-sm-9">{{ object.end_date_planned|date:"d-m-Y" }}</dd>
+  <dt class="col-sm-3">{% trans 'End date' %}</dt>
+  <dd class="col-sm-9">
+    {% if object.end_date_planned != object.end_date_expected %}
+    <p  class="text-warning">{{ object.end_date_expected|date:"d-m-Y" }}
+      <span class="fas fa-triangle-exclamation"></span>
+    </p>    
+    {% else %}
+    {{ object.end_date_expected|date:"d-m-Y" }}
+    {% endif %}
+  </dd>  
 </dl>
 
 
-<h2>Brews</h2>
+<h2>{% icon 'brew' %}Brews</h2>
 
 <table class="table table-striped">
   <thead>
@@ -94,7 +120,33 @@
 </table>
 
 
-<h2>Transfer history</h2>
+<h2>{% trans 'Schema' %}</h2>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>{% trans 'Phase' %}</th>
+      <th>{% trans 'Temperature (in &deg;C)' %}</th>
+      <th>{% trans 'Duration' %}</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for step in object.list_steps %}
+  <tr>
+    <td>{{ step.get_phase_display }}</td>
+    <td>{{ step.temperature }}</td>
+    <td>{{ step.duration }} {{ step.get_duration_unit_display }}</td>
+  </tr>
+  {% endfor %}
+  <tr>
+    <th colspan="2" scope="row">{% trans 'Total' %}</th>
+    <td>{{ object.get_total_duration }} {% trans 'Days' %}</td>
+  </tr>
+  </tbody>
+</table>
+
+
+<h2>{% icon 'transfer' %} Transfer history</h2>
 
 <table class="table table-striped">
   <thead>

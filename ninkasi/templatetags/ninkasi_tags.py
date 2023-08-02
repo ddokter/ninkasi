@@ -18,6 +18,13 @@ def ctname(obj):
     return get_model_name(obj)
 
 
+@register.filter
+def fslabel(formset):
+
+    """ Get the label from the verbose name plural option """
+
+    return formset.model._meta.verbose_name_plural
+
 @register.inclusion_tag('snippets/listing.html', takes_context=True)
 def listing(context, title, items, create_url=None):
 
@@ -205,12 +212,15 @@ def has_model_perm(user_model, perm):
 
 
 @register.simple_tag
-def icon(obj):
+def icon(obj_or_model):
 
+    if hasattr(obj_or_model, "_meta"):
+        model = get_model_name(obj_or_model)
+    else:
+        model = obj_or_model
+    
     try:
-        return render_to_string("snippets/icon/%s.html" %
-                                get_model_name(obj),
-                                {'obj': obj})
+        return render_to_string(f"snippets/icon/{ model }.html", {})
     except:
         return ""
 
@@ -234,7 +244,7 @@ def txt2html(txt):
 
 @register.simple_tag
 def tankcontent(tank, day, month, year):
-    
+
     """ Provide tank availability """
 
     batch = tank.content(datetime(year, month, day,

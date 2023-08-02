@@ -2,7 +2,6 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from .batch import Batch
 from .step import Step
 
 
@@ -25,8 +24,10 @@ class Sample(models.Model):
 
     def list_measurements(self):
 
+        """ List all measurements that are taken from this sample """
+
         return self.measurement_set.all()
-    
+
     def __str__(self):
 
         return f"{self.parent} {self.step}"
@@ -34,3 +35,4 @@ class Sample(models.Model):
     class Meta:
 
         app_label = "ninkasi"
+        ordering = ['date']

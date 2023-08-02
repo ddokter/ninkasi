@@ -80,6 +80,10 @@ urlpatterns = [
          BrewCreateView.as_view(),
          name="create_brew"),
 
+    path('brew/<int:pk>/edit',
+         BrewUpdateView.as_view(),
+         name="edit_brew"),
+
     # Generic delete view
     #
     path('<str:model>/<int:pk>/delete',

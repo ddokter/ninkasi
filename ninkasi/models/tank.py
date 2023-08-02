@@ -11,8 +11,9 @@ TTYPE_VOCAB = [
 
 class Tank(models.Model):
 
-    """Base class for all tanks. For now we use this as the only
-    model, maybe later switching to polymorphism.
+    """Container for brew. May be any type of tank that holds beer in
+    any stage of the process, i.e. CCT, BBT, lagertank.
+
     """
 
     name = models.CharField(_("Name"), null=True, blank=True, max_length=100)

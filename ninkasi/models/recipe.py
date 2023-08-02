@@ -1,3 +1,4 @@
+from math import ceil
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.contrib.contenttypes.fields import GenericRelation
@@ -35,14 +36,25 @@ class Recipe(models.Model):
             "ingredient",
             "unit")
 
-    def list_steps(self):
-        
-        return self.step.all()
-
     def list_batches(self):
 
+        """ Return list of batches related to this recipe """
+
         return self.batch_set.all()
-    
+
+    def list_steps(self):
+
+        """ return both brewing steps and fermentation steps """
+
+        return self.step.all()
+        
+    def get_total_duration(self, unit='day'):
+
+        """ TODO: use days or no """
+
+        return ceil(sum([step.get_duration() for step in self.step.all()]) /
+                    (60 * 24))
+
     class Meta:
         ordering = ["name"]
         app_label = "ninkasi"
@@ -54,7 +66,7 @@ class RecipeIngredient(models.Model):
 
     # TODO: make sure that there is a conversion from given unit to
     # ingredient's default unit
-    
+
     amount = models.FloatField(_("Amount"))
     unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)

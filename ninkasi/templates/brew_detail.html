@@ -18,10 +18,18 @@
 
 
 <dl class="row">
-  <dt class="col-sm-3">Date</dt>
-  <dd class="col-sm-9">{{ object.date }}</dd>  
-  <dt class="col-sm-3">Volume</dt>
+  <dt class="col-sm-3">{% trans 'Date' %}</dt>
+  <dd class="col-sm-9">{{ object.date }}</dd>
+  <dt class="col-sm-3">{% trans 'Volume' %}</dt>
   <dd class="col-sm-9">{{ object.volume }}</dd>
+  <dt class="col-sm-3">{% trans 'Brewhouse' %}</dt>
+  <dd class="col-sm-9">
+    <a href="object.brewhouse|detail_url">{{ object.brewhouse }}</a>
+  </dd>
+  <dt class="col-sm-3">{% trans 'Batch ' %}</dt>
+  <dd class="col-sm-9">
+    <a href="{{ object.batch|detail_url }}">{{ object.batch }}</a>
+  </dd>
 </dl>
 
 
@@ -31,18 +39,42 @@
   <thead>
     <tr>
       <th>Asset</th>
-      <th>Unit</th>      
+      <th>Unit</th>
       <th>Amount</th>
-      <th>Batch Nr.</th>      
+      <th>Batch Nr.</th>
     </tr>
   </thead>
   <tbody>
-  {% for asset in object.list_assets %}  
+  {% for asset in object.list_assets %}
   <tr>
     <td>{{ asset.asset }}</td>
     <td>{{ asset.unit }}</td>
     <td>{{ asset.amount }}</td>
-    <td>{{ asset.batchnr }}</td>    
+    <td>{{ asset.batchnr }}</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+
+<h2>Steps</h2>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Step</th>
+      <th>Start time</th>
+      <th>End time</th>
+      <th>Duration (minutes)</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for step in object.list_steps %}
+  <tr>
+    <td>{{ step.step }}</td>
+    <td>{{ step.start_time }}</td>
+    <td>{{ step.end_time }}</td>
+    <td>{{ step.duration }}</td>
   </tr>
   {% endfor %}
   </tbody>
@@ -60,7 +92,7 @@
     </tr>
   </thead>
   <tbody>
-  {% for tank in object.list_tanks %}  
+  {% for tank in object.list_tanks %}
   <tr>
     <td>{{ tank.tank }}</td>
     <td>{{ tank.date_from|date:"d-m-Y H:i " }}</td>

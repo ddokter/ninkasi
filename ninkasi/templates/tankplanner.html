@@ -9,14 +9,14 @@
 
 <hr>
 
-<h2 style="width: 200px;" class="mx-auto">
+<h2 style="width: 400px;" class="mx-auto">
   <a class="btn btn-outline-secondary btn-sm rounded-circle"
      href=".?go={{ month.prev }}"
      data-toggle="tooltip" data-placement="right"
      title="{% trans 'Previous' %}">
     <span class="fas fa-caret-left" />
   </a>    
-  {{ month.title }}
+  <span>{{ month.title }}</span>
   <a class="btn btn-outline-secondary btn-sm rounded-circle"
      href=".?go={{ month.next }}"
      data-toggle="tooltip" data-placement="right"
@@ -53,6 +53,15 @@
     {% endfor %}    
   </tbody>
 </table>
+
+<dl class="row">
+  {% for batch in view.list_batches %}
+  <dt class="col-sm-1">
+    <div style="width: 20px; height: 20px; background-color: {{ batch.get_color }}"></div>    
+  </dt>
+  <dd class="col-sm-11">{{ batch }}</dd>
+  {% endfor %}
+</dl>
 
 {% endwith %}
 {% endblock %}

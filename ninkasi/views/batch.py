@@ -1,11 +1,13 @@
 from django.utils.translation import gettext_lazy as _
 from django.http import HttpResponseRedirect
 from django.forms import inlineformset_factory
+from django.contrib.contenttypes.forms import generic_inlineformset_factory
 from .base import CreateView, UpdateView
 from ..forms.dtinput import DateTimeInput
 from ..forms.colorpicker import ColorInput
 from ..models.batch import Batch
 from ..models.recipe import Recipe
+from ..models.step import Step
 
 
 class FormSetMixin:
@@ -15,9 +17,11 @@ class FormSetMixin:
         form = super().get_form(form_class=form_class)
 
         form.fields['deliverydate'].widget = DateTimeInput()
-        form.fields['color'].widget = ColorInput()        
-        
+        form.fields['color'].widget = ColorInput()
+
         form.fields.pop('asset')
+        form.fields.pop('step')
+        form.fields.pop('tank')        
 
         return form
 
@@ -29,8 +33,15 @@ class FormSetMixin:
     @property
     def formsets(self):
 
-        factory = inlineformset_factory(
+        factory1 = inlineformset_factory(
             Batch, Batch.asset.through, exclude=[])
+
+        factory2 = inlineformset_factory(
+            Batch, Batch.step.through, exclude=[],
+            widgets={'start_time': DateTimeInput(),
+                     'end_time': DateTimeInput()
+                     }            
+        )
 
         kwargs = {}
 
@@ -39,10 +50,12 @@ class FormSetMixin:
 
         if self.object:
             kwargs['instance'] = self.object
-
-        return [factory(**kwargs)]
+            
+        return [factory1(**kwargs), factory2(**kwargs)]
 
     def form_valid(self, form):
+
+        """ Check the form and all formsets """
 
         self.object = form.save()
 
@@ -57,7 +70,7 @@ class BatchCreateView(FormSetMixin, CreateView):
 
     model = Batch
 
-    
+
     def get_initial(self):
 
         if self.kwargs.get('recipe'):

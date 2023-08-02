@@ -14,13 +14,13 @@ class Brewhouse(models.Model):
 
     def __str__(self):
 
-        return self.name
+        return f"{ self.name } { self.volume }L"
 
     def content(self, date):
 
         """ Is this tank full or empty on this day """
 
-        return Brew.objects.filter(date__date=date).first()
+        return self.brew_set.filter(date__date=date).first()
         
     class Meta:
 
