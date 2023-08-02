@@ -8,6 +8,11 @@ from ..models.brewhouse import Brewhouse
 
 class TankPlannerView(TemplateView):
 
+    """The tankplanner view provides a monthly overview of tanks,
+    brewhouses and their availability
+
+    """
+
     template_name = "tankplanner.html"
 
     def list_tanks(self):
@@ -26,7 +31,7 @@ class TankPlannerView(TemplateView):
 
                 day = datetime(self.month['year'], self.month['month'], day,
                                tzinfo=timezone.get_current_timezone())
-                
+
                 batch = tank.content(day)
 
                 if batch and batch not in batches:
