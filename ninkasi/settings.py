@@ -161,9 +161,9 @@ DEFAULT_PROCESSING_TIME = 30
 #
 BF_PROCESSING_TIME_OFFSET = 30 + 150 + 15 + 30
 
-BF_USER_ID = "fBYRmRgtKPOj4VmJL1mMI3No6Ky1"
+BF_USER_ID = ""
 
-BF_API_KEY = "6soLoBfjjiQMs0KD9k0tVUx0HgP35qLSboImbPgwdrW8o9HW875y8F6XcJ4rZ71O"
+BF_API_KEY = ""
 #
 # END BrewFather settings
 
@@ -175,3 +175,8 @@ BJCP_API_URL = "https://www.api-bjcp.com/graphql"
 
 #
 # END BJCP
+
+try:
+    from .settings_local import *
+except:
+    pass
