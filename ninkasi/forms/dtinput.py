@@ -1,7 +1,7 @@
 from django import forms
 
 
-class DateTimeInput(forms.DateInput):
+class DateTimeInput(forms.DateTimeInput):
 
     """ Use modern html5 datetime widget """
 
@@ -13,6 +13,9 @@ class DateTimeInput(forms.DateInput):
 
         if value:
 
-            return value.strftime("%Y-%m-%dT%H:%M")
+            try:
+                return value.strftime("%Y-%m-%dT%H:%M")
+            except AttributeError:
+                pass
 
         return value

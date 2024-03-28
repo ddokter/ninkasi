@@ -1,35 +1,52 @@
 """ Hold batch model """
 
-from random import choice
 from datetime import timedelta
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ValidationError
 from .tank import Tank
-from .asset import Asset
-from .unit import Unit
-from .step import Step
+from .material import Material, ParentedMaterial
+from .step import BatchStep
 
 
 class Batch(models.Model):
 
-    """ One production for a given recipe. """
+    """A batch is a volume of beer that can be treated as a separate
+    unit. This boils down to a volume that is brewed in one or more
+    brews, fermented and packaged in one or more ways.
+
+    The concept of a batch is mainly there to keep track of used
+    resources, with their own batch numbers, but it also provides a
+    focal point for measurements, like specific gravity, Ph,
+    durations, etc.
+
+    A batch goes through the following phases: brewing, fermentation,
+    maturation, packaging, although the system allows for defining
+    more phases.
+
+    A batch may be split during the process over containers, or even
+    blended. A blend however, effectively means that a batch cannot be
+    tracked on itself anymore. The 'blend' is registered and serves as
+    a new batch.
+
+    TODO: arrange this!
+
+    """
 
     nr = models.CharField(_("Nr"), max_length=100, unique=True)
-    recipe = models.ForeignKey("Recipe", on_delete=models.CASCADE)
-    asset = models.ManyToManyField(Asset, through="BatchAsset")
-    tank = models.ManyToManyField(Tank, through="Transfer")
-    step = models.ManyToManyField(Step, through="BatchStep")
+    beer = models.ForeignKey("Beer", on_delete=models.CASCADE)
+    material = models.ManyToManyField(Material, through="BatchMaterial")
+    tank = models.ManyToManyField(Tank, through="BatchContainer")
+
+    # tank = GenericRelation("Transfer")
+    #step = GenericRelation(BatchStep)
     sample = GenericRelation("Sample")
-    deliverydate = models.DateTimeField(_("Delivery date"),
-                                        null=True, blank=True)
-    color = models.CharField(_("Graph color"), max_length=7,
-                             null=True, blank=True)
 
     @property
-    def volume(self):
+    def volume_projected(self):
 
         """Total batch volume, i.e. sum of brew volumes """
 
@@ -37,7 +54,7 @@ class Batch(models.Model):
 
     def __str__(self):
 
-        return f"{self.recipe.name} - #{self.nr}"
+        return f"{self.beer.name} - #{self.nr}"
 
     def get_status(self):
 
@@ -57,38 +74,30 @@ class Batch(models.Model):
 
         return self.brew_set.all()
 
-    def list_steps(self):
+    def list_phases(self):
 
-        return self.batchstep_set.all()
+        return self.batchphase_set.all()
 
-    def list_assets(self):
+    def list_materials(self):
 
-        """ List all assets, also of sub brews """
-        
-        batch_assets = self.batchasset_set.all()
+        """ List all materials, also of sub brews """
+
+        batch_materials = self.batchmaterial_set.all()
 
         for brew in self.list_brews():
-            batch_assets = batch_assets.union(brew.list_assets())
+            batch_materials = batch_materials.union(brew.list_materials())
 
-        return batch_assets
-            
-    def list_transfers(self):
+        return batch_materials
 
-        return self.transfer_set.all()
+    def list_tanks(self):
+
+        return self.tank.all()
 
     def list_samples(self):
 
         """ samples may be taken from a batch. List them. """
 
         return self.sample_set.all()
-
-    def get_color(self):
-
-        """Return a random color from the given palette"""
-
-        return self.color or choice([
-            '#d9ed92', '#b5e48c', '#99d98c', '#76c893', '#52b69a',
-            '#34a0a4', '#168aad', '#1a759f', '#1e6091', '#184e77'])
 
     @property
     def start_date(self):
@@ -102,7 +111,7 @@ class Batch(models.Model):
         return None
 
     @property
-    def end_date_planned(self):
+    def end_date_projected(self):
 
         """ The end date according to the start date plus the number
         of days specified in the recipe """
@@ -110,12 +119,12 @@ class Batch(models.Model):
         if self.start_date:
 
             return self.start_date + timedelta(
-                days=self.recipe.get_total_duration())
+                days=self.beer.get_processing_time())
 
         return None
 
     @property
-    def end_date_expected(self):
+    def end_date(self):
 
         """ End date calculated from start date and steps """
 
@@ -130,12 +139,8 @@ class Batch(models.Model):
 
         """ TODO: use days or no """
 
-        return (sum([step.get_duration() for step in self.step.all()]) /
+        return (sum(phase.get_duration() for phase in self.list_phases()) /
                 (60 * 24))
-
-    def get_current_step(self):
-
-        """ Return the step the batch is in currently """
 
     class Meta:
 
@@ -144,59 +149,37 @@ class Batch(models.Model):
         verbose_name_plural = _("Batches")
 
 
-class Transfer(models.Model):
+class BatchMaterial(ParentedMaterial):
 
-    """ Represent racking from one tank to the other """
+    """Materials can be related to a batch given an amount of used
+    products. This is useful to, for instance, specify the amount of
+    bottles or kegs used to package the batch."""
+
+    batch = models.ForeignKey(Batch, on_delete=models.CASCADE)
+
+
+class BatchContainer(models.Model):
+
+    """Where is the batch contained? This may be split over more than
+    one container, or even blended over batches. However, a container
+    cannot contain more that it's volume.
+
+    """
 
     batch = models.ForeignKey(Batch, on_delete=models.CASCADE)
     tank = models.ForeignKey(Tank, on_delete=models.CASCADE)
-    #origin = GenericForeignKey("content_type", "object_id")
-    #content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    #object_id = models.PositiveIntegerField()
-    date = models.DateTimeField(_("Date from"))
-    end_date = models.DateTimeField(_("Date to"), blank=True, null=True,
-                                    editable=False)
-    volume = models.SmallIntegerField(_("Volume"), blank=True, null=True)
+    from_date = models.DateTimeField()
+    to_date = models.DateTimeField()
+    volume = models.FloatField()  # validators=(check_tank_volume))
 
-        
-    class Meta:
+    #def check_tank_volume(self, value):
 
-        app_label = "ninkasi"
-        ordering = ["date"]
+    #if value > self.tank.volume:
+    #        raise ValidationError(_("Volume is bigger than tank volume"),
+    #                              code="invalid",
+    #                              params={"value": value}
+    #                            )
 
+    # TODO: make validator for checking on whether the tank is already
+    # filled on these dates.
 
-class BatchStep(models.Model):
-
-    """ Represent racking from one tank to the other """
-
-    batch = models.ForeignKey(Batch, on_delete=models.CASCADE)
-    step = models.ForeignKey(Step, on_delete=models.CASCADE)
-    # step = GenericRelation(Step, on_delete=models.CASCADE)
-    start_time = models.DateTimeField(_("Start time"))
-    end_time = models.DateTimeField(_("End time"))
-
-    class Meta:
-
-        app_label = "ninkasi"
-        ordering = ["start_time"]
-
-
-class BatchAsset(models.Model):
-
-    # TODO: make sure that there is a conversion from given unit to
-    # ingredient's default unit
-
-    amount = models.FloatField(_("Amount"))
-    unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
-    batch = models.ForeignKey(Batch, on_delete=models.CASCADE)
-    asset = models.ForeignKey(Asset, on_delete=models.CASCADE)
-    batchnr = models.CharField(_("Batch Nr"), max_length=100)
-
-    @property
-    def label(self):
-
-        return _("Assets")
-
-    def __str__(self):
-
-        return f"{self.asset} {self.amount}"

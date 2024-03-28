@@ -1,4 +1,5 @@
-from datetime import datetime
+from datetime import datetime, date
+import calendar
 from django.template import Library
 from django.template.loader import render_to_string
 from django.urls import reverse
@@ -7,6 +8,7 @@ from django.utils.safestring import mark_safe
 from django.utils import timezone
 from markdown import markdown
 from ninkasi.utils import get_model_name
+from ninkasi.models.task import ScheduledTask
 
 
 register = Library()
@@ -218,7 +220,7 @@ def icon(obj_or_model):
         model = get_model_name(obj_or_model)
     else:
         model = obj_or_model
-    
+
     try:
         return render_to_string(f"snippets/icon/{ model }.html", {})
     except:
@@ -243,29 +245,19 @@ def txt2html(txt):
 
 
 @register.simple_tag
-def tankcontent(tank, day, month, year):
+def tasks(day, month, year):
 
-    """ Provide tank availability """
+    """ Get tasks for the given day """
 
-    batch = tank.content(datetime(year, month, day,
-                                  tzinfo=timezone.get_current_timezone()))
+    day = date(year, month, day)
 
-    if batch:
-        return batch.get_color()
-
-    return ""
+    return ScheduledTask.objects.filter(date=day)
 
 
-@register.simple_tag
-def brewhousecontent(brewhouse, day, month, year):
+@register.filter
+def month_name(month_number):
 
-    """ Provide tank availability """
+    """ Return the local month name from the given number """
 
-    brew = brewhouse.content(datetime(year, month, day,
-                                      tzinfo=timezone.get_current_timezone()))
-
-    if brew:
-
-        return brew.batch.color
-
-    return ""
+    month_number = int(month_number)
+    return calendar.month_name[month_number]

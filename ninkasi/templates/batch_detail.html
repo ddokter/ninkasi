@@ -3,13 +3,22 @@
 {% load i18n ninkasi_tags %}
 
 {% block extra_actions %}
-{% if user|push:'sample'|has_obj_perm:'add' %}
-<a class="btn btn-outline-success btn-sm"
-   href="{% url 'create_sample' %}{{ object.pk }}"
-   data-toggle="tooltip" data-placement="right" title="{% trans 'Add sample' %}">
-  <span class="fas fa-plus" />
-  <span class="fas fa-vial" />
-</a>
+{% if user|push:'phase'|has_obj_perm:'add' %}
+<span class="dropdown show">
+  <a class="btn btn-sm btn-outline-success dropdown-toggle" href="#"
+     role="button" id="phase-dropdown" data-toggle="dropdown"
+     aria-haspopup="true" aria-expanded="false" title="{% trans 'Add phase' %}">
+    <span class="fas fa-plus" />
+    <span class="fas fa-hourglass" />
+  </a>
+  <div class="dropdown-menu" aria-labelledby="phase-dropdown">
+    {% for phase in view.phase_vocab %}
+    <a class="dropdown-item"
+       href="{% url 'inline_create' 'batch' object.pk 'batchphase' %}?phase={{ phase.id }}&save=1">
+      {{ phase }}</a>
+    {% endfor %}
+  </div>
+</span>
 {% endif %}
 
 {% if user|push:'brew'|has_model_perm:'add' %}
@@ -21,12 +30,11 @@
 </a>
 {% endif %}
 
-<a class="btn btn-outline-success btn-sm"
-   href="{% url 'transfer' %}{{ object.pk }}"
+<!--a class="btn btn-outline-success btn-sm"
+   href="{% url 'transfer' view.ct_id object.id %}"
    data-toggle="tooltip" data-placement="right" title="{% trans 'Transfer' %}">
   <span class="fas fa-left-right" />
-</a>
-
+</a-->
 
 {% endblock %}
 
@@ -50,43 +58,48 @@
 <dl class="row">
   <dt class="col-sm-3">Volume</dt>
   <dd class="col-sm-9">{{ object.volume }}</dd>
+  <dt class="col-sm-3">Beer</dt>
+  <dd class="col-sm-9">
+    <a href="{{ object.beer|detail_url }}">{{ object.beer }}</a>
+  </dd>  
+  <dt class="col-sm-3">Processing time</dt>
+  <dd class="col-sm-9">
+    {{ object.beer.get_processing_time|floatformat:1 }} days
+  </dd>
   <dt class="col-sm-3">{% trans 'Start date' %}</dt>
   <dd class="col-sm-9">{{ object.start_date|date:"d-m-Y" }}</dd>
-  <dt class="col-sm-3">{% trans 'End date (planned)' %}</dt>
-  <dd class="col-sm-9">{{ object.end_date_planned|date:"d-m-Y" }}</dd>
-  <dt class="col-sm-3">{% trans 'End date' %}</dt>
-  <dd class="col-sm-9">
-    {% if object.end_date_planned != object.end_date_expected %}
-    <p  class="text-warning">{{ object.end_date_expected|date:"d-m-Y" }}
-      <span class="fas fa-triangle-exclamation"></span>
-    </p>    
+  <dt class="col-sm-3">{% trans 'End date (Recipe)' %}</dt>
+  <dd class="col-sm-9">{{ object.end_date_projected|date:"d-m-Y" }}</dd>
+  <dt class="col-sm-3">{% trans 'End date (Batch steps)' %}</dt>
+  <dd class="col-sm-9">{{ object.end_date|date:"d-m-Y" }}
+    {% if object.end_date_planned != object.end_date %}
+    <i class="text-warning" data-toggle="tooltip" data-placement="top"
+       title="{% trans 'Batch end date does not follow recipe' %}">
+      <span class="fas fa-triangle-exclamation">
+      </span>
+    </i>
     {% else %}
     {{ object.end_date_expected|date:"d-m-Y" }}
     {% endif %}
-  </dd>  
+  </dd>
 </dl>
 
 
-<h2>{% icon 'brew' %}Brews</h2>
+<h2>{% icon 'brew' %} Brews</h2>
 
 <table class="table table-striped">
   <thead>
     <tr>
-      <th />
+      <th>Brew</th>
       <th>Date</th>
-      <th>Volume</th>      
+      <th>Volume</th>
     </tr>
   </thead>
   <tbody>
-  {% for brew in object.list_brews %}  
+  {% for brew in object.list_brews %}
   <tr>
     <td>
-      <a class="btn btn-outline-secondary btn-sm rounded-circle"
-	 href="{{ brew|detail_url }}"
-	 data-toggle="tooltip"
-	 title="{% trans 'View' %}">
-	<span class="fas fa-eye" />
-      </a>
+      <a href="{{ brew|detail_url }}">{{ brew }}</a>
     </td>
     <td>{{ brew.date|date:"d-m-Y H:i " }}</td>
     <td>{{ brew.volume }}</td>
@@ -96,29 +109,72 @@
 </table>
 
 
-<h2>Assets</h2>
+<!--h2>{% icon 'material' %} Materials</h2>
 
 <table class="table table-striped">
   <thead>
     <tr>
-      <th>Asset</th>
-      <th>Unit</th>      
-      <th>Amount</th>
-      <th>Batch Nr.</th>      
+      <th>{% trans 'Material' %}</th>
+      <th>{% trans 'Unit' %}</th>
+      <th>{% trans 'Amount' %}</th>
+      <th>{% trans 'Brand' %}</th>
+      <th>{% trans 'Batch Nr.' %}</th>
     </tr>
   </thead>
   <tbody>
-  {% for asset in object.list_assets %}  
+  {% for material in object.list_materials %}
   <tr>
-    <td>{{ asset.asset }}</td>
-    <td>{{ asset.unit }}</td>
-    <td>{{ asset.amount }}</td>
-    <td>{{ asset.batchnr }}</td>    
+    <td><a href="{{ material.material|detail_url }}">{{ material.material }}</a></td>
+    <td>{{ material.unit }}</td>
+    <td>{{ material.amount }}</td>
+    <td>{{ material.brand }}</td>
+    <td>{{ material.batchnr }}</td>
   </tr>
   {% endfor %}
   </tbody>
-</table>
+</table-->
 
+  {% with dates=view.get_calendar %}
+  <table class="table table-bordered table-sm">
+    <thead>
+      <tr>
+	<th scope="col" />
+	{% for year in dates.years %}
+	<th scope="col" colspan="{{ year.1 }}">{{ year.0 }}</th> 
+	{% endfor %}
+    </tr>          
+    <tr>
+      <th scope="col" />
+      {% for month in dates.months %}
+      <th scope="col" colspan="{{ month.1 }}">{{ month.0|month_name }}</th> 
+      {% endfor %}
+    </tr>     
+    <tr>
+      <th scope="col" />
+      {% for day in dates.days %}
+      <th scope="col">{{ day.day }}</th> 
+      {% endfor %}
+    </tr>
+    </thead>
+    <tbody>
+      {% with data=view.get_tank_data %}
+      {% for tank, row in data.items %}
+      <tr>
+	<th scope="row">{{ tank }}</th>
+	{% for day in row %}
+	{% if day %}
+	<td style="background-color: {{ view.get_color }}"></td>
+	{% else %}
+	<td></td>
+	{% endif %}
+	{% endfor %}
+      </tr>
+      {% endfor %}
+      {% endwith %}
+    </tbody>
+  </table>
+  {% endwith %}
+  
 
 <h2>{% trans 'Schema' %}</h2>
 
@@ -126,16 +182,14 @@
   <thead>
     <tr>
       <th>{% trans 'Phase' %}</th>
-      <th>{% trans 'Temperature (in &deg;C)' %}</th>
-      <th>{% trans 'Duration' %}</th>
+      <th>{% trans 'Duration (in minutes)' %}</th>
     </tr>
   </thead>
   <tbody>
-  {% for step in object.list_steps %}
+  {% for phase in object.list_phases %}
   <tr>
-    <td>{{ step.get_phase_display }}</td>
-    <td>{{ step.temperature }}</td>
-    <td>{{ step.duration }} {{ step.get_duration_unit_display }}</td>
+    <td>{{ phase }}</td>
+    <td>{{ phase.get_duration }}</td>
   </tr>
   {% endfor %}
   <tr>
@@ -145,36 +199,6 @@
   </tbody>
 </table>
 
-
-<h2>{% icon 'transfer' %} Transfer history</h2>
-
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th />
-      <th>Tank</th>
-      <th>Date</th>
-      <th>To</th>      
-    </tr>
-  </thead>
-  <tbody>
-  {% for transfer in object.list_transfers %}  
-  <tr>
-    <td>
-      <a class="btn btn-outline-secondary btn-sm rounded-circle"
-	 href="{% url 'edit' 'transfer' transfer.id %}"
-	 data-toggle="tooltip" data-placement="right" title="{% trans 'Edit' %}">
-	<span class="fas fa-pen" />
-      </a>
-    </td>
-    <td>{{ transfer.tank }}</td>
-    <td>{{ transfer.date|date:"d-m-Y H:i " }}</td>
-    <td>
-      {{ transfer.end_date|date:"d-m-Y H:i " }}
-    </td>    
-  </tr>
-  {% endfor %}
-  </tbody>
-</table>
+<!-- {% sublisting 'Transfer history' object.list_transfers 'transfer' %} -->
 
 {% endblock content %}

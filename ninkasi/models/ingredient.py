@@ -2,19 +2,20 @@ from django.db import models
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from django.apps import apps
-#from polymorphic.models import PolymorphicModel
 from .category import Category
-from .asset import Asset
+from .material import Material
 
 
-class Ingredient(Asset):
+class Ingredient(Material):
 
-    """ Specific asset for beer, i.e. an ingredient that goes into
+    """ Specific material for beer, i.e. an ingredient that goes into
     the brew. """
-    
+
     def list_recipes(self):
 
-        ri_model = apps.get_model("caboose", "RecipeIngredient")
+        """ Return list of all recipes using this ingredient """
+
+        ri_model = apps.get_model("ninkasi", "RecipeIngredient")
         recipe_model = apps.get_model("caboose", "Recipe")
 
         recipe_ids = ri_model.objects.filter(

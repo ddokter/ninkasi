@@ -1,13 +1,19 @@
+import datetime
 from django.utils.translation import gettext_lazy as _
 from django.http import HttpResponseRedirect
-from django.forms import inlineformset_factory
+from django.forms import inlineformset_factory, Form, Select
 from django.contrib.contenttypes.forms import generic_inlineformset_factory
-from .base import CreateView, UpdateView
+from django.views.generic.detail import SingleObjectMixin
+from django.views.generic import FormView
+from django.urls import reverse_lazy
+from .base import CreateView, UpdateView, CTypeMixin, DetailView
 from ..forms.dtinput import DateTimeInput
 from ..forms.colorpicker import ColorInput
 from ..models.batch import Batch
-from ..models.recipe import Recipe
-from ..models.step import Step
+from ..models.transfer import Transfer
+from ..models.step import BatchStep
+from ..models.beer import Beer
+from ..models.phase import Phase
 
 
 class FormSetMixin:
@@ -16,32 +22,28 @@ class FormSetMixin:
 
         form = super().get_form(form_class=form_class)
 
-        form.fields['deliverydate'].widget = DateTimeInput()
-        form.fields['color'].widget = ColorInput()
+        # form.fields['color'].widget = ColorInput()
 
-        form.fields.pop('asset')
-        form.fields.pop('step')
-        form.fields.pop('tank')        
+        for field in ['tank', 'material']:
+            form.fields.pop(field)
 
         return form
-
-    @property
-    def formset_label(self):
-
-        return _("Assets")
 
     @property
     def formsets(self):
 
         factory1 = inlineformset_factory(
-            Batch, Batch.asset.through, exclude=[])
+            Batch, Batch.material.through, exclude=[])
 
         factory2 = inlineformset_factory(
-            Batch, Batch.step.through, exclude=[],
-            widgets={'start_time': DateTimeInput(),
-                     'end_time': DateTimeInput()
-                     }            
-        )
+            Batch, Batch.tank.through, exclude=[])
+
+        #factory2 = generic_inlineformset_factory(
+        #    BatchStep, exclude=[],
+            #widgets={'start_time': DateTimeInput(),
+            #         'end_time': DateTimeInput()
+            #         }
+        #)
 
         kwargs = {}
 
@@ -50,7 +52,7 @@ class FormSetMixin:
 
         if self.object:
             kwargs['instance'] = self.object
-            
+
         return [factory1(**kwargs), factory2(**kwargs)]
 
     def form_valid(self, form):
@@ -70,15 +72,103 @@ class BatchCreateView(FormSetMixin, CreateView):
 
     model = Batch
 
-
     def get_initial(self):
 
-        if self.kwargs.get('recipe'):
-            return {'recipe': Recipe.objects.get(pk=self.kwargs['recipe'])}
-        else:
-            return {}
+        """ Batches may be created with an initial beer """
+
+        if self.kwargs.get('beer'):
+            return {'beer': Beer.objects.get(pk=self.kwargs['beer'])}
+
+        return {}
 
 
 class BatchUpdateView(FormSetMixin, UpdateView):
 
     model = Batch
+
+
+class BatchDetailView(DetailView):
+
+    model = Batch
+
+    """ Provide the date range for this batch, so we can display
+    a calendar for the containers """
+
+    def get_calendar(self):
+
+        """ Create date range from start to projected end,
+        also provide a header for years and months.
+
+        """
+
+        _from = self.object.start_date
+        _to = self.object.end_date_projected
+
+        dates = []
+        months = {}
+        years = {}
+
+        if not (_from and _to):
+            return dates
+
+        while _from <= _to:
+            dates.append(_from)
+
+            if _from.month not in months:
+                months[_from.month] = 1
+            else:
+                months[_from.month] += 1
+
+            if _from.year not in years:
+                years[_from.year] = 1
+            else:
+                years[_from.year] += 1
+
+            _from += datetime.timedelta(days=1)
+
+        return {"years": years.items(), "months": months.items(), "days":dates}
+
+    def list_phases(self):
+
+        return self.object.list_phases()
+
+    def phase_vocab(self):
+
+        """ List phases defned for this system """
+
+        return Phase.objects.all()
+    
+    def list_tanks(self):
+
+        return self.object.list_tanks()
+
+    def list_brewhouses(self):
+
+        return []
+
+    def get_color(self):
+
+        return "#ff0000"
+
+    def get_tank_data(self):
+
+        """ Fill tank/content data """
+
+        tanks = {}
+
+        for tank in list(self.list_tanks()) + list(self.list_brewhouses()):
+
+            tanks[tank] = []
+
+            for day in self.get_calendar()["days"]:
+
+                batch = tank.content(day)
+
+                # TODO: find batch for brew in case the content is a brew
+                #
+                if batch == self.object:
+                    tanks[tank].append(1)
+                else:
+                    tanks[tank].append(0)
+
+        return tanks

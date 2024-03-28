@@ -2,7 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from .step import Step
+# from .step import Step
 
 
 class Sample(models.Model):
@@ -18,7 +18,7 @@ class Sample(models.Model):
     object_id = models.PositiveIntegerField()
 
     date = models.DateTimeField(_("Time"))
-    step = models.ForeignKey(Step, on_delete=models.CASCADE)
+    # step = models.ForeignKey(Step, on_delete=models.CASCADE)
     notes = models.CharField(_("Notes"), max_length=200, null=True,
                              blank=True)
 

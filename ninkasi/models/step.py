@@ -1,8 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from django.contrib.contenttypes.fields import GenericForeignKey
-from django.contrib.contenttypes.models import ContentType
 from .phase import Phase
+from .fields import DurationField
 
 
 DURATION_VOCAB = [
@@ -14,31 +13,80 @@ DURATION_VOCAB = [
 DURATION_TO_MINUTES = [1, 60, 60 * 24]
 
 
-class Step(models.Model):
+class BaseStep(models.Model):
 
-    """ Step in the scheme for a recipe, batch or brew.
+    """Step in the schema for a recipe, batch or brew. Steps for a
+    batch are inherited from the recipe, but more steps may be
+    added. The latter may be the case where a beer is normally
+    packaged in kegs for a given recipe, but this time will be
+    conditioned in a wood barrel.
+
+    Steps are ordered within their parent.
     """
 
-    parent = GenericForeignKey("content_type", "object_id")
-    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
-    object_id = models.PositiveIntegerField()
+    temperature = models.FloatField(_("Temperature"), blank=True, null=True)
+    duration = DurationField(_("Duration"), max_length=10)
+    order = models.SmallIntegerField(null=True, blank=True)
 
-    phase = models.ForeignKey(Phase, on_delete=models.CASCADE)
-    temperature = models.FloatField(_("Temperature"))
-    duration = models.FloatField(_("Duration"))
-    duration_unit = models.SmallIntegerField(_("Duration unit"),
-                                             choices=DURATION_VOCAB)
+    class Meta:
 
+        abstract = True
+
+    @property
+    def total_duration(self):
+
+        """Get the total duration of this step. This may be more than
+        the duration property, for example when a mash step has a ramp
+        up time in addition to a duration
+
+        """
+
+
+class RecipeStep(BaseStep):
+
+    """ Step in the scheme for a recipe.
+    """
+
+    phase = models.ForeignKey("RecipePhase", on_delete=models.CASCADE)    
+    recipe_step = models.ForeignKey("RecipeStep", null=True, blank=True,
+                                    on_delete=models.SET_NULL)
+    
     def __str__(self):
 
         return f"{self.phase} - {self.temperature}°C"
 
+    class Meta:
+
+        ordering = ["order"]
+
+
+class BatchStep(BaseStep):
+
+    """The batch step is inherited from the recipe, but may be changed
+    within the batch. Also, more steps may be added to a batch, for
+    instance steps involved with packaging.  The step within a batch
+    is more focused on measuring than planning, so when the batch is
+    produced, steps should be filled in with respect to actual start
+    and end times.
+
+    """
+
+    phase = models.ForeignKey("BatchPhase", on_delete=models.CASCADE)
+    start_time = models.DateTimeField(_("Start time"), null=True, blank=True)
+    end_time = models.DateTimeField(_("End time"), null=True, blank=True)
+    batch_step = models.ForeignKey("BatchStep", null=True, blank=True,
+                                   on_delete=models.SET_NULL)
+
     def get_duration(self):
 
-        """ Get the duration in minutes """
+        """ Duration in minutes. This is the calculated duration, or if no
+        times are filled in, the base duration"""
 
-        return self.duration * DURATION_TO_MINUTES[self.duration_unit]
+        try:
+            return (self.end_time - self.start_time).seconds / 60
+        except TypeError:
+            return super().get_duration()
 
     class Meta:
 
-        app_label = "ninkasi"
+        ordering = ["start_time"]

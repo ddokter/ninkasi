@@ -4,12 +4,12 @@ from .views.auth import LoginView, LogoutView
 from .views.base import (DeleteView, ListingView, DetailView, CreateView,
                          UpdateView, InlineCreateView, InlineUpdateView,
                          InlineDeleteView)
-from ninkasi.views.batch import BatchCreateView, BatchUpdateView
-from ninkasi.views.recipe import RecipeCreateView, RecipeUpdateView
-from ninkasi.views.sample import SampleCreateView, SampleUpdateView
-from ninkasi.views.brew import BrewCreateView, BrewUpdateView
+from .views.batch import (BatchCreateView, BatchUpdateView, BatchDetailView)
+from .views.recipe import RecipeCreateView, RecipeUpdateView, RecipeView
+from .views.sample import SampleCreateView, SampleUpdateView
+from .views.brew import BrewCreateView, BrewUpdateView
 from .views.home import Home
-from .views.tankplanner import TankPlannerView
+from .views.planner import PlannerView
 from .views.transfer import TransferView
 
 
@@ -24,11 +24,11 @@ urlpatterns = [
          LogoutView.as_view(),
          name="logout"),
 
-    path('tankplanner/',
-         TankPlannerView.as_view(),
-         name="tankplanner"),
+    path('planner/',
+         PlannerView.as_view(),
+         name="planner"),
 
-    path('transfer/<int:batch>',
+    path('transfer/<int:ct>/<int:cid>/',
          TransferView.as_view(),
          name="transfer"),
 
@@ -44,7 +44,7 @@ urlpatterns = [
          BatchCreateView.as_view(),
          name="create_batch"),
 
-    path('batch/add/<int:recipe>',
+    path('batch/add/<int:beer>/',
          BatchCreateView.as_view(),
          name="create_batch"),
     
@@ -52,9 +52,19 @@ urlpatterns = [
          BatchUpdateView.as_view(),
          name="edit_batch"),
 
+    # Generic detail view
+    #
+    path('batch/<int:pk>',
+         BatchDetailView.as_view(),
+         name="view"),
+    
     path('recipe/add/',
          RecipeCreateView.as_view(),
          name="create_recipe"),
+
+    path('recipe/<int:pk>',
+         RecipeView.as_view(),
+         name="view"),
 
     path('recipe/<int:pk>/edit',
          RecipeUpdateView.as_view(),

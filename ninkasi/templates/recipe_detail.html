@@ -3,15 +3,25 @@
 {% load i18n ninkasi_tags %}
 
 {% block extra_actions %}
-{% if user|push:object|has_obj_perm:'manage' %}
-<a class="btn btn-outline-success btn-sm"
-   href="{% url 'create_batch' %}{{ object.pk }}"
-   data-toggle="tooltip" data-placement="right" title="{% trans 'Add batch' %}">
-  <span class="fas fa-plus" />
-  <span class="fas fa-hashtag" />
-</a>
+{% if user|push:'phase'|has_obj_perm:'add' %}
+<span class="dropdown show">
+  <a class="btn btn-sm btn-outline-success dropdown-toggle" href="#"
+     role="button" id="phase-dropdown" data-toggle="dropdown"
+     aria-haspopup="true" aria-expanded="false" title="{% trans 'Add phase' %}">
+    <span class="fas fa-plus" />
+    <span class="fas fa-hourglass" />
+  </a>
+  <div class="dropdown-menu" aria-labelledby="phase-dropdown">
+    {% for phase in view.phase_vocab %}
+    <a class="dropdown-item"
+       href="{% url 'inline_create' 'recipe' object.pk 'recipephase' %}?phase={{ phase.id }}&save=1">
+      {{ phase }}</a>
+    {% endfor %}
+  </div>
+</span>
 {% endif %}
 {% endblock %}
+
 
 {% block content %}
 
@@ -24,18 +34,19 @@
   <dd class="col-sm-9">{{ object.volume }}</dd>
 </dl>
 
-<h2>{% trans 'Ingredients' %}</h2>
+<h2>{% trans 'Fermentables' %}</h2>
 
 <table class="table table-striped">
   <thead>
     <tr>
       <th></th>
       <th>{% trans 'Amount' %}</th>
-      <th>{% trans 'Unit' %}</th>
+      <th>{% trans 'Name' %}</th>
+      <th>{% trans 'Percentage' %}</th>
     </tr>
   </thead>
   <tbody>
-  {% for ingredient in object.list_ingredients %}
+  {% for ingredient in object.list_fermentables %}
   <tr>
     <td>{{ ingredient.ingredient }}
       {% for cat in ingredient.ingredient.categories %}
@@ -43,7 +54,9 @@
       {% endfor %}
     </td>
     <td>{{ ingredient.amount }}</td>
-    <td>{{ ingredient.unit }} </tr>
+    <td>{{ ingredient.name }} </td>
+    <td>{{ ingredient.percentage }}</td>
+    </tr>
   {% endfor %}
   </tbody>
 </table>
@@ -55,25 +68,21 @@
   <thead>
     <tr>
       <th>{% trans 'Phase' %}</th>
-      <th>{% trans 'Temperature (in &deg;C)' %}</th>
       <th>{% trans 'Duration' %}</th>
     </tr>
   </thead>
   <tbody>
-  {% for step in object.list_steps %}
+  {% for phase in object.list_phases %}
   <tr>
-    <td><span class="badge badge-pill badge-success">{{ step.phase }}</span></td>
-    <td>{{ step.temperature }}</td>
-    <td>{{ step.duration }} {{ step.get_duration_unit_display }}</td>
+    <td><span class="badge badge-pill badge-success">{{ phase }}</span></td>
+    <td>{{ phase.duration }}</td>
   </tr>
   {% endfor %}
   <tr>
-    <th colspan="2" scope="row">{% trans 'Total' %}</th>
+    <th colspan="1" scope="row">{% trans 'Total' %}</th>
     <td>{{ object.get_total_duration }} {% trans 'Days' %}</td>
   </tr>
   </tbody>
 </table>
-
-{% sublisting 'Batches' object.list_batches 'batch' %}
 
 {% endblock content %}

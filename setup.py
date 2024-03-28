@@ -9,6 +9,7 @@ CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 requires = [
     'Django',
     'django-bootstrap4',
+    'requests'
     ]
 
 setup(name='ninkasi',

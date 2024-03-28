@@ -3,8 +3,8 @@ from django.http import HttpResponseRedirect
 from django.forms import inlineformset_factory, HiddenInput
 from django.urls import reverse
 from .base import CreateView, UpdateView
-from ..models.batch import Transfer, Batch
-from ..forms.dtinput import DateTimeInput
+from ..models.batch import Batch
+from ..models.transfer import Transfer
 
 
 #class TransferView(FormSetMixin, UpdateView):
@@ -16,20 +16,21 @@ class TransferView(CreateView):
 
         form = super().get_form(form_class=form_class)
 
-        form.fields['date'].widget = DateTimeInput()
-        form.fields['batch'].widget = HiddenInput()
+        form.fields['content_type'].widget = HiddenInput()
+        form.fields['object_id'].widget = HiddenInput()
 
         return form
 
     def get_initial(self):
 
-        """If batch is in the initial arguments of the url, set it on
+        """If parent is in the initial arguments of the url, set it on
         the form
 
         """
 
-        if self.kwargs.get('batch'):
-            return {'batch': Batch.objects.get(pk=self.kwargs['batch'])}
+        if self.kwargs.get('ct'):
+            return {'content_type': self.kwargs['ct'],
+                    'object_id': self.kwargs['cid']}
 
         return {}
 

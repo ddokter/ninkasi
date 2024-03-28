@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_extensions',
     'bootstrap4',
-    'ninkasi'
+    'ninkasi',
+    'ninkasi.brewfather'
 ]
 
 
@@ -139,3 +140,38 @@ BOOTSTRAP4 = {
     }
 }
 
+
+# BEGIN Ninkasi variables
+#
+# RECIPE_MODEL = "brewfather.Recipe"
+RECIPE_MODEL = "ninkasi.Recipe"
+
+# When no recipe is set, use the default
+#
+DEFAULT_PROCESSING_TIME = 30
+
+#
+# END Ninkasi variables
+
+
+# BEGIN BrewFather settings
+#
+
+# Bf doesn't account for startup, filter, whilrpool and transfer
+#
+BF_PROCESSING_TIME_OFFSET = 30 + 150 + 15 + 30
+
+BF_USER_ID = "fBYRmRgtKPOj4VmJL1mMI3No6Ky1"
+
+BF_API_KEY = "6soLoBfjjiQMs0KD9k0tVUx0HgP35qLSboImbPgwdrW8o9HW875y8F6XcJ4rZ71O"
+#
+# END BrewFather settings
+
+
+# BEGIN BJCP
+#
+
+BJCP_API_URL = "https://www.api-bjcp.com/graphql"
+
+#
+# END BJCP

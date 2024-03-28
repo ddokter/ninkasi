@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from .container import Container
 
 
 TTYPE_VOCAB = [
@@ -9,15 +10,13 @@ TTYPE_VOCAB = [
 ]
 
 
-class Tank(models.Model):
+class Tank(Container):
 
     """Container for brew. May be any type of tank that holds beer in
     any stage of the process, i.e. CCT, BBT, lagertank.
 
     """
 
-    name = models.CharField(_("Name"), null=True, blank=True, max_length=100)
-    volume = models.SmallIntegerField(_("Volume"))
     ttype = models.SmallIntegerField(_("Type"),
                                      default=0,
                                      choices=TTYPE_VOCAB,
@@ -31,14 +30,14 @@ class Tank(models.Model):
     def content(self, date):
 
         """Return the batch that is in the tank on the given date, if
-        at all
+        at all.
 
         """
 
-        if self.transfer_set.filter(
-                date__date__lte=date, end_date__date__gte=date).exists():
-            return self.transfer_set.filter(
-                date__date__lte=date, end_date__date__gte=date).first().batch
+        if self.batchcontainer_set.filter(
+                from_date__date__lte=date, to_date__date__gte=date).exists():
+            return self.batchcontainer_set.filter(
+                from_date__date__lte=date, to_date__date__gte=date).first().batch
 
         return None
 

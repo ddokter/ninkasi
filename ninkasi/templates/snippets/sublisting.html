@@ -1,7 +1,7 @@
 {% load i18n ninkasi_tags %}
 
 <section class="listing">
-  <h2>
+  <h2>{% icon submodel %}
     {% trans title %}
     {% if submodel %}
     {% if user|push:submodel|has_model_perm:'add' %}

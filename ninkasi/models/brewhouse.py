@@ -1,15 +1,21 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from .brew import Brew
+from .container import Container
 
 
-class Brewhouse(models.Model):
+WARMUP_HELP = _("Time in minutes needed for 1 degree C warmup")
 
-    """ Represent brewing installation
+
+class Brewhouse(Container):
+
+    """Represent brewing installation. This defines a few parameters
+    for the installation as well, that may be effecting quality.
+
     """
 
-    name = models.CharField(_("Name"), null=True, blank=True, max_length=100)
-    volume = models.SmallIntegerField(_("Volume"))
+    warmup = models.SmallIntegerField(_("Warmup time per degree C"),
+                                      help_text=WARMUP_HELP,
+                                      blank=True, null=True)
 
 
     def __str__(self):
@@ -18,10 +24,10 @@ class Brewhouse(models.Model):
 
     def content(self, date):
 
-        """ Is this tank full or empty on this day """
+        """ Is the installation available on this day? """
 
         return self.brew_set.filter(date__date=date).first()
-        
+
     class Meta:
 
         app_label = "ninkasi"

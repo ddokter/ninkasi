@@ -3,12 +3,30 @@
 {% load i18n ninkasi_tags %}
 
 {% block extra_actions %}
+
+{% if user|push:'phase'|has_obj_perm:'add' %}
+<a class="btn btn-outline-success btn-sm"
+   href="{% url 'create_phase' %}{{ object.pk }}"
+   data-toggle="tooltip" data-placement="right" title="{% trans 'Add phase' %}">
+  <span class="fas fa-plus" />
+  <span class="fas fa-hourglass" />
+</a>
+{% endif %}
+
 {% if user|push:'sample'|has_obj_perm:'add' %}
 <a class="btn btn-outline-success btn-sm"
    href="{% url 'create_sample' %}{{ object.pk }}"
    data-toggle="tooltip" data-placement="right" title="{% trans 'Add sample' %}">
   <span class="fas fa-plus" />
   <span class="fas fa-vial" />
+</a>
+{% endif %}
+
+{% if not object.has_transfer %}
+<a class="btn btn-outline-success btn-sm"
+   href="{% url 'transfer' view.ct_id object.id %}"
+   data-toggle="tooltip" data-placement="right" title="{% trans 'Transfer' %}">
+  <span class="fas fa-left-right" />
 </a>
 {% endif %}
 
@@ -33,24 +51,24 @@
 </dl>
 
 
-<h2>Assets</h2>
+<h2>Materials</h2>
 
 <table class="table table-striped">
   <thead>
     <tr>
-      <th>Asset</th>
+      <th>Material</th>
       <th>Unit</th>
       <th>Amount</th>
       <th>Batch Nr.</th>
     </tr>
   </thead>
   <tbody>
-  {% for asset in object.list_assets %}
+  {% for material in object.list_materials %}
   <tr>
-    <td>{{ asset.asset }}</td>
-    <td>{{ asset.unit }}</td>
-    <td>{{ asset.amount }}</td>
-    <td>{{ asset.batchnr }}</td>
+    <td>{{ material.material }}</td>
+    <td>{{ material.unit }}</td>
+    <td>{{ material.amount }}</td>
+    <td>{{ material.batchnr }}</td>
   </tr>
   {% endfor %}
   </tbody>

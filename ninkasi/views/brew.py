@@ -5,8 +5,8 @@ from django.contrib.contenttypes.forms import generic_inlineformset_factory
 from .base import CreateView, UpdateView
 from ..models.brew import Brew
 from ..models.batch import Batch
-from ..models.step import Step
-from ..forms.dtinput import DateTimeInput
+from ..models.step import BatchStep
+from ..models.transfer import Transfer
 
 
 class FormSetMixin:
@@ -17,32 +17,27 @@ class FormSetMixin:
 
         form.fields['batch'].widget = HiddenInput()
 
-        form.fields.pop('asset')
-        form.fields.pop('step')
-        form.fields.pop('tank')
-
-        form.fields['date'].widget = DateTimeInput()
+        form.fields.pop('material')
+        # form.fields.pop('tank')
 
         return form
 
     @property
     def formsets(self):
 
+        """ Return all formsets for the brew. That amounts to a whopping 3 """
+
         factory1 = inlineformset_factory(
-            Brew, Brew.asset.through, exclude=[],
+            Brew, Brew.material.through, exclude=[],
         )
 
-        factory2 = inlineformset_factory(
-            Brew, Brew.step.through, exclude=[],
-            widgets={'start_time': DateTimeInput(),
-                     'end_time': DateTimeInput()
-                     },
+        factory2 = generic_inlineformset_factory(
+            BatchStep, exclude=[],
             can_order=True
         )
 
-        factory3 = inlineformset_factory(
-            Brew, Brew.tank.through, exclude=[],
-            widgets={'date': DateTimeInput()},
+        factory3 = generic_inlineformset_factory(
+            Transfer, exclude=[],
             extra=1,
         )
 
@@ -56,7 +51,7 @@ class FormSetMixin:
 
         formset_3 = factory3(**kwargs)
         setattr(formset_3, "expanded", True)
-            
+
         return [factory1(**kwargs), factory2(**kwargs), formset_3]
 
     def form_valid(self, form):

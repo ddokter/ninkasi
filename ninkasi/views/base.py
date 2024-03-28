@@ -7,7 +7,9 @@ from django import forms
 from django.urls import reverse, reverse_lazy
 from django.urls.exceptions import NoReverseMatch
 from django.utils.translation import gettext_lazy as _
+from django.contrib.contenttypes.models import ContentType
 from django.apps import apps
+from django.conf import settings
 from ..utils import get_model_name
 from ..forms.dtinput import DateTimeInput
 
@@ -39,6 +41,13 @@ class CTypeMixin(object):
         """
 
         return self.get_model().__name__.lower()
+
+    @property
+    def ct_id(self):
+
+        app = self.get_model()._meta.app_label
+
+        return ContentType.objects.get(app_label=app, model=self.ctype).id
 
     @property
     def ct_label(self):
@@ -78,7 +87,16 @@ class GenericMixin:
     def model(self):
 
         if self.kwargs.get('model', None):
-            return apps.get_model("ninkasi", self.kwargs['model'])
+            mdl = apps.get_model("ninkasi", self.kwargs['model'])
+
+            if mdl._meta.swappable:
+
+                module, model = getattr(settings, mdl._meta.swappable).split(".")
+
+                return apps.get_model(module, model)
+
+            return mdl
+            
         else:
             return self._model
 
@@ -147,8 +165,8 @@ class InlineActionMixin:
 
         # Hide parent
         #
-        form.fields[self.fk_field].widget = forms.HiddenInput()
-                
+        # form.fields[self.fk_field].widget = forms.HiddenInput()
+
         return form
 
 
@@ -184,6 +202,17 @@ class CreateView(GenericMixin, BaseCreateView, CTypeMixin):
     def get_template_names(self):
 
         return ["%s_create.html" % self.ctype, "base_create.html"]
+
+    @property
+    def success_url(self):
+
+        if self.object:
+            return reverse("view", kwargs={
+                'pk': self.object.id,
+                'model': self.ctype
+            })
+
+        return super().success_url
 
     @property
     def action_url(self):
@@ -232,6 +261,14 @@ class UpdateView(GenericMixin, BaseUpdateView, CTypeMixin):
 
         return action_url
 
+    @property
+    def success_url(self):
+
+        return reverse("view", kwargs={
+            'pk': self.object.id,
+            'model': self.ctype
+        })
+
 
 class DetailView(GenericMixin, BaseDetailView, CTypeMixin):
 
@@ -270,7 +307,7 @@ class DetailView(GenericMixin, BaseDetailView, CTypeMixin):
             try:
                 _props.append((field.verbose_name,
                                getattr(self.object,
-                                       'get_%s_display' % field.name)()))
+                                       f"get_{ field.name }_display" )()))
             except AttributeError:
 
                 _props.append((field.verbose_name,
@@ -279,33 +316,21 @@ class DetailView(GenericMixin, BaseDetailView, CTypeMixin):
         return _props
 
 
-class DeleteView(BaseDeleteView):
+class DeleteView(GenericMixin, BaseDeleteView):
 
     """Delete view that takes a model as argument, and may take a
     list_url_name to point to the listing view of the specifiek model.
 
     """
 
-    _model = None
     template_name = "confirm_delete.html"
     _list_url = None
     view_type = "delete"
 
     @property
-    def model(self):
-
-        if self.kwargs.get('model', None):
-            return apps.get_model("ninkasi", self.kwargs['model'])
-        else:
-            return self._model
-
-    @model.setter
-    def model(self, value):
-
-        self._model = value
-
-    @property
     def success_url(self):
+
+        """ What to do after delete? """
 
         return reverse_lazy("list",
                             kwargs={'model': self.model.__name__.lower()})

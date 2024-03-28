@@ -3,9 +3,10 @@
 {% load ninkasi_tags i18n %}
 
 {% block content %}
+{% with data=view.get_data %}
 {% with month=view.month %}
 
-<h1>Tank planner</h1>
+<h1>Planner</h1>
 
 <hr>
 
@@ -15,7 +16,7 @@
      data-toggle="tooltip" data-placement="right"
      title="{% trans 'Previous' %}">
     <span class="fas fa-caret-left" />
-  </a>    
+  </a>
   <span>{{ month.title }}</span>
   <a class="btn btn-outline-secondary btn-sm rounded-circle"
      href=".?go={{ month.next }}"
@@ -35,33 +36,37 @@
     </tr>
   </thead>
   <tbody>
-    {% for tank in view.list_tanks %}
+    {% with batches=data.1 tanks=data.0 %}
+    {% for tank, tdata in tanks.items %}
     <tr>
       <th scope="row">{{ tank }}</th>
-      {% for day in month.days %}
-      <td style="background-color: {% tankcontent tank day month.month month.year %}" />
+      {% for day, ddata in tdata.items %}
+      {% if ddata.0 %}
+      <td style="background-color: {{ ddata.1 }}">
+      </td>
+      {% else %}
+      <td></td>
+      {% endif %}
       {% endfor %}
     </tr>
     {% endfor %}
-    {% for brewhouse in view.list_brewhouses %}
-    <tr>
-      <th scope="row">{{ brewhouse }}</th>
-      {% for day in month.days %}
-      <td style="background-color: {% brewhousecontent brewhouse day month.month month.year %}" />
-      {% endfor %}
-    </tr>
-    {% endfor %}    
+    {% endwith %}
   </tbody>
 </table>
 
 <dl class="row">
-  {% for batch in view.list_batches %}
+  {% with batches=data.1 %}
+  {% for batch, color in batches.items %}
   <dt class="col-sm-1">
-    <div style="width: 20px; height: 20px; background-color: {{ batch.get_color }}"></div>    
+    <div style="width: 20px; height: 20px; background-color: {{ color }}"></div>
   </dt>
-  <dd class="col-sm-11">{{ batch }}</dd>
+  <dd class="col-sm-11">
+    <a href="{{ batch|detail_url }}">{{ batch }}</a>
+  </dd>
   {% endfor %}
+  {% endwith %}
 </dl>
 
+{% endwith %}
 {% endwith %}
 {% endblock %}

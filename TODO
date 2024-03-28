@@ -8,3 +8,8 @@
     - saccharification
     - mash out
 * add settings for critical parameters, like warm-up time
+* add option to relate one batch to another for slurry use
+
+* make shopping list, based on inventory, for planned batches.
+  - configurable for a given date.
+* add warning when inventory not sufficient for planned brews
