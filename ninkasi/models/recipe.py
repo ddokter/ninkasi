@@ -6,42 +6,28 @@ from django.apps import apps
 from django.utils.translation import gettext_lazy as _
 from django.contrib.contenttypes.fields import GenericRelation
 from django.conf import settings
+from ninkasi.resource import Resource, ResourceRegistry
+from ..api import Recipe as BaseRecipe
 from .unit import Unit
 from .ingredient import Ingredient
-from .step import RecipeStep
+from .ordered import OrderedContainer
 
 
-def get_recipe_model():
+class RecipeResource(Resource):
 
-    """ Return the configured recipe model """
+    def list(self):
 
-    module, model = settings.RECIPE_MODEL.split(".")
+        return Recipe.objects.all()
 
-    return apps.get_model(module, model)
+    def get(self, _id):
 
-
-class AbstractRecipe(models.Model):
-
-    """ Base recipe class, defining what Ninkasi expects of a recipe. All
-    recipe models must implement the methods described here.
-    """
-
-    @property
-    def volume(self):
-
-        """ Return batch volume for this recipe """
-
-    def list_phases(self):
-
-        """ Return a list of BasePhase objects, ordered """
-
-    class Meta:
-
-        app_label = "ninkasi"
-        abstract = True
+        return Recipe.objects.get(_id)
 
 
-class Recipe(AbstractRecipe):
+ResourceRegistry.register("recipe", "django", RecipeResource())
+
+
+class Recipe(models.Model, BaseRecipe, OrderedContainer):
 
     """Brew recipe for a given beer, including ingredients,
     processing aids, mash and fermentation profiles, etc.
@@ -50,11 +36,21 @@ class Recipe(AbstractRecipe):
 
     name = models.CharField(_("Name"), max_length=100)
     volume = models.SmallIntegerField(_("Volume"))
-    # ingredient = models.ManyToManyField(Ingredient, through="RecipeIngredient")
+    # ingredient = models.ManyToManyField(Ingredient, through="RecipeIngredient"
+    phase = GenericRelation("Phase")
 
+    def get_child_qs(self):
+
+        return self.phase
+    
     def __str__(self):
 
         return self.name
+
+    @property
+    def urn(self):
+
+        return f"urn:django:{ self.id }"
 
     @property
     def has_ingredients(self):
@@ -79,23 +75,22 @@ class Recipe(AbstractRecipe):
 
         """ return both brewing steps and fermentation steps """
 
-        return self.recipephase_set.all()    
+        return self.phase.all()
 
-    def get_total_duration(self, unit='day'):
+    def get_total_duration(self, unit='d'):
 
         """ TODO: use days or no """
 
-        return ceil(sum(phase.get_duration() for phase in self.list_phases()) /
-                    (60 * 24))
+        return sum(phase.get_duration(unit=unit) for phase in
+                   self.list_phases())
 
-    class Meta(AbstractRecipe.Meta):
+    class Meta:
 
         """This model is swappable, by the value of RECIPE_MODEL in
         settings
 
         """
 
-        swappable = 'RECIPE_MODEL'
         app_label = "ninkasi"
         verbose_name = _("Recipe")
         verbose_name_plural = _("Recipes")
@@ -114,7 +109,7 @@ class RecipeIngredient(models.Model):
 
     amount = models.FloatField(_("Amount"))
     unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
-    recipe = models.ForeignKey(settings.RECIPE_MODEL, on_delete=models.CASCADE)
+    recipe = models.ForeignKey("Recipe", on_delete=models.CASCADE)
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
     addition = models.ForeignKey("RecipeStep", on_delete=models.SET_NULL,
                                  blank=True, null=True)

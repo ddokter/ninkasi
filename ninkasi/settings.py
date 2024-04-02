@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'django_extensions',
     'bootstrap4',
     'ninkasi',
-    'ninkasi.brewfather'
+    'ninkasi.brewfather', 
+    'ninkasi.bjcp'   
 ]
 
 
@@ -144,7 +145,7 @@ BOOTSTRAP4 = {
 # BEGIN Ninkasi variables
 #
 # RECIPE_MODEL = "brewfather.Recipe"
-RECIPE_MODEL = "ninkasi.Recipe"
+# RECIPE_MODEL = "ninkasi.Recipe"
 
 # When no recipe is set, use the default
 #

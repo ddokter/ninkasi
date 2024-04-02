@@ -163,10 +163,13 @@ class InlineActionMixin:
             if form.fields[field].__class__.__name__ == 'DateTimeField':
                 form.fields[field].widget = DateTimeInput()
 
-        # Hide parent
+        # Hide parent, if possible
         #
-        # form.fields[self.fk_field].widget = forms.HiddenInput()
-
+        try:
+            form.fields[self.fk_field].widget = forms.HiddenInput()
+        except KeyError:
+            pass
+            
         return form
 
 

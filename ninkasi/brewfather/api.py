@@ -12,8 +12,7 @@ def _call(url):
     basic = HTTPBasicAuth(settings.BF_USER_ID, settings.BF_API_KEY)
 
     try:
-        # return requests.get(url, auth=basic, timeout=10).json()
-        return []
+        return requests.get(url, auth=basic, timeout=10).json()
     except requests.exceptions.ConnectionError:
         return []
 
@@ -32,6 +31,7 @@ def list_recipes():
     """ Get the recipes """
 
     return _call("https://api.brewfather.app/v2/recipes")
+
 
 def get_recipe(_id):
 

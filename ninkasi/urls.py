@@ -5,9 +5,11 @@ from .views.base import (DeleteView, ListingView, DetailView, CreateView,
                          UpdateView, InlineCreateView, InlineUpdateView,
                          InlineDeleteView)
 from .views.batch import (BatchCreateView, BatchUpdateView, BatchDetailView)
-from .views.recipe import RecipeCreateView, RecipeUpdateView, RecipeView
+from .views.recipe import (RecipeCreateView, RecipeUpdateView, RecipeView,
+                           RecipeAddPhaseView, RecipeMovePhaseView)
 from .views.sample import SampleCreateView, SampleUpdateView
 from .views.brew import BrewCreateView, BrewUpdateView
+from .views.phase import PhaseMoveStepView, PhaseView
 from .views.home import Home
 from .views.planner import PlannerView
 from .views.transfer import TransferView
@@ -35,7 +37,7 @@ urlpatterns = [
     path('transfer/',
          TransferView.as_view(),
          name="transfer"),
-    
+
     path('admin/', admin.site.urls),
 
     path('', Home.as_view(), name="home"),
@@ -47,7 +49,7 @@ urlpatterns = [
     path('batch/add/<int:beer>/',
          BatchCreateView.as_view(),
          name="create_batch"),
-    
+
     path('batch/<int:pk>/edit',
          BatchUpdateView.as_view(),
          name="edit_batch"),
@@ -57,7 +59,7 @@ urlpatterns = [
     path('batch/<int:pk>',
          BatchDetailView.as_view(),
          name="view"),
-    
+
     path('recipe/add/',
          RecipeCreateView.as_view(),
          name="create_recipe"),
@@ -69,7 +71,15 @@ urlpatterns = [
     path('recipe/<int:pk>/edit',
          RecipeUpdateView.as_view(),
          name="edit_recipe"),
-    
+
+    path('recipe/<int:pk>/addphase/<str:phase>',
+         RecipeAddPhaseView.as_view(),
+         name="recipe_addphase"),
+
+    path('recipe/<int:pk>/movephase/<int:phase>',
+         RecipeMovePhaseView.as_view(),
+         name="recipe_movephase"),
+
     path('sample/add/',
          SampleCreateView.as_view(),
          name="create_sample"),
@@ -77,7 +87,7 @@ urlpatterns = [
     path('sample/<int:pk>/edit',
          SampleUpdateView.as_view(),
          name="edit_sample"),
-    
+
     path('sample/add/<int:batch>',
          SampleCreateView.as_view(),
          name="create_sample"),
@@ -85,7 +95,7 @@ urlpatterns = [
     path('brew/add/',
          BrewCreateView.as_view(),
          name="create_brew"),
-    
+
     path('brew/add/<int:batch>',
          BrewCreateView.as_view(),
          name="create_brew"),
@@ -93,6 +103,14 @@ urlpatterns = [
     path('brew/<int:pk>/edit',
          BrewUpdateView.as_view(),
          name="edit_brew"),
+
+    path('phase/<int:pk>',
+         PhaseView.as_view(),
+         name="view"),
+
+    path('phase/<int:pk>/movestep/<int:step>',
+         PhaseMoveStepView.as_view(),
+         name="phase_movestep"),
 
     # Generic delete view
     #

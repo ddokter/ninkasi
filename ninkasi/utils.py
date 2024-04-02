@@ -1,5 +1,24 @@
+""" Ninkasi utility module """
+
 import hashlib
 from django.core.cache import cache as base_cache
+
+
+def class_implements(clazz, superclazz, check_self=True):
+
+    well_does_it = False
+
+    if check_self and clazz == superclazz:
+        return True
+    if superclazz in clazz.__bases__:
+        well_does_it = True
+    else:
+        for base in clazz.__bases__:
+            well_does_it = class_implements(base, superclazz)
+            if well_does_it:
+                break
+
+    return well_does_it
 
 
 def get_model_name(obj):

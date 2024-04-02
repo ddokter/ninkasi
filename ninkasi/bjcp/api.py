@@ -1,6 +1,8 @@
 from gql import gql, Client
 from gql.transport.aiohttp import AIOHTTPTransport
+from aiohttp.client_exceptions import ClientConnectorError
 from django.conf import settings
+from ninkasi.api import APIConnectionException
 
 
 LIST_STYLES_QRY = """query getAllBeerStyles {
@@ -66,4 +68,16 @@ def _call(qry):
 
 def list_styles():
 
-    return _call(LIST_STYLES_QRY)
+    """ Return listing of style defnitions """
+
+    try:
+        return _call(LIST_STYLES_QRY)
+    except ClientConnectorError as exc:
+        raise APIConnectionException from exc
+
+
+def get_style(_id):
+
+    """ Show one style """
+
+    return None
