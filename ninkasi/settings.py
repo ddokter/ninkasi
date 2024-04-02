@@ -178,6 +178,6 @@ BJCP_API_URL = "https://www.api-bjcp.com/graphql"
 # END BJCP
 
 try:
-    from .settings_local import *
+    from .local_settings import *
 except:
     pass
