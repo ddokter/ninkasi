@@ -32,7 +32,7 @@ class StyleResource(Resource):
                 styles.append(Style(data))
         except APIConnectionException:
             LOGGER.exception("Couldn't get styles from BJCP API")
-
+            
         return styles
 
     def get(self, _id):

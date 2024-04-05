@@ -1,0 +1,87 @@
+{% extends 'base_detail.html' %}
+
+{% load i18n ninkasi_tags %}
+
+{% block extra_actions %}
+{% if user|push:'step'|has_obj_perm:'add' %}
+<span class="dropdown show">
+  <a class="btn btn-sm btn-outline-success dropdown-toggle" href="#"
+     role="button" id="phase-dropdown" data-toggle="dropdown"
+     aria-haspopup="true" aria-expanded="false" title="{% trans 'Add step' %}">
+    <span class="fas fa-plus" />
+    <span class="fas fa-shoe-prints" />
+  </a>
+  <div class="dropdown-menu" aria-labelledby="phase-dropdown">
+    {% for step, name in view.step_vocab %}
+    <a class="dropdown-item"
+       href="{% url 'inline_create' 'phase' view.object.id step %}">
+      {{ name }}</a>
+    {% endfor %}
+  </div>
+</span>
+{% endif %}
+{% endblock %}
+
+
+{% block content %}
+
+{% if object.descr %}
+<p>{{ object.descr }}</p>
+{% endif %}
+
+
+<h2>{% trans 'Steps' %}</h2>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>{% trans 'Step' %}</th>
+      <th>{% trans 'Duration' %}</th>
+      <th />
+    </tr>
+  </thead>
+  <tbody>
+  {% for step in object.list_steps %}
+  <tr>
+    <td>
+      <a href="{{ step|detail_url }}">
+	<span class="badge badge-pill badge-info">{{ step|safe }}</span>
+      </a>
+    </td>
+    <td>{{ step.duration }}</td>
+    <td>
+      <div class="float-right">
+	{% if not forloop.first %}
+	<a class="btn btn-outline-info btn-sm rounded-circle"
+	   href="{% url 'phase_movestep' object.id step.id %}?dir=-1"
+	   data-toggle="tooltip" data-placement="right"
+	   title="{% trans 'Move up' %}">
+	  <span class="fas fa-arrow-up" />
+	</a>
+	{% endif %}
+	{% if not forloop.last %}
+	<a class="btn btn-outline-info btn-sm rounded-circle"
+	   href="{% url 'phase_movestep' object.id step.id %}?dir=1"
+	   data-toggle="tooltip" data-placement="right"
+	   title="{% trans 'Move down' %}">
+	  <span class="fas fa-arrow-down" />
+	</a>
+	{% endif %}
+        {% if user|push:step|has_obj_perm:'change' %}
+        {% edit_action step %}
+        {% endif %}
+        {% if user|push:step|has_obj_perm:'delete' %}
+        {% inline_delete_action step object %}
+        {% endif %}
+      </div>
+    </td>
+  </tr>
+  {% endfor %}
+  <tr>
+    <th colspan="1" scope="row">{% trans 'Total' %}</th>
+    <td>{{ object.get_duration }}</td>
+  </tr>
+  </tbody>
+</table>
+
+{% endblock content %}

@@ -1,0 +1,38 @@
+{% extends 'base_update.html' %}
+
+{% load i18n bootstrap4 ninkasi_tags %}
+
+{% block title %}
+<h1>{% trans 'Plan batch' %}</h1>
+{% endblock %}
+
+{% block form %}
+<form action="{% block action_url %}{{ view.action_url }}{% endblock %}"
+      method="POST" 
+      enctype="multipart/form-data"
+      class="form">
+
+    {% csrf_token %}
+    {{ form.media }}
+    {% bootstrap_form form %}
+
+    {% for formset in view.formsets %}
+    <h2>
+      {{ formset|fslabel }}
+    </h2>
+    <section>
+      {% bootstrap_formset formset layout='horizontal' %}
+    </section>
+    {% endfor %}
+        
+    {% buttons %}
+    <button type="submit" class="btn btn-primary">
+      {% trans 'Save' %}
+    </button>
+    <a href="{{ view.cancel_url }}" class="btn btn-default">
+      {% trans 'Cancel' %}
+    </a>
+    
+    {% endbuttons %}
+</form>
+{% endblock form %}

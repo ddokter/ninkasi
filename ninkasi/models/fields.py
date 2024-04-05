@@ -4,6 +4,7 @@ import re
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
+from ninkasi.resource import ResourceRegistry
 
 
 RANGE_FIELD_SEP = ","
@@ -51,13 +52,20 @@ class Duration:
 
     def __str__(self):
 
-        return f"{ self.amount }{ self.unit }"
+        return f"{self.amount:.2f}{ self.unit }"
 
     def convert(self, unit):
 
         """ Convert to the value asked """
 
         return convert_duration(self, unit=unit)
+
+    @property
+    def days(self):
+
+        """ Convenience property, returning the number of days """
+
+        return self.convert(unit="d")
 
     def __len__(self):
 
@@ -221,6 +229,8 @@ class URNField(models.CharField):
     """Resources, like recipe's, may come from many different
     sources.  Ninkasi uses a URN field to specify the provider and the
     unique ID.
+
+    TODO: add model to opts
     """
 
     default_validators = [validate_urn]
@@ -236,3 +246,35 @@ class URNField(models.CharField):
         """ Return the namespace """
 
         return value.split(URN_SEP)[1]
+
+    def __to_python(self, value):
+
+        """ Return Model object, but gracefully """
+
+        if isinstance(value, Duration):
+            return value
+
+        if value is None:
+            return value
+
+        nid = self.get_ns(value)
+        _id = self.get_id(value)
+
+        res = ResourceRegistry.get_resource('style', nid)
+
+        return res.get(_id)
+
+    def __from_db_value(self, value, *args):
+
+        """ Convert from DB value into python value stored on the model """
+
+        if value is None or value == '':
+            return value
+
+        return Duration(value)
+
+    def __get_prep_value(self, value):
+
+        """ Prepare for DB, cast to str """
+
+        return str(value)

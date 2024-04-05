@@ -1,6 +1,7 @@
 from gql import gql, Client
 from gql.transport.aiohttp import AIOHTTPTransport
 from aiohttp.client_exceptions import ClientConnectorError
+from gql.transport.exceptions import TransportServerError
 from django.conf import settings
 from ninkasi.api import APIConnectionException
 
@@ -72,7 +73,7 @@ def list_styles():
 
     try:
         return _call(LIST_STYLES_QRY)
-    except ClientConnectorError as exc:
+    except (ClientConnectorError, TransportServerError) as exc:
         raise APIConnectionException from exc
 
 

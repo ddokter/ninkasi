@@ -34,6 +34,7 @@ class Beer(models.Model):
     """A beer is defined by it's name, style and description. A beer
     can be further linked to a recipe, but it is not the same.
 
+    TODO: make recipe multiple field
     """
 
     name = models.CharField(_("Name"), max_length=100)
@@ -70,6 +71,19 @@ class Beer(models.Model):
         _id = self._meta.get_field("style").get_id(self.style)
 
         res = ResourceRegistry.get_resource('style', nid)
+
+        return res.get(_id)
+
+    def get_recipe(self):
+
+        """ Fetch the actual recipe
+        TODO: leave this to the field itself
+        """
+
+        nid = self._meta.get_field("recipe").get_ns(self.style)
+        _id = self._meta.get_field("recipe").get_id(self.style)
+
+        res = ResourceRegistry.get_resource('recipe', nid)
 
         return res.get(_id)
 

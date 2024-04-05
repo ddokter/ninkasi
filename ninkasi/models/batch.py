@@ -41,9 +41,11 @@ class Batch(models.Model):
     material = models.ManyToManyField(Material, through="BatchMaterial")
     tank = models.ManyToManyField(Tank, through="BatchContainer")
 
+    phase = GenericRelation("Phase")
     # tank = GenericRelation("Transfer")
     #step = GenericRelation(BatchStep)
     sample = GenericRelation("Sample")
+
 
     @property
     def volume_projected(self):
@@ -76,7 +78,9 @@ class Batch(models.Model):
 
     def list_phases(self):
 
-        return self.batchphase_set.all()
+        """ Get all phases defined for this batch """
+
+        return self.phase.all()
 
     def list_materials(self):
 
@@ -131,16 +135,29 @@ class Batch(models.Model):
         if self.start_date:
 
             return self.start_date + timedelta(
-                days=self.get_total_duration())
+                days=self.get_total_duration().days)
 
         return None
 
-    def get_total_duration(self, unit='day'):
+    def get_total_duration(self):
 
         """ TODO: use days or no """
 
-        return (sum(phase.get_duration() for phase in self.list_phases()) /
-                (60 * 24))
+        return sum(phase.get_duration() for phase in self.list_phases())
+
+    def import_phases(self):
+
+        """Import all phases from the batch recipe, that is in fact
+        the recipe of the beer for this batch. In the future, this
+        could be a choice of many.
+        """
+
+        for phase in self.beer.get_recipe().list_phases():
+            
+            if 'batch' in phase.get_metaphase().parents:
+
+                phase.copy(self)
+
 
     class Meta:
 
@@ -182,4 +199,3 @@ class BatchContainer(models.Model):
 
     # TODO: make validator for checking on whether the tank is already
     # filled on these dates.
-

@@ -113,7 +113,7 @@
   {% endfor %}
   <tr>
     <th colspan="1" scope="row">{% trans 'Total' %}</th>
-    <td>{{ object.get_total_duration|floatformat:2 }} {% trans 'Days' %}</td>
+    <td>{{ object.get_total_duration.days|floatformat:2 }} {% trans 'Days' %}</td>
   </tr>
   </tbody>
 </table>

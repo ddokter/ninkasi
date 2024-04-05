@@ -1,4 +1,4 @@
-""" Define API for Ninkasi """
+""" API definitions for Ninkasi """
 
 
 class APIConnectionException(Exception):
@@ -48,7 +48,7 @@ class Recipe:
     def list_phases(self):
 
         """ Return a list of BasePhase objects, ordered """
-  
+
 
 class MetaPhase:
 
@@ -75,20 +75,52 @@ class MetaPhase:
 
 class MashMetaPhase(MetaPhase):
 
+    """ Mash for any brew """
+
     id = "mash"
     name = "Mash"
-    steps = ["ninkasi.MashStep", "ninkasi.Step"] 
+    parents = ["brew", "recipe"]
+    steps = ["ninkasi.MashStep", "ninkasi.Step"]
+
+
+class BoilMetaPhase(MetaPhase):
+
+    """ Boil for any brew. Could be absent for raw ales. """
+
+    id = "boil"
+    name = "Boil"
+    parents = ["brew", "recipe"]
+    steps = ["ninkasi.BoilStep", "ninkasi.Step"]
 
 
 class MaturationMetaPhase(MetaPhase):
 
+    """ Maturation, that is the stage after fermentation """
+
     id = "maturation"
     name = "Maturation"
+    parents = ["batch", "recipe"]
     steps = ["ninkasi.MaturationStep"]
 
 
 class FermentationMetaPhase(MetaPhase):
 
+    """All fermentation steps. For Ninkasi, this does not include
+    maturation etc., purely actual yeast fermentation.
+
+    """
+
     id = "fermentation"
     name = "Fermentation"
+    parents = ["batch", "recipe"]
     steps = ["ninkasi.FermentationStep"]
+
+
+class PackagingMetaPhase(MetaPhase):
+
+    """ Packaging, i.e. bottling and kegging. """
+
+    id = "packaging"
+    name = "Packaging"
+    parents = ["batch"]
+    steps = ["ninkasi.PackagingStep"]

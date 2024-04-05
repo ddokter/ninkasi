@@ -31,15 +31,15 @@ class FormSetMixin:
             Brew, Brew.material.through, exclude=[],
         )
 
-        factory2 = generic_inlineformset_factory(
-            BatchStep, exclude=[],
-            can_order=True
-        )
+        # factory2 = generic_inlineformset_factory(
+        #    BatchStep, exclude=[],
+        #    can_order=True
+        #)
 
-        factory3 = generic_inlineformset_factory(
-            Transfer, exclude=[],
-            extra=1,
-        )
+        #factory3 = generic_inlineformset_factory(
+        #    Transfer, exclude=[],
+        #    extra=1,
+        #)
 
         kwargs = {}
 
@@ -49,10 +49,10 @@ class FormSetMixin:
         if self.object:
             kwargs['instance'] = self.object
 
-        formset_3 = factory3(**kwargs)
-        setattr(formset_3, "expanded", True)
+        #formset_3 = factory3(**kwargs)
+        #setattr(formset_3, "expanded", True)
 
-        return [factory1(**kwargs), factory2(**kwargs), formset_3]
+        return [factory1(**kwargs)]
 
     def form_valid(self, form):
 

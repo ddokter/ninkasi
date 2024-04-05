@@ -18,9 +18,7 @@ class Brew(models.Model):
     material = models.ManyToManyField(Material, through="BrewMaterial")
     volume_projected = models.FloatField()
 
-    step = GenericRelation(BatchStep)
-    tank = GenericRelation("Transfer")
-    sample = GenericRelation("Sample")
+    # sample = GenericRelation("Sample")
 
     def __str__(self):
 
@@ -46,16 +44,15 @@ class Brew(models.Model):
 
         """ TODO: use days or no """
 
-        return (sum([step.get_duration() for step in self.step_set.all()]) /
-                (60 * 24))
+        return sum([phase.get_duration() for step in self.phase_set.all()])
 
     @property
     def volume(self):
 
         """ The brew volume is the volume of the final transfer """
 
-        if self.list_transfers().exists():
-            return self.list_transfers().last().volume
+        #if self.list_transfers().exists():
+        #    return self.list_transfers().last().volume
 
         return 0
 

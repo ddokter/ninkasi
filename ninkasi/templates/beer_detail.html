@@ -1,0 +1,24 @@
+{% extends 'base_detail.html' %}
+
+{% load i18n ninkasi_tags %}
+
+{% block extra_actions %}
+{% if user|push:object|has_obj_perm:'manage' %}
+<a class="btn btn-outline-success btn-sm"
+   href="{% url 'create_batch' %}{{ object.pk }}"
+   data-toggle="tooltip" data-placement="right" title="{% trans 'Add batch' %}">
+  <span class="fas fa-plus" />
+  <span class="fas fa-hashtag" />
+</a>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+
+{% if object.descr %}
+<p>{{ object.descr }}</p>
+{% endif %}
+
+{% sublisting 'Batches' object.list_batches 'batch' %}
+
+{% endblock content %}

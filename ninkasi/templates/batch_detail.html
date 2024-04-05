@@ -30,6 +30,16 @@
 </a>
 {% endif %}
 
+{% if user|push:object|has_obj_perm:'change' %}
+<a class="btn btn-outline-warning btn-sm"
+   href="{% url 'import_phases' object.pk %}"
+   data-toggle="tooltip" data-placement="right"
+   title="{% trans 'Import phases' %}">
+  <span class="fas fa-arrow-left" />
+</a>
+{% endif %}
+
+
 <!--a class="btn btn-outline-success btn-sm"
    href="{% url 'transfer' view.ct_id object.id %}"
    data-toggle="tooltip" data-placement="right" title="{% trans 'Transfer' %}">
@@ -133,8 +143,11 @@
   {% endfor %}
   </tbody>
 </table-->
-
+  
   {% with dates=view.get_calendar %}
+  {% if dates %}
+  <h2>Planning</h2>
+  
   <table class="table table-bordered table-sm">
     <thead>
       <tr>
@@ -173,6 +186,7 @@
       {% endwith %}
     </tbody>
   </table>
+  {% endif %}
   {% endwith %}
   
 
@@ -183,6 +197,7 @@
     <tr>
       <th>{% trans 'Phase' %}</th>
       <th>{% trans 'Duration (in minutes)' %}</th>
+      <th />
     </tr>
   </thead>
   <tbody>
@@ -193,8 +208,8 @@
   </tr>
   {% endfor %}
   <tr>
-    <th colspan="2" scope="row">{% trans 'Total' %}</th>
-    <td>{{ object.get_total_duration }} {% trans 'Days' %}</td>
+    <th colspan="1" scope="row">{% trans 'Total' %}</th>
+    <td>{{ object.get_total_duration }}</td>
   </tr>
   </tbody>
 </table>

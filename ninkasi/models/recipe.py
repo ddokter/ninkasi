@@ -21,7 +21,7 @@ class RecipeResource(Resource):
 
     def get(self, _id):
 
-        return Recipe.objects.get(_id)
+        return Recipe.objects.get(pk=_id)
 
 
 ResourceRegistry.register("recipe", "django", RecipeResource())
@@ -77,12 +77,11 @@ class Recipe(models.Model, BaseRecipe, OrderedContainer):
 
         return self.phase.all()
 
-    def get_total_duration(self, unit='d'):
+    def get_total_duration(self):
 
         """ TODO: use days or no """
 
-        return sum(phase.get_duration(unit=unit) for phase in
-                   self.list_phases())
+        return sum(phase.get_duration() for phase in self.list_phases())
 
     class Meta:
 

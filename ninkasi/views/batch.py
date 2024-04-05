@@ -172,3 +172,15 @@ class BatchDetailView(DetailView):
                     tanks[tank].append(0)
 
         return tanks
+
+
+class BatchImportPhasesView(BatchDetailView):
+
+    def get(self, request, *args, **kwargs):
+
+        """ Shortcut to import of phases """
+
+        self.get_object().import_phases()
+
+        return HttpResponseRedirect(self.success_url)
+    
