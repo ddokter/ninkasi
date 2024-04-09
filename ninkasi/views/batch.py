@@ -11,7 +11,6 @@ from ..forms.dtinput import DateTimeInput
 from ..forms.colorpicker import ColorInput
 from ..models.batch import Batch
 from ..models.transfer import Transfer
-from ..models.step import BatchStep
 from ..models.beer import Beer
 from ..models.phase import Phase
 

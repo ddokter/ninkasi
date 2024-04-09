@@ -204,6 +204,9 @@ class CreateView(GenericMixin, BaseCreateView, CTypeMixin):
 
     def get_template_names(self):
 
+        if self.template_name:
+            return [self.template_name]
+        
         return ["%s_create.html" % self.ctype, "base_create.html"]
 
     @property

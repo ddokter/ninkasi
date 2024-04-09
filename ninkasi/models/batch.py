@@ -9,7 +9,6 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from .tank import Tank
 from .material import Material, ParentedMaterial
-from .step import BatchStep
 
 
 class Batch(models.Model):
@@ -43,7 +42,6 @@ class Batch(models.Model):
 
     phase = GenericRelation("Phase")
     # tank = GenericRelation("Transfer")
-    #step = GenericRelation(BatchStep)
     sample = GenericRelation("Sample")
 
 

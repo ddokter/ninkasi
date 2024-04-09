@@ -1,6 +1,7 @@
 """ Ninkasi specific fields """
 
 import re
+from datetime import timedelta
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
@@ -12,7 +13,7 @@ URN_SEP = ":"
 
 # Duration field regexp
 #
-DURATION_RE = re.compile(r"^([0-9]+\.?[0-9]*)\s*([smhd])$")
+DURATION_RE = re.compile(r"^(\-?[0-9]+\.?[0-9]*)\s*([smhd])$")
 
 # Map duration to minutes
 #
@@ -67,6 +68,17 @@ class Duration:
 
         return self.convert(unit="d")
 
+    @classmethod
+    def from_dates(cls, start, end):
+
+        """ Calculate a duration from two dates """
+
+        return Duration(f"{ (end - start).total_seconds() / 60 }m")
+
+    def to_timedelta(self):
+
+        return timedelta(days=self.days)
+    
     def __len__(self):
 
         return len(str(self))
@@ -89,6 +101,9 @@ class Duration:
         return self.__add__(other)
 
     def __eq__(self, thing):
+
+        if not thing:
+            return False
 
         return (self.amount == thing.amount and self.unit == thing.unit)
 

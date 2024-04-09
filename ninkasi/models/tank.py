@@ -41,6 +41,10 @@ class Tank(Container):
 
         return None
 
+    def list_tasks(self):
+
+        return self.maintenance_schema.all()
+        
     class Meta:
 
         app_label = "ninkasi"

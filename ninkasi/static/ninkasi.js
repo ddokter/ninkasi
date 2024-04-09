@@ -16,13 +16,13 @@ $(document).ready(function() {
 
       listing.find(".list-group-item").each(function(idx, elt) {
 
-        li = $(elt);
+	li = $(elt);
 
-        if (li.text().toLowerCase().indexOf(text) == -1) {
-          li.hide();
-        } else {
-          li.show();
-        }
+	if (li.text().toLowerCase().indexOf(text) == -1) {
+	  li.hide();
+	} else {
+	  li.show();
+	}
       });
     }
   });
@@ -40,13 +40,13 @@ $(document).ready(function() {
 
       listing.find(".list-group-item").each(function(idx, elt) {
 
-        li = $(elt);
+	li = $(elt);
 
-        if (li.text().toLowerCase().indexOf(text) == -1) {
-          li.hide("slow");
-        } else {
-          li.show("slow");
-        }
+	if (li.text().toLowerCase().indexOf(text) == -1) {
+	  li.hide("slow");
+	} else {
+	  li.show("slow");
+	}
       });
     }
 
@@ -54,4 +54,31 @@ $(document).ready(function() {
 
     return false;
   });
+
+    /* Submit modal forms AJAX style */
+    $("form.inline").submit(function(e) {
+
+	var form = $(e.target);
+
+	var modal = form.parents("div.modal");
+
+	$.ajax(form.attr("action"),
+               {type: form.attr("method") || "POST",
+		data: form.serialize(),
+		success: function(data, status, xhr) {
+
+		    if (xhr.status == 202) {
+			modal.find(".modal-body").replaceWith($(data).find(
+			    ".modal-body"));
+			modal.trigger("modal_action_show");
+		    } else {
+			modal.modal('hide');
+		    }
+		}
+               });
+
+	e.preventDefault();
+
+	return false;
+    });
 });

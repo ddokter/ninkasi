@@ -32,7 +32,7 @@
 
 {% if user|push:object|has_obj_perm:'change' %}
 <a class="btn btn-outline-warning btn-sm"
-   href="{% url 'import_phases' object.pk %}"
+   href="{% url 'batch_import_phases' object.pk %}"
    data-toggle="tooltip" data-placement="right"
    title="{% trans 'Import phases' %}">
   <span class="fas fa-arrow-left" />

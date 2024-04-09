@@ -1,14 +1,14 @@
-from datetime import datetime, date
-from calendar import monthrange
 from random import choice
+from datetime import datetime
 from django.views.generic import TemplateView
 from django.utils import timezone
 from ..models.tank import Tank
 from ..models.brewhouse import Brewhouse
 from ..utils import get_model_name
+from .calendar import Calendar
 
 
-class PlannerView(TemplateView):
+class PlannerView(TemplateView, Calendar):
 
     """The planner view provides a monthly overview of tanks,
     brewhouses and their availability, based on scheduled batches.
@@ -81,38 +81,3 @@ class PlannerView(TemplateView):
             return thing.batch
         else:
             return None
-
-    @property
-    def month(self):
-
-        """Return current month data, for displaying of the month
-        calendar
-
-        """
-
-        if self.request.GET.get('go', None):
-
-            year, month = self.request.GET['go'].split('-')
-
-            now = date(int(year), int(month), 1)
-        else:
-            now = datetime.now()
-
-        if now.month == 12:
-            _next = date(now.year + 1, 1, 1)
-        else:
-            _next = date(now.year, now.month + 1, 1)
-
-        if now.month == 1:
-            _prev = date(now.year - 1, 12, 1)
-        else:
-            _prev = date(now.year, now.month - 1, 1)
-
-        return {
-            'title': now.strftime("%B %Y"),
-            'days': range(1, monthrange(now.year, now.month)[1] + 1),
-            'next': _next.strftime("%Y-%m"),
-            'prev': _prev.strftime("%Y-%m"),
-            'month': now.month,
-            'year': now.year
-            }

@@ -1,7 +1,6 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.contrib.contenttypes.fields import GenericRelation
-from .step import BatchStep
 from .material import Material, ParentedMaterial
 
 
@@ -18,6 +17,8 @@ class Brew(models.Model):
     material = models.ManyToManyField(Material, through="BrewMaterial")
     volume_projected = models.FloatField()
 
+    phase = GenericRelation("Phase")
+
     # sample = GenericRelation("Sample")
 
     def __str__(self):
@@ -28,10 +29,6 @@ class Brew(models.Model):
 
         return self.brewmaterial_set.all()
 
-    def list_steps(self):
-
-        return self.step.all()
-
     def has_transfer(self):
 
         return self.list_transfers().exists()
@@ -40,11 +37,15 @@ class Brew(models.Model):
 
         return self.tank.all()
 
-    def get_total_duration(self, unit='day'):
+    def list_phases(self):
 
-        """ TODO: use days or no """
+        return self.phase.all()
+    
+    def get_total_duration(self):
 
-        return sum([phase.get_duration() for step in self.phase_set.all()])
+        """ Return total duration of the brew """
+
+        return sum(phase.get_duration() for phase in self.phase.all())
 
     @property
     def volume(self):
@@ -55,6 +56,20 @@ class Brew(models.Model):
         #    return self.list_transfers().last().volume
 
         return 0
+
+    def import_phases(self):
+
+        """Import all phases from the bre recipe, that is in fact the
+        recipe of the beer for this batch. In the future, this could
+        be a choice of many.
+
+        """
+
+        for phase in self.batch.beer.get_recipe().list_phases():
+
+            if 'brew' in phase.get_metaphase().parents:
+
+                phase.copy(self)
 
     class Meta:
 

@@ -86,7 +86,13 @@
 	  <a class="dropdown-item" href="{% url 'list' model='scheduledtask' %}">
 	    {% trans 'Scheduled' %}
 	  </a>
-        </div>
+	  <a class="dropdown-item" href="{% url 'list' model='eventscheduledtask' %}">
+	    {% trans 'Event scheduled' %}
+	  </a>
+	  <a class="dropdown-item" href="{% url 'list' model='repeatedscheduledtask' %}">
+	    {% trans 'Repeat scheduled' %}
+	  </a>	  
+        </div>	
       </li>
       
       <li class="nav-item {% if view.view_name.0 == 'beer' %}active{% endif %}">
@@ -120,11 +126,17 @@
     <ul class="navbar-nav navbar-right">
 
       <li class="nav-item">
+	  <a class="nav-link" href="{% url 'agenda' %}">
+	    {% trans 'Agenda' %}
+	  </a>
+      </li>
+
+      <li class="nav-item">
 	  <a class="nav-link" href="{% url 'planner' %}">
 	    {% trans 'Planner' %}
 	  </a>
       </li>
-
+      
       {% if request.user.is_authenticated %}
       <li class="nav-item dropdown">
 	<a class="nav-link dropdown-toggle"

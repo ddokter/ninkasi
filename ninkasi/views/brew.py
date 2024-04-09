@@ -2,10 +2,9 @@ from django.utils.translation import gettext_lazy as _
 from django.http import HttpResponseRedirect
 from django.forms import inlineformset_factory, HiddenInput
 from django.contrib.contenttypes.forms import generic_inlineformset_factory
-from .base import CreateView, UpdateView
+from .base import CreateView, UpdateView, DetailView
 from ..models.brew import Brew
 from ..models.batch import Batch
-from ..models.step import BatchStep
 from ..models.transfer import Transfer
 
 
@@ -71,12 +70,29 @@ class BrewCreateView(FormSetMixin, CreateView):
 
     def get_initial(self):
 
+        """ Get initial form fields """
+
         if self.kwargs.get('batch'):
             return {'batch': Batch.objects.get(pk=self.kwargs['batch'])}
-        else:
-            return {}
+
+        return {}
 
 
 class BrewUpdateView(FormSetMixin, UpdateView):
 
     model = Brew
+
+
+class BrewImportPhasesView(DetailView):
+
+    """ Get all brew phases from brewed beer """
+
+    model = Brew
+
+    def get(self, request, *args, **kwargs):
+
+        """ Shortcut to import of phases """
+
+        self.get_object().import_phases()
+
+        return HttpResponseRedirect(self.success_url)

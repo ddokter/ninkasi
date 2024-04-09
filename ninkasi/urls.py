@@ -9,10 +9,12 @@ from .views.batch import (BatchCreateView, BatchUpdateView, BatchDetailView,
 from .views.recipe import (RecipeCreateView, RecipeUpdateView, RecipeView,
                            RecipeAddPhaseView, RecipeMovePhaseView)
 from .views.sample import SampleCreateView, SampleUpdateView
-from .views.brew import BrewCreateView, BrewUpdateView
+from .views.brew import (BrewCreateView, BrewUpdateView, BrewImportPhasesView)
 from .views.phase import PhaseMoveStepView, PhaseView
+from .views.tank import TankCreateView, TankUpdateView
 from .views.home import Home
 from .views.planner import PlannerView
+from .views.agenda import AgendaView
 from .views.transfer import TransferView
 
 
@@ -31,6 +33,10 @@ urlpatterns = [
          PlannerView.as_view(),
          name="planner"),
 
+    path('agenda/',
+         AgendaView.as_view(),
+         name="agenda"),
+    
     path('transfer/<int:ct>/<int:cid>/',
          TransferView.as_view(),
          name="transfer"),
@@ -63,7 +69,7 @@ urlpatterns = [
 
     path('batch/<int:pk>/importphases',
          BatchImportPhasesView.as_view(),
-         name="import_phases"),
+         name="batch_import_phases"),
 
     path('recipe/add/',
          RecipeCreateView.as_view(),
@@ -109,6 +115,10 @@ urlpatterns = [
          BrewUpdateView.as_view(),
          name="edit_brew"),
 
+    path('brew/<int:pk>/importphases',
+         BrewImportPhasesView.as_view(),
+         name="brew_import_phases"),
+
     path('phase/<int:pk>',
          PhaseView.as_view(),
          name="view"),
@@ -116,6 +126,17 @@ urlpatterns = [
     path('phase/<int:pk>/movestep/<int:step>',
          PhaseMoveStepView.as_view(),
          name="phase_movestep"),
+
+    # Tank
+    #
+    #path('tank/add/<int:batch>',
+    #     TankCreateView.as_view(),
+    #     name="create_tank"),
+
+    #path('tank/<int:pk>/edit',
+    #     TankUpdateView.as_view(),
+    #     name="edit_tank"),
+
 
     # Generic delete view
     #

@@ -1,10 +1,9 @@
+""" All step definitions, and StopLog model """
+
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from django.core.exceptions import ObjectDoesNotExist
-from ..utils import class_implements
-from .phase import Phase
-from .fields import DurationField
-
+from .fields import DurationField, Duration
+from .base import BaseModel
 
 
 DURATION_VOCAB = [
@@ -16,7 +15,7 @@ DURATION_VOCAB = [
 DURATION_TO_MINUTES = [1, 60, 60 * 24]
 
 
-class Step(models.Model):
+class Step(BaseModel):
 
     """Step in the schema for a recipe, batch or brew. Steps for a
     batch are inherited from the recipe, but more steps may be
@@ -37,32 +36,24 @@ class Step(models.Model):
         app_label = "ninkasi"
         ordering = ["order"]
 
-    def get_real(self):
 
-        """See if there is an object there that is the actual
-        implementation
-
-        """
-
-        for obj in self._meta.related_objects:
-
-            try:
-                real = getattr(self, obj.name)
-
-                if class_implements(real.__class__, self.__class__):
-                    return real
-            except ObjectDoesNotExist:
-                pass
-
-        return self
-
-    def get_total_duration(self):
+    @property
+    def total_duration(self):
 
         """Get the total duration of this step. This may be more than
         the duration property only, for example when a mash step has a
         ramp up time in addition to a duration
 
         """
+
+        try:
+            return self.steplog.get_duration()
+        except self.__class__.steplog.RelatedObjectDoesNotExist:
+            return self.get_total_duration()
+
+    def get_total_duration(self):
+
+        """ Override to add more that the duration field if needed """
 
         return self.duration
 
@@ -79,6 +70,9 @@ class Step(models.Model):
     def __eq__(self, thing):
 
         """ Check for equality. Disregard parent. """
+
+        if not thing:
+            return False
 
         return (self.__class__ == thing.__class__
                 and self.order == thing.order
@@ -135,29 +129,27 @@ class RecipeStep(Step):
         ordering = ["order"]
 
 
-class BatchStep(Step):
+class StepLog(models.Model):
 
-    """The batch step is inherited from the recipe, but may be changed
-    within the batch. Also, more steps may be added to a batch, for
-    instance steps involved with packaging.  The step within a batch
-    is more focused on measuring than planning, so when the batch is
-    produced, steps should be filled in with respect to actual start
-    and end times.
+    """ Within a batch or brew, a step should be logged in terms of start
+    and end times, to get a realistic duration.
 
     """
 
     start_time = models.DateTimeField(_("Start time"), null=True, blank=True)
     end_time = models.DateTimeField(_("End time"), null=True, blank=True)
-    batch_step = models.ForeignKey("BatchStep", null=True, blank=True,
-                                   on_delete=models.SET_NULL)
+    step = models.OneToOneField("Step", on_delete=models.CASCADE)
+
+    def __str__(self):
+
+        return f"{ self.start_time } - { self.end_time }"
 
     def get_duration(self):
 
-        """ Duration in minutes. This is the calculated duration, or if no
-        times are filled in, the base duration"""
+        """ Get the difference between start and end time """
 
         try:
-            return (self.end_time - self.start_time).seconds / 60
+            return Duration.from_dates(self.start_time, self.end_time)
         except TypeError:
             return super().get_duration()
 

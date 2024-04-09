@@ -10,6 +10,8 @@ class Container(models.Model):
     name = models.CharField(_("Name"), max_length=100)
     volume = models.FloatField()
 
+    maintenance_schema = models.ManyToManyField("Task")
+    
     def __str__(self):
 
         return self.name

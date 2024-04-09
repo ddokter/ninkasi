@@ -6,9 +6,12 @@ from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
 from django.utils.safestring import mark_safe
 from django.utils import timezone
+from django.forms import models as model_forms
 from markdown import markdown
 from ninkasi.utils import get_model_name
 from ninkasi.models.task import ScheduledTask
+from ninkasi.models.step import StepLog
+from ninkasi.views.base import InlineCreateView
 
 
 register = Library()
@@ -261,3 +264,15 @@ def month_name(month_number):
 
     month_number = int(month_number)
     return calendar.month_name[month_number]
+
+
+@register.inclusion_tag("snippets/logform.html", takes_context=True)
+def step_logform(context, step):
+
+    form = model_forms.modelform_factory(StepLog, fields=['start_time',
+                                                          'step',
+                                                          'end_time'])
+
+    context.update({'step': step, 'form': form(initial={'step': step.id})})
+
+    return context

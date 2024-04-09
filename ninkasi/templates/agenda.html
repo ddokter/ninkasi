@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% load ninkasi_tags i18n %}
+
+{% block content %}
+{% with data=view.get_data %}
+{% with month=view.month %}
+
+<h1>{% trans 'Agenda' %}</h1>
+
+<hr>
+
+<h2 style="width: 400px;" class="mx-auto">
+  <a class="btn btn-outline-secondary btn-sm rounded-circle"
+     href=".?go={{ month.prev }}"
+     data-toggle="tooltip" data-placement="right"
+     title="{% trans 'Previous' %}">
+    <span class="fas fa-caret-left" />
+  </a>
+  <span>{{ month.title }}</span>
+  <a class="btn btn-outline-secondary btn-sm rounded-circle"
+     href=".?go={{ month.next }}"
+     data-toggle="tooltip" data-placement="right"
+     title="{% trans 'Next' %}">
+    <span class="fas fa-caret-right" />
+  </a>
+</h2>
+
+<table class="table table-bordered table-sm">
+  <thead>
+    <tr>
+      {% for day in month.days %}
+      <th scope="col">{{ day|stringformat:'02i' }}</th>
+      {% endfor %}
+    </tr>
+  </thead>
+  <tbody>
+    {% with data=view.get_data %}
+    <tr>
+      {% for day, tasks in data.items %}
+      <td>
+	<ul>
+	  {% for task in tasks %}
+	  <li>{{ task }}</li>
+	  {% endfor %}
+	</ul>
+      </td>
+      {% endfor %}
+    </tr>
+    {% endwith %}
+  </tbody>
+</table>
+
+{% endwith %}
+{% endwith %}
+{% endblock %}

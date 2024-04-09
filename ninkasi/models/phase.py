@@ -18,7 +18,7 @@ class BasePhase(OrderedContainer):
 
         """ Return total of all steps """
 
-        return sum(step.get_total_duration() for step in self.list_steps())
+        return sum(step.total_duration for step in self.list_steps())
 
     def list_steps(self, raw=False):
 
