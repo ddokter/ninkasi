@@ -58,7 +58,7 @@ class PlannerView(TemplateView, Calendar):
                 #
                 batch = self.get_batch(batch)
 
-                if batch and not batch in batches:
+                if batch and batch not in batches:
                     batches[batch] = self.get_color()
 
                 tankdata[mday] = (batch, batches.get(batch, None))

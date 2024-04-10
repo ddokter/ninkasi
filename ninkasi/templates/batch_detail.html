@@ -66,8 +66,8 @@
 
 
 <dl class="row">
-  <dt class="col-sm-3">Volume</dt>
-  <dd class="col-sm-9">{{ object.volume }}</dd>
+  <dt class="col-sm-3">Volume (planned)</dt>
+  <dd class="col-sm-9">{{ object.volume_projected }}</dd>
   <dt class="col-sm-3">Beer</dt>
   <dd class="col-sm-9">
     <a href="{{ object.beer|detail_url }}">{{ object.beer }}</a>
@@ -76,22 +76,10 @@
   <dd class="col-sm-9">
     {{ object.beer.get_processing_time|floatformat:1 }} days
   </dd>
+  <dt class="col-sm-3">{% trans 'Delivery date' %}</dt>
+  <dd class="col-sm-9">{{ object.delivery_date|date:"d-m-Y" }}</dd>  
   <dt class="col-sm-3">{% trans 'Start date' %}</dt>
   <dd class="col-sm-9">{{ object.start_date|date:"d-m-Y" }}</dd>
-  <dt class="col-sm-3">{% trans 'End date (Recipe)' %}</dt>
-  <dd class="col-sm-9">{{ object.end_date_projected|date:"d-m-Y" }}</dd>
-  <dt class="col-sm-3">{% trans 'End date (Batch steps)' %}</dt>
-  <dd class="col-sm-9">{{ object.end_date|date:"d-m-Y" }}
-    {% if object.end_date_planned != object.end_date %}
-    <i class="text-warning" data-toggle="tooltip" data-placement="top"
-       title="{% trans 'Batch end date does not follow recipe' %}">
-      <span class="fas fa-triangle-exclamation">
-      </span>
-    </i>
-    {% else %}
-    {{ object.end_date_expected|date:"d-m-Y" }}
-    {% endif %}
-  </dd>
 </dl>
 
 
@@ -176,7 +164,11 @@
 	<th scope="row">{{ tank }}</th>
 	{% for day in row %}
 	{% if day %}
+	{% if forloop.parentloop.last %}
+	<td style="background-color: #ff0000"></td>	
+	{% else %}
 	<td style="background-color: {{ view.get_color }}"></td>
+	{% endif %}
 	{% else %}
 	<td></td>
 	{% endif %}

@@ -33,24 +33,22 @@ class Batch(models.Model):
 
     TODO: arrange this!
 
+    The batch is used as a vehicle for planning. That means that the
+    batch has a projected volume and a projected end date.
+
     """
 
     nr = models.CharField(_("Nr"), max_length=100, unique=True)
     beer = models.ForeignKey("Beer", on_delete=models.CASCADE)
+    volume_projected = models.FloatField()
+    delivery_date = models.DateField()
+
     material = models.ManyToManyField(Material, through="BatchMaterial")
     tank = models.ManyToManyField(Tank, through="BatchContainer")
 
     phase = GenericRelation("Phase")
-    # tank = GenericRelation("Transfer")
     sample = GenericRelation("Sample")
 
-
-    @property
-    def volume_projected(self):
-
-        """Total batch volume, i.e. sum of brew volumes """
-
-        return sum([brew.volume for brew in self.list_brews()])
 
     def __str__(self):
 
@@ -71,6 +69,8 @@ class Batch(models.Model):
         return problems
 
     def list_brews(self):
+
+        """ A batch may consist of several brews """
 
         return self.brew_set.all()
 
@@ -93,6 +93,8 @@ class Batch(models.Model):
 
     def list_tanks(self):
 
+        """ List all tank transfers for the batch """
+
         return self.tank.all()
 
     def list_samples(self):
@@ -104,42 +106,15 @@ class Batch(models.Model):
     @property
     def start_date(self):
 
-        """ The start date is inferred from the first brew """
+        """ The start date calculated from the delivery_date. Time needed
+        will be subtracted to determine start date. """
 
-        if self.list_brews().exists():
-
-            return self.list_brews().first().date
-
-        return None
-
-    @property
-    def end_date_projected(self):
-
-        """ The end date according to the start date plus the number
-        of days specified in the recipe """
-
-        if self.start_date:
-
-            return self.start_date + timedelta(
-                days=self.beer.get_processing_time())
-
-        return None
-
-    @property
-    def end_date(self):
-
-        """ End date calculated from start date and steps """
-
-        if self.start_date:
-
-            return self.start_date + timedelta(
-                days=self.get_total_duration().days)
-
-        return None
+        return self.delivery_date - timedelta(
+            days=self.beer.get_processing_time())
 
     def get_total_duration(self):
 
-        """ TODO: use days or no """
+        """ Get duration based on phases """
 
         return sum(phase.get_duration() for phase in self.list_phases())
 
@@ -151,7 +126,7 @@ class Batch(models.Model):
         """
 
         for phase in self.beer.get_recipe().list_phases():
-            
+
             if 'batch' in phase.get_metaphase().parents:
 
                 phase.copy(self)

@@ -1,4 +1,5 @@
 import datetime
+from random import choice
 from django.utils.translation import gettext_lazy as _
 from django.http import HttpResponseRedirect
 from django.forms import inlineformset_factory, Form, Select
@@ -90,6 +91,8 @@ class BatchDetailView(DetailView):
 
     model = Batch
 
+    _color = None
+
     """ Provide the date range for this batch, so we can display
     a calendar for the containers """
 
@@ -101,7 +104,7 @@ class BatchDetailView(DetailView):
         """
 
         _from = self.object.start_date
-        _to = self.object.end_date_projected
+        _to = self.object.delivery_date
 
         dates = []
         months = {}
@@ -136,7 +139,7 @@ class BatchDetailView(DetailView):
         """ List phases defned for this system """
 
         return Phase.objects.all()
-    
+
     def list_tanks(self):
 
         return self.object.list_tanks()
@@ -145,9 +148,19 @@ class BatchDetailView(DetailView):
 
         return []
 
+
     def get_color(self):
 
-        return "#ff0000"
+        """Return a random color from the given palette
+        """
+
+        if not self._color:
+
+            self._color = choice([
+                '#d9ed92', '#b5e48c', '#99d98c', '#76c893', '#52b69a',
+                '#34a0a4', '#168aad', '#1a759f', '#1e6091', '#184e77'])
+
+        return self._color
 
     def get_tank_data(self):
 
@@ -155,11 +168,15 @@ class BatchDetailView(DetailView):
 
         tanks = {}
 
+        days = self.get_calendar()["days"]
+
+        unspecified = [1] * len(days)
+
         for tank in list(self.list_tanks()) + list(self.list_brewhouses()):
 
             tanks[tank] = []
 
-            for day in self.get_calendar()["days"]:
+            for day in days:
 
                 batch = tank.content(day)
 
@@ -167,8 +184,13 @@ class BatchDetailView(DetailView):
                 #
                 if batch == self.object:
                     tanks[tank].append(1)
+                    unspecified[days.index(day)] = 0
                 else:
                     tanks[tank].append(0)
+
+        # Fill up Unspecified!
+        #
+        tanks['Unspecified'] = unspecified
 
         return tanks
 
@@ -182,4 +204,3 @@ class BatchImportPhasesView(BatchDetailView):
         self.get_object().import_phases()
 
         return HttpResponseRedirect(self.success_url)
-    
