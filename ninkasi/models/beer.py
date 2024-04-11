@@ -49,9 +49,9 @@ class Beer(models.Model):
         but valid options are 'h' (hour), 'm' (month), 'w' (week).
 
         """
-
+        
         try:
-            return self.recipe.get_processing_time(unit=unit)
+            return self.get_recipe().get_total_duration()
         except AttributeError:
             return settings.DEFAULT_PROCESSING_TIME
 

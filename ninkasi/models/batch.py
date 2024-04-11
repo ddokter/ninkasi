@@ -107,10 +107,15 @@ class Batch(models.Model):
     def start_date(self):
 
         """ The start date calculated from the delivery_date. Time needed
-        will be subtracted to determine start date. """
+        will be subtracted to determine start date. The start date
+        is projected. If a brew is added, it may reset the start date."""
+
+        if self.list_brews().exists():
+
+            return self.list_brews().first().date.date()
 
         return self.delivery_date - timedelta(
-            days=self.beer.get_processing_time())
+            days=self.beer.get_processing_time().days)
 
     def get_total_duration(self):
 

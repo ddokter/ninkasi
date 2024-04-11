@@ -7,13 +7,12 @@ from django.contrib.contenttypes.forms import generic_inlineformset_factory
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic import FormView
 from django.urls import reverse_lazy
-from .base import CreateView, UpdateView, CTypeMixin, DetailView
-from ..forms.dtinput import DateTimeInput
-from ..forms.colorpicker import ColorInput
+from .base import CreateView, UpdateView, DetailView
 from ..models.batch import Batch
-from ..models.transfer import Transfer
 from ..models.beer import Beer
 from ..models.phase import Phase
+from ..models.brewhouse import Brewhouse
+from ..utils import get_model_name
 
 
 class FormSetMixin:
@@ -146,8 +145,7 @@ class BatchDetailView(DetailView):
 
     def list_brewhouses(self):
 
-        return []
-
+        return set(brew.brewhouse for brew in self.object.list_brews())
 
     def get_color(self):
 
@@ -162,6 +160,17 @@ class BatchDetailView(DetailView):
 
         return self._color
 
+    def get_batch(self, thing):
+
+        # TODO: dry!
+        
+        if get_model_name(thing) == "batch":
+            return thing
+        elif get_model_name(thing) == "brew":
+            return thing.batch
+        else:
+            return None
+    
     def get_tank_data(self):
 
         """ Fill tank/content data """
@@ -180,8 +189,8 @@ class BatchDetailView(DetailView):
 
                 batch = tank.content(day)
 
-                # TODO: find batch for brew in case the content is a brew
-                #
+                batch = self.get_batch(batch)
+
                 if batch == self.object:
                     tanks[tank].append(1)
                     unspecified[days.index(day)] = 0

@@ -15,3 +15,6 @@
 
 * pass around duration values as-is, so the receiver can determine how
 to show
+
+* use batch projected volume and subtract losses to calculate brew
+  volumes
