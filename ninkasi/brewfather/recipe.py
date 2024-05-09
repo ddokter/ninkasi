@@ -3,6 +3,9 @@ from ninkasi.api import Recipe as BaseRecipe
 from ninkasi.brewfather import api
 
 
+BASE_URL = "https://web.brewfather.app/tabs/recipes/recipe/"
+
+
 class Recipe(BaseRecipe):
 
     """ BrewFather recipe
@@ -10,6 +13,7 @@ class Recipe(BaseRecipe):
     TODO: cache data
     """
 
+    mode = "ro"
     _data = {}
 
     def __init__(self, data):
@@ -24,7 +28,7 @@ class Recipe(BaseRecipe):
     def urn(self):
 
         return f"urn:bf:{ self.id }"
-    
+
     @property
     def id(self):
 
@@ -105,3 +109,11 @@ class Recipe(BaseRecipe):
             total += step['stepTime']
 
         return total
+
+    def get_url(self, mode):
+
+        if mode == 'view':
+
+            return f"{ BASE_URL }{ self.data['_id'] }"
+
+        return "#"

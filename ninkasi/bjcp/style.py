@@ -10,8 +10,11 @@ NID = "bjcp"
 
 class Style(BaseStyle):
 
+    """ Style class to wrap BJCP api style """
+
     source = NID
     _data = {}
+    mode = "ro"
 
     def __init__(self, data):
 

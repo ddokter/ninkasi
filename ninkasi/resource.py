@@ -29,7 +29,7 @@ class ResourceRegistry:
 
         """ Register resource byt it's NID """
 
-        if not model in cls._registry:
+        if model not in cls._registry:
             cls._registry[model] = {}
 
         cls._registry[model][nid] = resource
@@ -53,7 +53,7 @@ class Resource:
 
     name = ""
 
-    def get_data(self):
+    def list(self):
 
         """ Return an iterable of the objects queried """
 
@@ -65,14 +65,14 @@ class ModelResource(Resource):
 
     """
 
-    name ="django"
+    name = "django"
     model = None
 
     def __init__(self, model):
 
         self.model = model
 
-    def get_data(self):
+    def list(self):
 
         return self.model.objects.all()
 

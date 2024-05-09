@@ -3,11 +3,12 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.forms import inlineformset_factory
 from django.contrib.contenttypes.forms import generic_inlineformset_factory
-from .base import CreateView, UpdateView, DetailView
+from .base import CreateView, UpdateView, DetailView, ListingView
 from ..models.step import RecipeStep
 from ..models.recipe import Recipe
 from ..models.phase import Phase
 from ninkasi.apps import PhaseRegistry
+from ninkasi.resource import ResourceRegistry
 
 
 class FormSetMixin:
@@ -23,9 +24,9 @@ class FormSetMixin:
     @property
     def formsets(self):
 
-        #factory1 = inlineformset_factory(
-        #    Recipe, Recipe.ingredient.through, exclude=[]
-        #)
+        factory1 = inlineformset_factory(
+            Recipe, Recipe.ingredient.through, exclude=[]
+        )
 
         factory2 = generic_inlineformset_factory(
             RecipeStep, exclude=[]
@@ -94,7 +95,6 @@ class RecipeAddPhaseView(DetailView):
 
         if kwargs.get('phase'):
 
-
             parent = self.get_object()
             phase = PhaseRegistry.get_phase(kwargs['phase'])
 
@@ -104,7 +104,7 @@ class RecipeAddPhaseView(DetailView):
                 order = parent.phase.last().order + 1
             except Exception:
                 pass
-            
+
             parent.phase.create(metaphase=phase.id, order=order)
 
         return HttpResponseRedirect(self.success_url)
@@ -123,3 +123,24 @@ class RecipeMovePhaseView(RecipeAddPhaseView):
             parent.move(kwargs['phase'], request.GET.get('dir'))
 
         return HttpResponseRedirect(self.success_url)
+
+
+class RecipeListingView(ListingView):
+
+    """ Override base listing to show all resources for recipe's
+
+    """
+
+    model = Recipe
+
+    def list_items(self):
+
+        """ Fetch all recipe's from all resources """
+
+        recipes = []
+
+        for resource in ResourceRegistry.get_resources('recipe'):
+
+            recipes.extend(resource.list())
+
+        return recipes

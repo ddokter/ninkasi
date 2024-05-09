@@ -2,7 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from ninkasi.resource import ResourceRegistry
-from .fields import URNField
+from .fields import URNField, URNListField
 
 
 def list_recipes():
@@ -38,18 +38,20 @@ class Beer(models.Model):
     """
 
     name = models.CharField(_("Name"), max_length=100)
-    style = URNField(max_length=100, choices=list_styles)
-    recipe = URNField(max_length=100, choices=list_recipes)
+    style = URNField(max_length=100, registry='style', choices=list_styles)
+    recipe = URNField(max_length=100, registry='recipe', choices=list_recipes)
     description = models.TextField()
 
-    def get_processing_time(self, unit='d'):
+    recipes = URNListField(null=True, blank=True, registry='recipe',
+                           choices=list_recipes)
 
-        """Return the amount of time needed to produce this beer,
-        from brew to packaging in the unit given. Default is day ('d'),
-        but valid options are 'h' (hour), 'm' (month), 'w' (week).
+    def get_processing_time(self):
+
+        """Return the processing time for this beer, provided as a
+        Duration object.
 
         """
-        
+
         try:
             return self.get_recipe().get_total_duration()
         except AttributeError:
@@ -57,15 +59,20 @@ class Beer(models.Model):
 
     def __str__(self):
 
-        return f"{ self.name } ({ self.get_style() })"
+        return f"{ self.name } ({ self.style })"
 
     def list_batches(self):
+
+        """ All batches for this beer """
 
         return self.batch_set.all()
 
     def get_style(self):
 
-        """ Fetch the actual style """
+        """Fetch the style for the beer. This should be a generally
+        recognized style, i.e. BJCP or other.
+
+        """
 
         nid = self._meta.get_field("style").get_ns(self.style)
         _id = self._meta.get_field("style").get_id(self.style)

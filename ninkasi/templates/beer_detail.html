@@ -15,6 +15,19 @@
 
 {% block content %}
 
+<dl class="row">
+  <dt class="col-sm-3">{% trans 'Style' %}</dt>
+  <dd class="col-sm-9">{{ object.style }}</dd>
+
+  <dt class="col-sm-3">{% trans 'Recipe (old)' %}</dt>
+  <dd class="col-sm-9">{{ object.recipe }}</dd>
+  
+  <dt class="col-sm-3">{% trans 'Recipes' %}</dt>
+  <dd>
+  </dd>
+</dl>
+
+
 {% if object.descr %}
 <p>{{ object.descr }}</p>
 {% endif %}

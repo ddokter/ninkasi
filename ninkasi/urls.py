@@ -7,11 +7,13 @@ from .views.base import (DeleteView, ListingView, DetailView, CreateView,
 from .views.batch import (BatchCreateView, BatchUpdateView, BatchDetailView,
                           BatchImportPhasesView)
 from .views.recipe import (RecipeCreateView, RecipeUpdateView, RecipeView,
-                           RecipeAddPhaseView, RecipeMovePhaseView)
+                           RecipeAddPhaseView, RecipeMovePhaseView,
+                           RecipeListingView)
+from .views.style import StyleListingView
 from .views.sample import SampleCreateView, SampleUpdateView
 from .views.brew import (BrewCreateView, BrewUpdateView, BrewImportPhasesView)
 from .views.phase import PhaseMoveStepView, PhaseView
-from .views.tank import TankCreateView, TankUpdateView
+from .views.beer import BeerCreateView
 from .views.home import Home
 from .views.planner import PlannerView
 from .views.agenda import AgendaView
@@ -36,7 +38,7 @@ urlpatterns = [
     path('agenda/',
          AgendaView.as_view(),
          name="agenda"),
-    
+
     path('transfer/<int:ct>/<int:cid>/',
          TransferView.as_view(),
          name="transfer"),
@@ -61,8 +63,6 @@ urlpatterns = [
          BatchUpdateView.as_view(),
          name="edit_batch"),
 
-    # Generic detail view
-    #
     path('batch/<int:pk>',
          BatchDetailView.as_view(),
          name="view"),
@@ -90,6 +90,14 @@ urlpatterns = [
     path('recipe/<int:pk>/movephase/<int:phase>',
          RecipeMovePhaseView.as_view(),
          name="recipe_movephase"),
+
+    path('recipe/list',
+         RecipeListingView.as_view(),
+         name="list_recipes"),
+
+    path('style/list',
+         StyleListingView.as_view(),
+         name="list_styles"),
 
     path('sample/add/',
          SampleCreateView.as_view(),
@@ -119,6 +127,10 @@ urlpatterns = [
          BrewImportPhasesView.as_view(),
          name="brew_import_phases"),
 
+    path('beer/add/',
+         BeerCreateView.as_view(),
+         name="create_beer"),
+
     path('phase/<int:pk>',
          PhaseView.as_view(),
          name="view"),
@@ -129,11 +141,11 @@ urlpatterns = [
 
     # Tank
     #
-    #path('tank/add/<int:batch>',
+    # path('tank/add/<int:batch>',
     #     TankCreateView.as_view(),
     #     name="create_tank"),
 
-    #path('tank/<int:pk>/edit',
+    # path('tank/<int:pk>/edit',
     #     TankUpdateView.as_view(),
     #     name="edit_tank"),
 

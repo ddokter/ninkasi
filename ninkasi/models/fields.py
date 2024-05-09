@@ -78,7 +78,7 @@ class Duration:
     def to_timedelta(self):
 
         return timedelta(days=self.days)
-    
+
     def __len__(self):
 
         return len(str(self))
@@ -123,6 +123,15 @@ def validate_urn(value):
             _("Enter a valid urn (RFC2141)"), code="invalid",
             params={"value": value}
         ) from exc
+
+
+def validate_urn_list(value):
+
+    """ Check on the list of URN values and check 'm all """
+
+    for urn in value.split():
+
+        validate_urn(urn)
 
 
 def validate_range(value, _type=int):
@@ -239,16 +248,17 @@ class FloatRangeField(models.CharField):
     default_validators = [validate_float_range]
 
 
-class URNField(models.CharField):
+class URNMixin:
 
-    """Resources, like recipe's, may come from many different
-    sources.  Ninkasi uses a URN field to specify the provider and the
-    unique ID.
+    registry = None
 
-    TODO: add model to opts
-    """
+    def __init__(self, *args, **kwargs):
 
-    default_validators = [validate_urn]
+        self.registry = kwargs.get('registry')
+
+        kwargs.pop('registry')
+
+        super().__init__(*args, **kwargs)
 
     def get_id(self, value):
 
@@ -262,14 +272,75 @@ class URNField(models.CharField):
 
         return value.split(URN_SEP)[1]
 
+
+class URNField(URNMixin, models.CharField):
+
+    """Resources, like recipe's, may come from many different
+    sources.  Ninkasi uses a URN field to specify the provider and the
+    unique ID.
+
+    """
+
+    default_validators = [validate_urn]
+
     def __to_python(self, value):
 
-        """ Return Model object, but gracefully """
+        """Return Model object if possible.  TODO: this method should
+        be very conservative. So check for the correct python result,
+        as it may already have been called.
 
-        if isinstance(value, Duration):
+        """
+
+        if isinstance(value, models.Model) or value is None:
             return value
 
-        if value is None:
+        nid = self.get_ns(value)
+        _id = self.get_id(value)
+
+        res = ResourceRegistry.get_resource(self.registry, nid)
+
+        return res.get(_id)
+
+    def from_db_value(self, value, *args):
+
+        """ Convert from DB value into python value stored on the model.
+        This makes sure the model.< fieldname > value is the actual
+        resource.
+        """
+
+        return self.__to_python(value)
+
+    def __get_prep_value(self, value):
+
+        """ Prepare for DB, cast to str """
+
+        return str(value)
+
+
+class URNListField(URNMixin, models.JSONField):
+
+    """ Store a list of URNs in a charfield
+
+    """
+
+    default_validators = [validate_urn_list]
+
+    def to_python(self, value):
+
+        """ Return list of Models if possible """
+
+        value = super().to_python(value)
+
+        if isinstance(value, list) or value is None:
+            return value
+
+        return [self.get_obj(urn) for urn in value]
+
+    def get_obj(self, value):
+
+        """ Return the model from the resource if possible """
+
+        if not isinstance(value, str) or not value:
             return value
 
         nid = self.get_ns(value)
@@ -279,17 +350,8 @@ class URNField(models.CharField):
 
         return res.get(_id)
 
-    def __from_db_value(self, value, *args):
+    def from_db_value(self, value, *args):
 
         """ Convert from DB value into python value stored on the model """
 
-        if value is None or value == '':
-            return value
-
-        return Duration(value)
-
-    def __get_prep_value(self, value):
-
-        """ Prepare for DB, cast to str """
-
-        return str(value)
+        return self.to_python(value)

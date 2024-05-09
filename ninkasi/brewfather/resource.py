@@ -16,4 +16,6 @@ class RecipeResource(Resource):
 
     def get(self, _id):
 
-        return get_recipe(_id)
+        """ Wrap data in Recipe class """
+
+        return Recipe(get_recipe(_id))

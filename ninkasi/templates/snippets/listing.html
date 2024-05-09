@@ -15,8 +15,17 @@
 
       {% icon item %}
 
-      <a href="{{ item|detail_url }}">{{ item|safe }}</a>
-
+      {% with url=item|detail_url %}
+      {% if url|url_is_remote %}
+      <a href="{{ url }}" target="_NEW">
+	{{ item|safe }}
+	<i class="fas fa-up-right-from-square"></i>
+      </a>
+      {% else %}
+      <a href="{{ url }}">{{ item|safe }}</a>      
+      {% endif %}
+      {% endwith %}
+      
       {% status item %}
 
       <div class="float-right">

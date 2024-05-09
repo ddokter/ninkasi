@@ -1,7 +1,10 @@
-from datetime import datetime, date
+""" Ninkasi template tag lib """
+
+from datetime import date
 import calendar
 from django.template import Library
 from django.template.loader import render_to_string
+from django.template.exceptions import TemplateDoesNotExist
 from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
 from django.utils.safestring import mark_safe
@@ -29,6 +32,7 @@ def fslabel(formset):
     """ Get the label from the verbose name plural option """
 
     return formset.model._meta.verbose_name_plural
+
 
 @register.inclusion_tag('snippets/listing.html', takes_context=True)
 def listing(context, title, items, create_url=None):
@@ -65,7 +69,11 @@ def edit_action(obj):
     try:
         _url = reverse("edit_%s" % model_name, kwargs={'pk': obj.id})
     except NoReverseMatch:
-        _url = reverse("edit", kwargs={'model': model_name, 'pk': obj.id})
+        try:
+            _url = reverse("edit", kwargs={'model': model_name, 'pk': obj.id})
+        except NoReverseMatch:
+            _url = obj.get_url('edit')
+
     return {'edit_url': _url}
 
 
@@ -104,9 +112,12 @@ def inline_add_action(model_name, parent, extra_args=""):
 @register.inclusion_tag('snippets/delete_action.html')
 def delete_action(obj, extra_args=""):
 
-    return {'delete_url': "%s%s" % (reverse("delete", kwargs={
-        'model': get_model_name(obj),
-        'pk': obj.id}), extra_args)}
+    try:
+        return {'delete_url': "%s%s" % (reverse("delete", kwargs={
+            'model': get_model_name(obj),
+            'pk': obj.id}), extra_args)}
+    except NoReverseMatch:
+        return {'delete_url': obj.get_url('delete')}
 
 
 @register.inclusion_tag('snippets/delete_action.html')
@@ -130,7 +141,13 @@ def path_detail(path):
 @register.filter
 def detail_url(obj):
 
-    return reverse('view', kwargs={'model': get_model_name(obj), 'pk': obj.id})
+    """ The object may not have a view. Ask it's url in that case """
+
+    try:
+        return reverse('view',
+                       kwargs={'model': get_model_name(obj), 'pk': obj.id})
+    except NoReverseMatch:
+        return obj.get_url('view')
 
 
 @register.filter
@@ -155,7 +172,7 @@ def status_label(obj):
 
     try:
         return obj._meta.model.get_status_display(obj)
-    except:
+    except AttributeError:
         return None
 
 
@@ -173,7 +190,7 @@ def status_class(status):
             return "danger"
         else:
             return "warning"
-    except:
+    except TypeError:
         return "info"
 
 
@@ -184,7 +201,7 @@ def byline(obj):
         return render_to_string("snippets/%s_byline.html" %
                                 get_model_name(obj),
                                 {'obj': obj})
-    except:
+    except BaseException:
         return ""
 
 
@@ -200,6 +217,9 @@ def push(obj1, obj2):
 def has_obj_perm(user_obj, perm):
 
     user, obj = user_obj
+
+    if getattr(obj, "mode", None) == 'ro':
+        return False
 
     # return user.has_perm("unicorn.%s_%s" % (perm, get_model_name(obj)))
 
@@ -219,14 +239,16 @@ def has_model_perm(user_model, perm):
 @register.simple_tag
 def icon(obj_or_model):
 
-    if hasattr(obj_or_model, "_meta"):
+    """ Render the icom for the given model """
+
+    if not isinstance(obj_or_model, str):
         model = get_model_name(obj_or_model)
     else:
         model = obj_or_model
 
     try:
         return render_to_string(f"snippets/icon/{ model }.html", {})
-    except:
+    except TemplateDoesNotExist:
         return ""
 
 
@@ -237,7 +259,7 @@ def status(obj):
         return render_to_string("snippets/status/%s.html" %
                                 get_model_name(obj),
                                 {'obj': obj})
-    except:
+    except TemplateDoesNotExist:
         return ""
 
 
@@ -276,3 +298,11 @@ def step_logform(context, step):
     context.update({'step': step, 'form': form(initial={'step': step.id})})
 
     return context
+
+
+@register.filter
+def url_is_remote(url):
+
+    """ Poor man's implementation of the remote check """
+
+    return url.startswith("http")
