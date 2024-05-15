@@ -46,6 +46,14 @@ class Phase(BasePhase, models.Model):
 
         return self.get_metaphase().list_step_models()
 
+    def add_step(self, **kwargs):
+
+        """ Add default step """
+
+        model = self.get_metaphase().get_default_step_model()
+
+        model.objects.create(phase=self, **kwargs)
+
     @property
     def name(self):
 
@@ -79,8 +87,7 @@ class Phase(BasePhase, models.Model):
 
             return False
 
-        if (self.list_steps(raw=True).count()
-            != thing.list_steps(raw=True).count()):
+        if self.step_set.count() != thing.list_steps(raw=True).count():
             return False
 
         steps_old = list(self.list_steps())

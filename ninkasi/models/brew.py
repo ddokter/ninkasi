@@ -25,6 +25,10 @@ class Brew(models.Model):
 
         return f"{self.batch.nr} - {self.batch.beer}"
 
+    def list_recipes(self):
+
+        return self.batch.beer.recipes
+
     def list_materials(self):
 
         return self.brewmaterial_set.all()
@@ -40,7 +44,7 @@ class Brew(models.Model):
     def list_phases(self):
 
         return self.phase.all()
-    
+
     def get_total_duration(self):
 
         """ Return total duration of the brew """
@@ -50,14 +54,13 @@ class Brew(models.Model):
     @property
     def volume(self):
 
-        """ The brew volume is the volume of the final transfer """
-
-        #if self.list_transfers().exists():
-        #    return self.list_transfers().last().volume
+        """ The brew volume is the volume of the final transfer
+        TODO: implement me
+        """
 
         return 0
 
-    def import_phases(self):
+    def import_phases(self, recipe_id):
 
         """Import all phases from the bre recipe, that is in fact the
         recipe of the beer for this batch. In the future, this could
@@ -65,7 +68,7 @@ class Brew(models.Model):
 
         """
 
-        for phase in self.batch.beer.get_recipe().list_phases():
+        for phase in self.batch.beer.get_recipe(recipe_id).list_phases():
 
             if 'brew' in phase.get_metaphase().parents:
 

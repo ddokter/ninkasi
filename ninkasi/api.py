@@ -1,5 +1,6 @@
 """ API definitions for Ninkasi """
 
+from django.apps import apps
 from .ordered import OrderedContainer
 from .registry import PhaseRegistry
 
@@ -158,6 +159,14 @@ class MetaPhase:
         """ return a list of step models that may be added to this phase """
 
         return self.steps
+
+    def get_default_step_model(self):
+
+        """ Get the step model for this meta """
+
+        parts = self.steps[0].split(".")
+
+        return apps.get_model(parts[0], parts[1])
 
 
 class MashMetaPhase(MetaPhase):

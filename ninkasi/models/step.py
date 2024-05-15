@@ -33,6 +33,10 @@ class Step(BaseModel, BaseStep):
     duration = DurationField(_("Duration"), max_length=10)
     order = models.SmallIntegerField(default=0, editable=False)
 
+    def __hash__(self):
+
+        return self.pk
+
     class Meta:
 
         app_label = "ninkasi"
@@ -91,6 +95,10 @@ class MashStep(Step):
 
         return f"{ self.temperature } &deg;C"
 
+    def __hash__(self):
+
+        return self.pk
+
     def get_total_duration(self):
 
         """ Get total duration """
@@ -124,6 +132,10 @@ class RecipeStep(Step):
     def __str__(self):
 
         return f"{self.phase} - {self.temperature}°C"
+
+    def __hash__(self):
+
+        return self.pk
 
     class Meta:
 

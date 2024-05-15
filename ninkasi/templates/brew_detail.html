@@ -14,12 +14,23 @@
 {% endif %}
 
 {% if user|push:object|has_obj_perm:'change' %}
-<a class="btn btn-outline-warning btn-sm"
-   href="{% url 'brew_import_phases' object.pk %}"
-   data-toggle="tooltip" data-placement="right"
-   title="{% trans 'Import phases' %}">
-  <span class="fas fa-arrow-left" />
-</a>
+<span class="dropdown show">
+  <a class="btn btn-sm btn-outline-info dropdown-toggle" href="#"
+     role="button" id="import-dropdown" data-toggle="dropdown"
+     aria-haspopup="true" aria-expanded="false"
+     title="{% trans 'Import recipe' %}">
+    <span class="fas fa-arrow-left" />
+    <span class="fas fa-clipboard-list" />
+  </a>
+  <div class="dropdown-menu" aria-labelledby="phase-dropdown">
+    {% for recipe in object.list_recipes %}
+    <a class="dropdown-item"
+       href="{% url 'brew_import_phases' object.pk %}?recipe={{ recipe.id }}">
+      {{ recipe }}
+    </a>
+    {% endfor %}
+  </div>
+</span>
 {% endif %}
 
 {% endblock %}

@@ -1,11 +1,12 @@
 from django.utils.translation import gettext_lazy as _
 from django.http import HttpResponseRedirect
 from django.forms import inlineformset_factory, HiddenInput
+from django.urls import reverse
 from django.contrib.contenttypes.forms import generic_inlineformset_factory
+from django.contrib import messages
 from .base import CreateView, UpdateView, DetailView
 from ..models.brew import Brew
 from ..models.batch import Batch
-from ..models.transfer import Transfer
 
 
 class FormSetMixin:
@@ -33,12 +34,12 @@ class FormSetMixin:
         # factory2 = generic_inlineformset_factory(
         #    BatchStep, exclude=[],
         #    can_order=True
-        #)
+        # )
 
-        #factory3 = generic_inlineformset_factory(
+        # factory3 = generic_inlineformset_factory(
         #    Transfer, exclude=[],
         #    extra=1,
-        #)
+        # )
 
         kwargs = {}
 
@@ -48,8 +49,8 @@ class FormSetMixin:
         if self.object:
             kwargs['instance'] = self.object
 
-        #formset_3 = factory3(**kwargs)
-        #setattr(formset_3, "expanded", True)
+        # formset_3 = factory3(**kwargs)
+        # setattr(formset_3, "expanded", True)
 
         return [factory1(**kwargs)]
 
@@ -89,10 +90,20 @@ class BrewImportPhasesView(DetailView):
 
     model = Brew
 
+    @property
+    def success_url(self):
+
+        return reverse("view", kwargs={'pk': self.get_object().pk,
+                                       'model': 'brew'})
+
     def get(self, request, *args, **kwargs):
 
-        """ Shortcut to import of phases """
+        """ Shortcut to import of phases from recipe provided """
 
-        self.get_object().import_phases()
+        if request.GET.get('recipe'):
+
+            self.get_object().import_phases(request.GET['recipe'])
+        else:
+            messages.error(self.request, _("Recipe to import not provided."))
 
         return HttpResponseRedirect(self.success_url)

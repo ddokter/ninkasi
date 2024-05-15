@@ -44,24 +44,30 @@ class Phase(api.Phase):
 
 class StepMixin:
 
+    """ Provide step basics """
+
     order = 0
-    
+
     def copy(self, parent, **kwargs):
 
         """ Copy self onto parent """
 
         kwargs.update({"order": self.order,
+                       "rampup": self.ramp,
                        "duration": self.total_duration,
                        "temperature": self.temperature})
 
-        return self.__class__.objects.create(phase=parent, **kwargs)
-    
+        return parent.add_step(**kwargs)
+
     @property
     def temperature(self):
 
+        """ Return step temperature """
+
         return self.data['stepTemp']
 
-class MashStep(api.Step):
+
+class MashStep(StepMixin, api.Step):
 
     """ Step wrapper """
 
@@ -70,20 +76,27 @@ class MashStep(api.Step):
         self.data = data
 
     @property
+    def duration(self):
+
+        return Duration(f"{ self.data['stepTime'] }m")
+
+    @property
+    def ramp(self):
+
+        try:
+            return Duration(f"{ self.data['ramp'] }m")
+        except KeyError:
+            return Duration("0m")
+
+    @property
     def total_duration(self):
 
         """ For Brewfather mash steps, total time is time + ramp """
 
-        duration = Duration(f"{ self.data['stepTime'] }m")
-
-        if self.data['rampTime']:
-
-            duration += Duration(f"{ self.data['rampTime'] }m")
-
-        return duration
+        return self.duration + self.ramp
 
 
-class FermentationStep(api.Step):
+class FermentationStep(StepMixin, api.Step):
 
     """ Step wrapper for fermentation """
 
@@ -96,14 +109,21 @@ class FermentationStep(api.Step):
         return self.data['type']
 
     @property
+    def duration(self):
+
+        return Duration(f"{ self.data['stepTime'] }d")
+
+    @property
+    def ramp(self):
+
+        try:
+            return Duration(f"{ self.data['ramp'] }d")
+        except KeyError:
+            return Duration("0m")
+
+    @property
     def total_duration(self):
 
         """ For Brewfather mash steps, total time is time + ramp """
 
-        duration = Duration(f"{ self.data['stepTime'] }d")
-
-        if self.data.get('ramp', None):
-
-            duration += Duration(f"{ self.data['ramp'] }d")
-
-        return duration
+        return self.duration + self.ramp
