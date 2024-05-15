@@ -1,111 +1,14 @@
 """ Ninkasi specific fields """
 
-import re
-from datetime import timedelta
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
 from ninkasi.resource import ResourceRegistry
+from ninkasi.duration import Duration
 
 
 RANGE_FIELD_SEP = ","
 URN_SEP = ":"
-
-# Duration field regexp
-#
-DURATION_RE = re.compile(r"^(\-?[0-9]+\.?[0-9]*)\s*([smhd])$")
-
-# Map duration to minutes
-#
-DURATION_MAP = {
-    'd': 60 * 24,
-    'm': 1,
-    'h': 60,
-    's': 1/60
-}
-
-
-def convert_duration(value, unit="m"):
-
-    """Take a Duration value and convert it to the unit provided.
-
-    """
-
-    if isinstance(value, str):
-        value = Duration(value)
-
-    return (value.amount * DURATION_MAP[value.unit]) / DURATION_MAP[unit]
-
-
-class Duration:
-
-    """ Duration object, specifying an amount and a unit """
-
-    def __init__(self, value):
-
-        res = DURATION_RE.match(value)
-
-        try:
-            self.amount = float(res.group(1))
-            self.unit = res.group(2)
-        except AttributeError as exc:
-            raise ValidationError(_("Improper format for duration")) from exc
-
-    def __str__(self):
-
-        return f"{self.amount:.2f}{ self.unit }"
-
-    def convert(self, unit):
-
-        """ Convert to the value asked """
-
-        return convert_duration(self, unit=unit)
-
-    @property
-    def days(self):
-
-        """ Convenience property, returning the number of days """
-
-        return self.convert(unit="d")
-
-    @classmethod
-    def from_dates(cls, start, end):
-
-        """ Calculate a duration from two dates """
-
-        return Duration(f"{ (end - start).total_seconds() / 60 }m")
-
-    def to_timedelta(self):
-
-        return timedelta(days=self.days)
-
-    def __len__(self):
-
-        return len(str(self))
-
-    def __add__(self, value):
-
-        """ Add another duration. Convert to same unit. """
-
-        self.amount += convert_duration(str(value), unit=self.unit)
-
-        return self
-
-    def __radd__(self, other):
-
-        """ Allow summation """
-
-        if other == 0:
-            return self
-
-        return self.__add__(other)
-
-    def __eq__(self, thing):
-
-        if not thing:
-            return False
-
-        return (self.amount == thing.amount and self.unit == thing.unit)
 
 
 def validate_urn(value):
@@ -129,7 +32,7 @@ def validate_urn_list(value):
 
     """ Check on the list of URN values and check 'm all """
 
-    for urn in value.split():
+    for urn in value:
 
         validate_urn(urn)
 
@@ -256,9 +159,29 @@ class URNMixin:
 
         self.registry = kwargs.get('registry')
 
-        kwargs.pop('registry')
+        try:
+            kwargs.pop('registry')
+        except KeyError:
+            pass
 
         super().__init__(*args, **kwargs)
+
+    def _check_choices(self):
+
+        """ Do not check choices, as they are provided dynamically """
+
+        return []
+
+    def __clean(self, value, model_instance):
+
+        """Sadly Django wants to check on a list of normalized choices
+        and we don't. Skip 'validate' call therefore.
+
+        """
+
+        # self.run_validators(value)
+        value = self.to_python(value)
+        return value
 
     def get_id(self, value):
 
@@ -281,7 +204,9 @@ class URNField(URNMixin, models.CharField):
 
     """
 
-    default_validators = [validate_urn]
+    description = "Resource specifier following the URN scheme."
+
+    # default_validators = [validate_urn]
 
     def __to_python(self, value):
 
@@ -289,9 +214,11 @@ class URNField(URNMixin, models.CharField):
         be very conservative. So check for the correct python result,
         as it may already have been called.
 
+        TODO: enable to_python ???
+
         """
 
-        if isinstance(value, models.Model) or value is None:
+        if value is None or not isinstance(value, str):
             return value
 
         nid = self.get_ns(value)
@@ -310,12 +237,6 @@ class URNField(URNMixin, models.CharField):
 
         return self.__to_python(value)
 
-    def __get_prep_value(self, value):
-
-        """ Prepare for DB, cast to str """
-
-        return str(value)
-
 
 class URNListField(URNMixin, models.JSONField):
 
@@ -323,18 +244,31 @@ class URNListField(URNMixin, models.JSONField):
 
     """
 
-    default_validators = [validate_urn_list]
+    # default_validators = [validate_urn_list]
 
-    def to_python(self, value):
+    def validate(self, value, model_instance):
 
-        """ Return list of Models if possible """
+        """ The value is a list, and the default validate doesn't support
+        multiple values. So override and take care of it. """
+
+        if isinstance(value, list):
+            for val in value:
+                super().validate(val, model_instance)
+        else:
+            super().validate(value, model_instance)
+
+    def __to_python(self, value):
+
+        """ Return list of actual URN resource classes if possible """
 
         value = super().to_python(value)
 
-        if isinstance(value, list) or value is None:
+        if value is None or isinstance(value, str):
             return value
 
-        return [self.get_obj(urn) for urn in value]
+        if isinstance(value, list):
+
+            return [self.get_obj(urn) for urn in value]
 
     def get_obj(self, value):
 
@@ -346,7 +280,7 @@ class URNListField(URNMixin, models.JSONField):
         nid = self.get_ns(value)
         _id = self.get_id(value)
 
-        res = ResourceRegistry.get_resource('style', nid)
+        res = ResourceRegistry.get_resource(self.registry, nid)
 
         return res.get(_id)
 
@@ -354,4 +288,6 @@ class URNListField(URNMixin, models.JSONField):
 
         """ Convert from DB value into python value stored on the model """
 
-        return self.to_python(value)
+        value = super().from_db_value(value, *args)
+
+        return self.__to_python(value)

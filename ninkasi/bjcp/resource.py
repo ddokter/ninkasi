@@ -1,9 +1,9 @@
 """ BrewFather resource """
 
 import logging
-from ninkasi.resource import Resource, ResourceRegistry
+from ninkasi.resource import Resource
 from ninkasi.api import APIConnectionException
-from .api import list_styles
+from .api import list_styles, get_style
 from .style import Style
 
 
@@ -32,11 +32,20 @@ class StyleResource(Resource):
                 styles.append(Style(data))
         except APIConnectionException:
             LOGGER.exception("Couldn't get styles from BJCP API")
-            
+
         return styles
 
     def get(self, _id):
 
-        """ return get_recipe(_id) """
+        """ return one single  style by the given BJCP id """
 
-        return {'name': 'foo', 'id': _id, 'source': 'bjcp'}
+        try:
+            style = get_style(_id)['beerStyles']['data'][0]
+
+            data = style['attributes']
+            data['id'] = style['id']
+
+            return Style(data)
+        except APIConnectionException:
+            LOGGER.exception("Couldn't get style from BJCP API")
+            return None

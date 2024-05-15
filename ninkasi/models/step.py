@@ -4,6 +4,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from .fields import DurationField, Duration
 from .base import BaseModel
+from ninkasi.api import Step as BaseStep
 
 
 DURATION_VOCAB = [
@@ -15,7 +16,7 @@ DURATION_VOCAB = [
 DURATION_TO_MINUTES = [1, 60, 60 * 24]
 
 
-class Step(BaseModel):
+class Step(BaseModel, BaseStep):
 
     """Step in the schema for a recipe, batch or brew. Steps for a
     batch are inherited from the recipe, but more steps may be
@@ -26,6 +27,7 @@ class Step(BaseModel):
     Steps are ordered within their parent.
     """
 
+    name = models.CharField(max_length=100, blank=True, null=True)
     phase = models.ForeignKey("Phase", on_delete=models.CASCADE)
     temperature = models.FloatField(_("Temperature"), blank=True, null=True)
     duration = DurationField(_("Duration"), max_length=10)
@@ -35,7 +37,6 @@ class Step(BaseModel):
 
         app_label = "ninkasi"
         ordering = ["order"]
-
 
     @property
     def total_duration(self):

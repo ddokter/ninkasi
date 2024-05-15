@@ -4,10 +4,11 @@ from aiohttp.client_exceptions import ClientConnectorError
 from gql.transport.exceptions import TransportServerError
 from django.conf import settings
 from ninkasi.api import APIConnectionException
+from ninkasi.utils import cache
 
 
 LIST_STYLES_QRY = """query getAllBeerStyles {
-    beerStyles(sort: "id") {
+    beerStyles(%PARAMS) {
     data {
     id
       attributes {
@@ -67,18 +68,24 @@ def _call(qry):
     return client.execute(query)
 
 
+@cache(time=3600)
 def list_styles():
 
-    """ Return listing of style defnitions """
+    """ Return listing of style definitions """
 
     try:
-        return _call(LIST_STYLES_QRY)
+        return _call(LIST_STYLES_QRY.replace('%PARAMS', 'sort: "id"'))
     except (ClientConnectorError, TransportServerError) as exc:
         raise APIConnectionException from exc
 
 
+@cache(time=3600)
 def get_style(_id):
 
     """ Show one style """
 
-    return None
+    try:
+        return _call(LIST_STYLES_QRY.replace(
+            '%PARAMS', f'filters: {{ id: {{ eq: { _id } }} }}'))
+    except (ClientConnectorError, TransportServerError) as exc:
+        raise APIConnectionException from exc

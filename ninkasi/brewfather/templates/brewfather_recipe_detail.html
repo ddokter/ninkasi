@@ -1,0 +1,66 @@
+{% extends 'base_detail.html' %}
+
+{% load i18n ninkasi_tags %}
+
+{% block content %}
+
+<dl class="row">
+  <dt class="col-sm-3">Volume</dt>
+  <dd class="col-sm-9">{{ object.volume }}</dd>
+</dl>
+
+<h2>{% trans 'Fermentables' %}</h2>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>{% trans 'Amount' %}</th>
+      <th>{% trans 'Name' %}</th>
+      <th>{% trans 'Percentage' %}</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for ingredient in object.list_fermentables %}
+  <tr>
+    <td>{{ ingredient.ingredient }}
+      {% for cat in ingredient.ingredient.categories %}
+      <span class="badge badge-pill badge-info">{{ cat }}</span>
+      {% endfor %}
+    </td>
+    <td>{{ ingredient.amount }}</td>
+    <td>{{ ingredient.name }} </td>
+    <td>{{ ingredient.percentage }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+
+<h2>{% trans 'Schema' %}</h2>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>{% trans 'Phase' %}</th>
+      <th>{% trans 'Duration' %}</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for phase in object.list_phases %}
+  <tr>
+    <td>
+      <span class="badge badge-pill badge-info">{{ phase }}
+      </span>
+    </td>
+    <td>{{ phase.get_duration }}</td>
+  </tr>
+  {% endfor %}
+  <tr>
+    <th colspan="1" scope="row">{% trans 'Total' %}</th>
+    <td>{{ object.get_total_duration.days|floatformat:2 }} {% trans 'Days' %}</td>
+  </tr>
+  </tbody>
+</table>
+
+{% endblock content %}

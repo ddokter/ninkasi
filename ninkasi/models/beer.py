@@ -32,30 +32,25 @@ def list_styles():
 class Beer(models.Model):
 
     """A beer is defined by it's name, style and description. A beer
-    can be further linked to a recipe, but it is not the same.
-
-    TODO: make recipe multiple field
+    can be further linked to one or more recipes.
     """
 
     name = models.CharField(_("Name"), max_length=100)
     style = URNField(max_length=100, registry='style', choices=list_styles)
-    recipe = URNField(max_length=100, registry='recipe', choices=list_recipes)
     description = models.TextField()
 
     recipes = URNListField(null=True, blank=True, registry='recipe',
                            choices=list_recipes)
 
-    def get_processing_time(self):
+    def get_recipe(self, _id):
 
-        """Return the processing time for this beer, provided as a
-        Duration object.
+        """ Return the recipe by it's id. """
 
-        """
+        for recipe in self.recipes:
+            if recipe.id == _id:
+                return recipe
 
-        try:
-            return self.get_recipe().get_total_duration()
-        except AttributeError:
-            return settings.DEFAULT_PROCESSING_TIME
+        return None
 
     def __str__(self):
 
@@ -66,33 +61,6 @@ class Beer(models.Model):
         """ All batches for this beer """
 
         return self.batch_set.all()
-
-    def get_style(self):
-
-        """Fetch the style for the beer. This should be a generally
-        recognized style, i.e. BJCP or other.
-
-        """
-
-        nid = self._meta.get_field("style").get_ns(self.style)
-        _id = self._meta.get_field("style").get_id(self.style)
-
-        res = ResourceRegistry.get_resource('style', nid)
-
-        return res.get(_id)
-
-    def get_recipe(self):
-
-        """ Fetch the actual recipe
-        TODO: leave this to the field itself
-        """
-
-        nid = self._meta.get_field("recipe").get_ns(self.style)
-        _id = self._meta.get_field("recipe").get_id(self.style)
-
-        res = ResourceRegistry.get_resource('recipe', nid)
-
-        return res.get(_id)
 
     class Meta:
 

@@ -13,7 +13,7 @@ from .views.style import StyleListingView
 from .views.sample import SampleCreateView, SampleUpdateView
 from .views.brew import (BrewCreateView, BrewUpdateView, BrewImportPhasesView)
 from .views.phase import PhaseMoveStepView, PhaseView
-from .views.beer import BeerCreateView
+from .views.beer import BeerCreateView, BeerUpdateView
 from .views.home import Home
 from .views.planner import PlannerView
 from .views.agenda import AgendaView
@@ -22,6 +22,8 @@ from .views.transfer import TransferView
 
 urlpatterns = [
     path('auth/', include('django.contrib.auth.urls')),
+
+    path(r'^brewfather/', include('ninkasi.brewfather.urls')),
 
     path('login/',
          LoginView.as_view(),
@@ -130,6 +132,10 @@ urlpatterns = [
     path('beer/add/',
          BeerCreateView.as_view(),
          name="create_beer"),
+
+    path('beer/<int:pk>/edit',
+         BeerUpdateView.as_view(),
+         name="edit_beer"),
 
     path('phase/<int:pk>',
          PhaseView.as_view(),

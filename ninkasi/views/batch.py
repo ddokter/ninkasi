@@ -6,7 +6,8 @@ from django.forms import inlineformset_factory, Form, Select
 from django.contrib.contenttypes.forms import generic_inlineformset_factory
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic import FormView
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
+from django.contrib import messages
 from .base import CreateView, UpdateView, DetailView
 from ..models.batch import Batch
 from ..models.beer import Beer
@@ -129,10 +130,6 @@ class BatchDetailView(DetailView):
 
         return {"years": years.items(), "months": months.items(), "days":dates}
 
-    def list_phases(self):
-
-        return self.object.list_phases()
-
     def phase_vocab(self):
 
         """ List phases defned for this system """
@@ -146,6 +143,12 @@ class BatchDetailView(DetailView):
     def list_brewhouses(self):
 
         return set(brew.brewhouse for brew in self.object.list_brews())
+
+    def list_recipes(self):
+
+        """ List possible recipes for this batch """
+
+        return self.object.beer.recipes
 
     def get_color(self):
 
@@ -163,14 +166,14 @@ class BatchDetailView(DetailView):
     def get_batch(self, thing):
 
         # TODO: dry!
-        
+
         if get_model_name(thing) == "batch":
             return thing
         elif get_model_name(thing) == "brew":
             return thing.batch
         else:
             return None
-    
+
     def get_tank_data(self):
 
         """ Fill tank/content data """
@@ -206,10 +209,20 @@ class BatchDetailView(DetailView):
 
 class BatchImportPhasesView(BatchDetailView):
 
+    @property
+    def success_url(self):
+
+        return reverse("view", kwargs={'pk': self.get_object().pk,
+                                       'model': 'batch'})
+
     def get(self, request, *args, **kwargs):
 
-        """ Shortcut to import of phases """
+        """ Shortcut to import of phases from recipe provided """
 
-        self.get_object().import_phases()
+        if request.GET.get('recipe'):
+
+            self.get_object().import_phases(request.GET['recipe'])
+        else:
+            messages.error(self.request, _("Recipe to import not provided."))
 
         return HttpResponseRedirect(self.success_url)

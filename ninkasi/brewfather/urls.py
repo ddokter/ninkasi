@@ -1,13 +1,10 @@
-""" Provide specific URLs """
-
-from django.conf.urls import url
-from .views import RecipeDetailView
+from django.urls import path, include
+from .views import RecipeView
 
 
 urlpatterns = [
 
-    url(r'^recipe/(?P<pk>[\d]+)/?$',
-        RecipeDetailView.as_view(),
-        name=""
-        )
+    path('brewfather_recipe/<pk>',
+         RecipeView.as_view(),
+         name="brewfather_view_recipe")
 ]

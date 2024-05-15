@@ -1,8 +1,9 @@
 """ BrewFather resource """
 
 from ninkasi.resource import Resource, ResourceRegistry
-from .api import list_recipes, get_recipe
+from .api import list_recipes, get_recipe, list_batches, get_batch
 from .recipe import Recipe
+from .batch import Batch
 
 
 class RecipeResource(Resource):
@@ -19,3 +20,18 @@ class RecipeResource(Resource):
         """ Wrap data in Recipe class """
 
         return Recipe(get_recipe(_id))
+
+
+class BatchResource(Resource):
+
+    """ Brewfather batches """
+
+    def list(self):
+
+        return [Batch(data) for data in list_batches()]
+
+    def get(self, _id):
+
+        """ Wrap data in Batch class """
+
+        return Batch(get_batch(_id))

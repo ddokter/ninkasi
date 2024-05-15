@@ -82,10 +82,18 @@ WSGI_APPLICATION = 'ninkasi.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': './db.sqlite3',
     }
 }
 
+
+# Local cache during DEV, to prevent API overload.
+#
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache"
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -149,7 +157,7 @@ BOOTSTRAP4 = {
 
 # When no recipe is set, use the default
 #
-DEFAULT_PROCESSING_TIME = 30
+DEFAULT_PROCESSING_TIME = "30d"
 
 #
 # END Ninkasi variables

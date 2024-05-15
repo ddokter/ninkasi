@@ -1,14 +1,14 @@
-from ninkasi.models.recipe import get_recipe_model
-from base import BaseDetailView
+from django.views.generic.detail import DetailView
+from ninkasi.resource import ResourceRegistry
 
 
-class RecipeView(BaseDetailView):
+class RecipeView(DetailView):
 
-    @property
-    def model(self):
+    mode = "ro"
+    template_name = "brewfather_recipe_detail.html"
 
-        return get_recipe_model()
+    def get_object(self):
 
-    def get_queryset(self):
+        res = ResourceRegistry.get_resource('recipe', 'bf')
 
-        return get_recipe_model().objects.all()
+        return res.get(self.kwargs['pk'])

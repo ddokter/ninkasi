@@ -28,6 +28,7 @@ class Task(BaseModel):
     priority = models.SmallIntegerField(default=3,
                                         choices=PRIO_VOCAB)
     status = models.SmallIntegerField(default=0,
+                                      editable=False,
                                       choices=STATUS_VOCAB)
 
     def __str__(self):
@@ -75,6 +76,9 @@ EVENT_VOCAB =[(0, _("Container empty")),
               (3, _("Brew finish"))]
 
 
+PRECISION_HELP = _("Use negative durations to specify before.")
+
+
 class EventScheduledTask(Task):
 
     """Task that is created based on an event. The precision field
@@ -85,12 +89,17 @@ class EventScheduledTask(Task):
     """
 
     event = models.SmallIntegerField(choices=EVENT_VOCAB)
-    precision = DurationField(max_length=5)
+    precision = DurationField(max_length=10,
+                              help_text=PRECISION_HELP)
 
     def __str__(self):
 
-        return f"""{ self.name } within { self.precision } of
-                   { self.get_event_display() }"""
+        if self.precision.amount < 0:
+            return (f"{ self.name } { self.precision.abs() } before"
+                    f" { self.get_event_display() }")
+
+        return (f"{ self.name } within { self.precision } after "
+                f"{ self.get_event_display() }")
 
     def get_deadline(self):
 

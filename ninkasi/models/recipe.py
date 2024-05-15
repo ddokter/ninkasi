@@ -10,7 +10,7 @@ from ninkasi.resource import Resource, ResourceRegistry
 from ..api import Recipe as BaseRecipe
 from .unit import Unit
 from .ingredient import Ingredient
-from .ordered import OrderedContainer
+from ..ordered import OrderedContainer
 
 
 class RecipeResource(Resource):
@@ -65,6 +65,14 @@ class Recipe(models.Model, BaseRecipe, OrderedContainer):
             "ingredient",
             "unit")
 
+    def list_fermentables(self):
+
+        raise NotImplementedError
+
+    def get_grist_weight(self):
+
+        raise NotImplementedError
+        
     def list_steps(self):
 
         """ return both brewing steps and fermentation steps """

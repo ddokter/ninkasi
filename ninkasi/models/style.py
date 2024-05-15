@@ -26,9 +26,6 @@ class StyleResource(Resource):
         return Style.objects.get(pk=int(_id))
 
 
-ResourceRegistry.register("style", "django", StyleResource())
-
-
 class Style(models.Model, BaseStyle):
 
     """The (beer) style defines the ranges in terms of color, gravity,

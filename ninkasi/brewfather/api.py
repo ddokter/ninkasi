@@ -3,6 +3,7 @@
 import requests
 from requests.auth import HTTPBasicAuth
 from django.conf import settings
+from ninkasi.utils import cache
 
 
 def _call(url):
@@ -26,6 +27,7 @@ def list_fermentables():
     return _call(url)
 
 
+@cache(time=3600)
 def list_recipes():
 
     """ Get the recipes """
@@ -33,8 +35,25 @@ def list_recipes():
     return _call("https://api.brewfather.app/v2/recipes")
 
 
+@cache(time=3600)
 def get_recipe(_id):
 
     """ Get one recipe """
 
     return _call(f"https://api.brewfather.app/v2/recipes/{ _id }")
+
+
+@cache(time=3600)
+def list_batches():
+
+    """ Get all batches from brewfather """
+
+    return _call("https://api.brewfather.app/v2/batches")
+
+
+@cache(time=3600)
+def get_batch(_id):
+
+    """ Get one batch """
+
+    return _call(f"https://api.brewfather.app/v2/batches/{ _id }")

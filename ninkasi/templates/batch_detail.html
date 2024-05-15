@@ -31,12 +31,23 @@
 {% endif %}
 
 {% if user|push:object|has_obj_perm:'change' %}
-<a class="btn btn-outline-warning btn-sm"
-   href="{% url 'batch_import_phases' object.pk %}"
-   data-toggle="tooltip" data-placement="right"
-   title="{% trans 'Import phases' %}">
-  <span class="fas fa-arrow-left" />
-</a>
+<span class="dropdown show">
+  <a class="btn btn-sm btn-outline-info dropdown-toggle" href="#"
+     role="button" id="import-dropdown" data-toggle="dropdown"
+     aria-haspopup="true" aria-expanded="false"
+     title="{% trans 'Import recipe' %}">
+    <span class="fas fa-arrow-left" />
+    <span class="fas fa-clipboard-list" />
+  </a>
+  <div class="dropdown-menu" aria-labelledby="phase-dropdown">
+    {% for recipe in view.list_recipes %}
+    <a class="dropdown-item"
+       href="{% url 'batch_import_phases' object.pk %}?recipe={{ recipe.id }}">
+      {{ recipe }}
+    </a>
+    {% endfor %}
+  </div>
+</span>
 {% endif %}
 
 
@@ -74,7 +85,7 @@
   </dd>  
   <dt class="col-sm-3">Processing time</dt>
   <dd class="col-sm-9">
-    {{ object.beer.get_processing_time.days|floatformat:2 }} days
+    {{ object.get_processing_time.days|floatformat:2 }} days
   </dd>
   <dt class="col-sm-3">{% trans 'Delivery date' %}</dt>
   <dd class="col-sm-9">{{ object.delivery_date|date:"d-m-Y" }}</dd>  
@@ -197,6 +208,16 @@
   <tr>
     <td>{{ phase }}</td>
     <td>{{ phase.get_duration }}</td>
+    <td>
+      <div class="float-right">
+        {% if user|push:phase|has_obj_perm:'change' %}
+        {% edit_action phase %}
+        {% endif %}
+        {% if user|push:phase|has_obj_perm:'delete' %}
+        {% inline_delete_action phase object %}
+        {% endif %}
+      </div>
+    </td>
   </tr>
   {% endfor %}
   <tr>

@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.conf import settings
-from ninkasi.bjcp import list_styles
+from ninkasi.bjcp import api
 
 
 HELP = """Test BJCP API
@@ -21,7 +21,7 @@ class Command(BaseCommand):
         if options['verbosity'] > 1:
             self.stdout.write("Calling BJCP API")
 
-        res = list_styles()
+        res = api.get_style(16)
 
         if options['verbosity'] > 2:
             self.stdout.write(str(res))

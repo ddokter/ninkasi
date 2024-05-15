@@ -2,6 +2,7 @@
 
 from datetime import timedelta
 from django.db import models
+from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -9,6 +10,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from .tank import Tank
 from .material import Material, ParentedMaterial
+from .fields import Duration
 
 
 class Batch(models.Model):
@@ -40,7 +42,7 @@ class Batch(models.Model):
 
     nr = models.CharField(_("Nr"), max_length=100, unique=True)
     beer = models.ForeignKey("Beer", on_delete=models.CASCADE)
-    volume_projected = models.FloatField()
+    volume_projected = models.FloatField(_("Planned volume"))
     delivery_date = models.DateField()
 
     material = models.ManyToManyField(Material, through="BatchMaterial")
@@ -48,7 +50,6 @@ class Batch(models.Model):
 
     phase = GenericRelation("Phase")
     sample = GenericRelation("Sample")
-
 
     def __str__(self):
 
@@ -115,7 +116,7 @@ class Batch(models.Model):
             return self.list_brews().first().date.date()
 
         return self.delivery_date - timedelta(
-            days=self.beer.get_processing_time().days)
+            days=self.get_processing_time().days)
 
     def get_total_duration(self):
 
@@ -123,19 +124,32 @@ class Batch(models.Model):
 
         return sum(phase.get_duration() for phase in self.list_phases())
 
-    def import_phases(self):
+    def get_processing_time(self):
+
+        """ Get the time needed to process this batch.
+        """
+
+        try:
+            return self.get_recipe().get_total_duration()
+        except AttributeError:
+            return Duration(settings.DEFAULT_PROCESSING_TIME)
+
+    def import_phases(self, recipe_id):
 
         """Import all phases from the batch recipe, that is in fact
         the recipe of the beer for this batch. In the future, this
         could be a choice of many.
         """
 
-        for phase in self.beer.get_recipe().list_phases():
+        for phase in self.beer.get_recipe(recipe_id).list_phases():
 
             if 'batch' in phase.get_metaphase().parents:
 
                 phase.copy(self)
 
+    def get_recipe(self):
+
+        """ Get the recipe set for this batch """
 
     class Meta:
 

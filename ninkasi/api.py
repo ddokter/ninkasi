@@ -1,5 +1,8 @@
 """ API definitions for Ninkasi """
 
+from .ordered import OrderedContainer
+from .registry import PhaseRegistry
+
 
 class APIConnectionException(Exception):
 
@@ -48,6 +51,90 @@ class Recipe:
     def list_phases(self):
 
         """ Return a list of BasePhase objects, ordered """
+
+
+class Batch:
+
+    """ Base batch class
+    """
+
+    @property
+    def urn(self):
+
+        """ identifier """
+
+    @property
+    def name(self):
+
+        """ Return batch name """
+
+    @property
+    def volume(self):
+
+        """ Return batch volume for this recipe """
+
+
+class Phase(OrderedContainer):
+
+    """Base class for defining phases. Extend this class for
+    implementing any type of phase. Class must support deepcopy.
+
+    """
+
+    metaphase = None
+
+    def get_metaphase(self):
+
+        """ Return asociated meta phase """
+
+        return PhaseRegistry.get_phase(self.metaphase)
+
+    def get_duration(self):
+
+        """ Return total of all steps """
+
+        return sum(step.total_duration for step in self.list_steps())
+
+    def list_steps(self, raw=False):
+
+        """Return list of all steps for this phase. If raw is True do
+        not look for actual implementation of the steps, given that a
+        step may have different implementations.
+
+        """
+
+    def get_child_qs(self):
+
+        return self.list_steps(raw=True)
+
+    def copy(self, parent):
+
+        """ Provide a deep copy of self onto parent """
+
+    def __eq__(self, thing):
+
+        """Determine whether the phases are equal. This needs to dig
+        into any subs.
+
+        """
+
+
+class Step:
+
+    """ Step in the process. Could be mash step, of fermentation step """
+
+    def get_total_duration(self):
+
+        """ Get total duration, including rampu up etc. """
+
+    @property
+    def name(self):
+
+        """ step name """
+
+    def copy(self, parent):
+
+        """ Provide a copy of self onto parent """
 
 
 class MetaPhase:

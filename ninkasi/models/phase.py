@@ -3,50 +3,19 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
-from ninkasi.apps import PhaseRegistry
-from .ordered import OrderedContainer
+from ninkasi.api import Phase as BasePhase
 
 
-class BasePhase(OrderedContainer):
-
-    """Base class for defining phases. Extend this class for
-    implementing any type of phase. Class must support deepcopy.
-
-    """
-
-    def get_duration(self):
-
-        """ Return total of all steps """
-
-        return sum(step.total_duration for step in self.list_steps())
-
-    def list_steps(self, raw=False):
-
-        """ Return list of all steps for this phase. If raw is True
-        do not look for actual implementation of the steps."""
-
-    def get_child_qs(self):
-
-        return self.list_steps(raw=True)
-
-    def copy(self, parent):
-
-        """ Provide a deep copy of self onto parent """
-
-    def __eq__(self, thing):
-
-        """ Determine whether the phases are equal """
-
-
-class Phase(models.Model, BasePhase):
+class Phase(BasePhase, models.Model):
 
     """Phases in the production process, relevant to the lifecycle of
     a batch or brew. This could be anything, from 'boil' to
-    'maturation'. Defintion of phases is part of the system setup and
+    'maturation'. Definition of phases is part of the system setup and
     up to the brewer. However, usually the phases will reflect the
     standard process of: grind, mash, filter, boil, whirlpool, chill,
-    ferment and mature. The phase is defined upon the batch, brew but
-    also recipe.
+    ferment and mature. The phase is defined upon the batch and the
+    brew but also recipe. Batch and brew import phases from the
+    recipe.
 
     """
 
@@ -56,15 +25,13 @@ class Phase(models.Model, BasePhase):
     order = models.PositiveIntegerField()
     metaphase = models.CharField(max_length=100, editable=False)
 
-    def get_metaphase(self):
-
-        """ Return asociated meta phase """
-
-        return PhaseRegistry.get_phase(self.metaphase)
-
     def __str__(self):
 
         return self.name
+
+    def __hash__(self):
+
+        return self.pk
 
     def list_steps(self, raw=False):
 
