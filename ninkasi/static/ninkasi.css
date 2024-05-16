@@ -8,3 +8,23 @@ td.brewhouse.full {
 
 td.empty {
 }
+
+a[data-toggle=collapse] i.show {
+    display: none;
+}
+
+a[data-toggle=collapse].collapsed i.show {
+    display: inherit;
+}
+
+a[data-toggle=collapse] i.hide {
+    display: inherit;
+}
+
+a[data-toggle=collapse].collapsed i.hide {
+    display: none;
+}
+
+.step.badge {
+    margin-left: 20px;
+}

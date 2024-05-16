@@ -14,6 +14,11 @@ class Phase(api.Phase):
         self.steps = []
         self.order = 0
 
+    @property
+    def id(self):
+
+        return str(self)
+
     def __str__(self):
 
         return self.metaphase
@@ -65,6 +70,10 @@ class StepMixin:
         """ Return step temperature """
 
         return self.data['stepTemp']
+
+    def __str__(self):
+
+        return f"{ self.temperature } &deg;C"
 
 
 class MashStep(StepMixin, api.Step):

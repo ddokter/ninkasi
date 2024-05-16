@@ -37,30 +37,6 @@
 </table>
 
 
-<h2>{% trans 'Schema' %}</h2>
-
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th>{% trans 'Phase' %}</th>
-      <th>{% trans 'Duration' %}</th>
-    </tr>
-  </thead>
-  <tbody>
-  {% for phase in object.list_phases %}
-  <tr>
-    <td>
-      <span class="badge badge-pill badge-info">{{ phase }}
-      </span>
-    </td>
-    <td>{{ phase.get_duration }}</td>
-  </tr>
-  {% endfor %}
-  <tr>
-    <th colspan="1" scope="row">{% trans 'Total' %}</th>
-    <td>{{ object.get_total_duration.days|floatformat:2 }} {% trans 'Days' %}</td>
-  </tr>
-  </tbody>
-</table>
+{% include 'snippets/schema.html' %}
 
 {% endblock content %}
