@@ -13,6 +13,7 @@ class Phase(api.Phase):
         self.metaphase = metaphase
         self.steps = []
         self.order = 0
+        self.mode = 'ro'
 
     @property
     def id(self):
@@ -103,6 +104,9 @@ class MashStep(StepMixin, api.Step):
         """ For Brewfather mash steps, total time is time + ramp """
 
         return self.duration + self.ramp
+
+
+BoilStep = MashStep
 
 
 class FermentationStep(StepMixin, api.Step):

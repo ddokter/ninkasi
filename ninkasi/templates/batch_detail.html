@@ -192,41 +192,6 @@
   {% endif %}
   {% endwith %}
   
-
-<h2>{% trans 'Schema' %}</h2>
-
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th>{% trans 'Phase' %}</th>
-      <th>{% trans 'Duration (in minutes)' %}</th>
-      <th />
-    </tr>
-  </thead>
-  <tbody>
-  {% for phase in object.list_phases %}
-  <tr>
-    <td>{{ phase }}</td>
-    <td>{{ phase.get_duration }}</td>
-    <td>
-      <div class="float-right">
-        {% if user|push:phase|has_obj_perm:'change' %}
-        {% edit_action phase %}
-        {% endif %}
-        {% if user|push:phase|has_obj_perm:'delete' %}
-        {% inline_delete_action phase object %}
-        {% endif %}
-      </div>
-    </td>
-  </tr>
-  {% endfor %}
-  <tr>
-    <th colspan="1" scope="row">{% trans 'Total' %}</th>
-    <td>{{ object.get_total_duration }}</td>
-  </tr>
-  </tbody>
-</table>
-
-<!-- {% sublisting 'Transfer history' object.list_transfers 'transfer' %} -->
+{% include 'snippets/schema.html' %}
 
 {% endblock content %}

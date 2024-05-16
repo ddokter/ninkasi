@@ -3,7 +3,7 @@ from django.urls import reverse
 from ninkasi.api import Recipe as BaseRecipe
 from ninkasi.brewfather import api
 from ninkasi.duration import Duration
-from .phase import Phase, MashStep, FermentationStep
+from .phase import Phase, MashStep, FermentationStep, BoilStep
 
 
 BASE_URL = "https://web.brewfather.app/tabs/recipes/recipe/"
@@ -58,6 +58,13 @@ class Recipe(BaseRecipe):
 
         phases.append(phase)
 
+        phase = Phase("boil")
+
+        phase.add_step(BoilStep({'stepTime': self.data['boilTime'],
+                                 'stepTemp': 100}))
+
+        phases.append(phase)
+
         phase = Phase("fermentation")
 
         for step in self.list_fermentation_steps():
@@ -87,7 +94,7 @@ class Recipe(BaseRecipe):
         duration += self.get_fermentation_time()
 
         duration += Duration(f"{ total }m")
-        
+
         return duration
 
     def get_mash_time(self):

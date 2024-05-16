@@ -23,7 +23,7 @@ from .views.transfer import TransferView
 urlpatterns = [
     path('auth/', include('django.contrib.auth.urls')),
 
-    path(r'^brewfather/', include('ninkasi.brewfather.urls')),
+    path('brewfather/', include('ninkasi.brewfather.urls')),
 
     path('login/',
          LoginView.as_view(),

@@ -77,6 +77,16 @@
 	  </div>
 	</div>
 	{% endif %}
+
+	<div class="float-right">
+          {% if user|push:phase|has_obj_perm:'change' %}
+          {% edit_action phase %}
+          {% endif %}
+          {% if user|push:phase|has_obj_perm:'delete' %}
+          {% inline_delete_action phase object %}
+          {% endif %}
+	</div>
+	
       </td>
     </tr>
     {% endfor %}
