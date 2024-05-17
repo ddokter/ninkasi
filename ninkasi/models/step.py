@@ -118,7 +118,17 @@ class MashStep(Step):
 
 class FermentationStep(MashStep):
 
-    """ same, same """
+    """ Same """
+
+
+class MaturationStep(MashStep):
+
+    """ Same """
+
+
+class BoilStep(MashStep):
+
+    """ Same """
 
 
 class RecipeStep(Step):

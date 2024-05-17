@@ -44,7 +44,7 @@ class MetaPhase(models.Model):
 
         """ Get the step model for this meta """
 
-        return self.default_step.model_class
+        return self.default_step.model_class()
 
     class Meta:
 

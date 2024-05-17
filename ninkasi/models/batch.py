@@ -141,7 +141,7 @@ class Batch(models.Model):
 
         for phase in self.beer.get_recipe(recipe_id).list_phases():
 
-            if 'batch' in phase.get_metaphase().parents:
+            if phase.get_metaphase().parents.filter(model='batch').exists():
 
                 phase.copy(self)
 

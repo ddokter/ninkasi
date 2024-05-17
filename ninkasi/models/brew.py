@@ -70,7 +70,7 @@ class Brew(models.Model):
 
         for phase in self.batch.beer.get_recipe(recipe_id).list_phases():
 
-            if 'brew' in phase.get_metaphase().parents:
+            if phase.get_metaphase().parents.filter(model='brew').exists():
 
                 phase.copy(self)
 

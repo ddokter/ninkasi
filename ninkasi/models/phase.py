@@ -48,12 +48,6 @@ class Phase(BasePhase, models.Model):
 
         return self.get_metaphase().list_step_models()
 
-    def get_metaphase(self):
-
-        """ Return asociated meta phase """
-
-        return MetaPhase.objects.get(name__iexact=self.metaphase)
-
     def add_step(self, **kwargs):
 
         """ Add default step """

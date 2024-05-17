@@ -131,9 +131,13 @@ class BatchDetailView(DetailView):
 
     def list_tanks(self):
 
+        """ List all tanks used for this batch """
+
         return self.object.list_tanks()
 
     def list_brewhouses(self):
+
+        """ Return brewhouses used for this batch """
 
         return set(brew.brewhouse for brew in self.object.list_brews())
 

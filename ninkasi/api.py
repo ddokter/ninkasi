@@ -2,7 +2,6 @@
 
 from django.apps import apps
 from .ordered import OrderedContainer
-from .registry import PhaseRegistry
 
 
 class APIConnectionException(Exception):
@@ -92,6 +91,15 @@ class Phase(OrderedContainer):
 
         """
 
+    def get_metaphase(self):
+
+        """ Return asociated meta phase. Use get_model to prevent cirular
+        imports, given that this api module is rather central. """
+
+        model = apps.get_model("ninkasi", "MetaPhase")
+
+        return model.objects.get(name__iexact=self.metaphase)
+
     def get_child_qs(self):
 
         return self.list_steps(raw=True)
@@ -155,56 +163,3 @@ class MetaPhase:
         parts = self.steps[0].split(".")
 
         return apps.get_model(parts[0], parts[1])
-
-
-class MashMetaPhase(MetaPhase):
-
-    """ Mash for any brew """
-
-    id = "mash"
-    name = "Mash"
-    parents = ["brew", "recipe"]
-    steps = ["ninkasi.MashStep", "ninkasi.Step"]
-
-
-class BoilMetaPhase(MetaPhase):
-
-    """ Boil for any brew. Could be absent for raw ales. """
-
-    id = "boil"
-    name = "Boil"
-    parents = ["brew", "recipe"]
-    steps = ["ninkasi.BoilStep", "ninkasi.Step"]
-
-
-class MaturationMetaPhase(MetaPhase):
-
-    """ Maturation, that is the stage after fermentation """
-
-    id = "maturation"
-    name = "Maturation"
-    parents = ["batch", "recipe"]
-    steps = ["ninkasi.MaturationStep"]
-
-
-class FermentationMetaPhase(MetaPhase):
-
-    """All fermentation steps. For Ninkasi, this does not include
-    maturation etc., purely actual yeast fermentation.
-
-    """
-
-    id = "fermentation"
-    name = "Fermentation"
-    parents = ["batch", "recipe"]
-    steps = ["ninkasi.FermentationStep"]
-
-
-class PackagingMetaPhase(MetaPhase):
-
-    """ Packaging, i.e. bottling and kegging. """
-
-    id = "packaging"
-    name = "Packaging"
-    parents = ["batch"]
-    steps = ["ninkasi.PackagingStep"]
