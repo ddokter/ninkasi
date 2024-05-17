@@ -9,5 +9,6 @@ from .beer import Beer  # noqa
 from .style import Style  # noqa
 from .phase import Phase  # noqa
 from .task import Task, ScheduledTask  # noqa
+from .metaphase import MetaPhase
 
 from .signal_processors import *  # noqa

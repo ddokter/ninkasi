@@ -84,18 +84,6 @@ class Phase(OrderedContainer):
 
     metaphase = None
 
-    def get_metaphase(self):
-
-        """ Return asociated meta phase """
-
-        return PhaseRegistry.get_phase(self.metaphase)
-
-    def get_duration(self):
-
-        """ Return total of all steps """
-
-        return sum(step.total_duration for step in self.list_steps())
-
     def list_steps(self, raw=False):
 
         """Return list of all steps for this phase. If raw is True do

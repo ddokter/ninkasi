@@ -59,15 +59,7 @@ class Batch(models.Model):
 
         """ Return a list of problems, if any.  """
 
-        problems = []
-
-        #if not self.list_steps().exists():
-        #    problems.append(("danger", _("No steps defined in the batch")))
-
-        #if self.list_steps().count() != self.recipe.list_steps().count():
-        #    problems.append(("warning", _("Steps of batch and recipe differ")))
-
-        return problems
+        return []
 
     def list_brews(self):
 
@@ -80,6 +72,12 @@ class Batch(models.Model):
         """ Get all phases defined for this batch """
 
         return self.phase.all()
+
+    def add_phase(self, metaphase):
+
+        """ Add phase of the metpahase given """
+
+        self.phase.create(metaphase=metaphase, order=self.phase.count())
 
     def list_materials(self):
 
@@ -181,9 +179,9 @@ class BatchContainer(models.Model):
     to_date = models.DateTimeField()
     volume = models.FloatField()  # validators=(check_tank_volume))
 
-    #def check_tank_volume(self, value):
+    # def check_tank_volume(self, value):
 
-    #if value > self.tank.volume:
+    # if value > self.tank.volume:
     #        raise ValidationError(_("Volume is bigger than tank volume"),
     #                              code="invalid",
     #                              params={"value": value}

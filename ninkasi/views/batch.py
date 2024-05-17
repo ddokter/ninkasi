@@ -11,8 +11,7 @@ from django.contrib import messages
 from .base import CreateView, UpdateView, DetailView
 from ..models.batch import Batch
 from ..models.beer import Beer
-from ..models.phase import Phase
-from ..models.brewhouse import Brewhouse
+from ..models.metaphase import MetaPhase
 from ..utils import get_model_name
 
 
@@ -37,13 +36,6 @@ class FormSetMixin:
 
         factory2 = inlineformset_factory(
             Batch, Batch.tank.through, exclude=[])
-
-        #factory2 = generic_inlineformset_factory(
-        #    BatchStep, exclude=[],
-            #widgets={'start_time': DateTimeInput(),
-            #         'end_time': DateTimeInput()
-            #         }
-        #)
 
         kwargs = {}
 
@@ -128,13 +120,14 @@ class BatchDetailView(DetailView):
 
             _from += datetime.timedelta(days=1)
 
-        return {"years": years.items(), "months": months.items(), "days":dates}
+        return {"years": years.items(), "months": months.items(),
+                "days": dates}
 
     def phase_vocab(self):
 
-        """ List phases defned for this system """
+        """ List phases defined for this system """
 
-        return Phase.objects.all()
+        return MetaPhase.objects.filter(parents__model="batch")
 
     def list_tanks(self):
 
@@ -224,5 +217,26 @@ class BatchImportPhasesView(BatchDetailView):
             self.get_object().import_phases(request.GET['recipe'])
         else:
             messages.error(self.request, _("Recipe to import not provided."))
+
+        return HttpResponseRedirect(self.success_url)
+
+
+class BatchAddPhaseView(BatchDetailView):
+
+    @property
+    def success_url(self):
+
+        return reverse("view", kwargs={'pk': self.get_object().pk,
+                                       'model': 'batch'})
+
+    def get(self, request, *args, **kwargs):
+
+        """ Shortcut to creation of phases """
+
+        if request.GET.get('metaphase'):
+
+            self.get_object().add_phase(request.GET['metaphase'])
+        else:
+            messages.error(self.request, _("MetaPhase not provided."))
 
         return HttpResponseRedirect(self.success_url)

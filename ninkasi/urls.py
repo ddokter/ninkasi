@@ -5,7 +5,7 @@ from .views.base import (DeleteView, ListingView, DetailView, CreateView,
                          UpdateView, InlineCreateView, InlineUpdateView,
                          InlineDeleteView)
 from .views.batch import (BatchCreateView, BatchUpdateView, BatchDetailView,
-                          BatchImportPhasesView)
+                          BatchImportPhasesView, BatchAddPhaseView)
 from .views.recipe import (RecipeCreateView, RecipeUpdateView, RecipeView,
                            RecipeAddPhaseView, RecipeMovePhaseView,
                            RecipeListingView)
@@ -72,6 +72,10 @@ urlpatterns = [
     path('batch/<int:pk>/importphases',
          BatchImportPhasesView.as_view(),
          name="batch_import_phases"),
+
+    path('batch/<int:pk>/add_phase',
+         BatchAddPhaseView.as_view(),
+         name="batch_add_phase"),
 
     path('recipe/add/',
          RecipeCreateView.as_view(),
