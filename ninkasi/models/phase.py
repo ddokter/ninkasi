@@ -4,6 +4,8 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
 from ninkasi.api import Phase as BasePhase
+from ninkasi.duration import Duration
+from .metaphase import MetaPhase
 
 
 class Phase(BasePhase, models.Model):
@@ -60,6 +62,15 @@ class Phase(BasePhase, models.Model):
         """ Get the name from the metaphase """
 
         return self.get_metaphase().name
+
+    def get_duration(self):
+
+        """ Return total of all steps, or an empty duration """
+
+        if self.list_steps(raw=True).exists():
+            return sum(step.total_duration for step in self.list_steps())
+
+        return Duration("0m")
 
     def copy(self, parent):
 

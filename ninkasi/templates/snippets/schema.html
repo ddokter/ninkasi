@@ -28,7 +28,13 @@
 	   title="{% trans 'Hide steps' %}">	
           <span class="fas fa-caret-up"></span>
 	</i>
-      </a>      
+      </a>
+
+      <div class="float-right">
+        {% if user|push:phase|has_obj_perm:'delete' %}
+        {% inline_delete_action phase object %}
+        {% endif %}
+	</div>
     </td>
   </tr>
   <tbody class="collapse" id="steps_{{ phase.id }}">
@@ -79,11 +85,8 @@
 	{% endif %}
 
 	<div class="float-right">
-          {% if user|push:phase|has_obj_perm:'change' %}
-          {% edit_action phase %}
-          {% endif %}
-          {% if user|push:phase|has_obj_perm:'delete' %}
-          {% inline_delete_action phase object %}
+          {% if user|push:step|has_obj_perm:'delete' %}
+          {% inline_delete_action step phase %}
           {% endif %}
 	</div>
 	

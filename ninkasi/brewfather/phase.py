@@ -53,6 +53,7 @@ class StepMixin:
     """ Provide step basics """
 
     order = 0
+    mode = 'ro'
 
     def copy(self, parent, **kwargs):
 
