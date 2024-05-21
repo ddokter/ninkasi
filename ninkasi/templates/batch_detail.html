@@ -14,7 +14,7 @@
   <div class="dropdown-menu" aria-labelledby="phase-dropdown">
     {% for phase in view.phase_vocab %}
     <a class="dropdown-item"
-       href="{% url 'inline_create' 'batch' object.pk 'phase' %}?metaphase={{ phase.name }}">
+       href="{% url 'addphase' 'batch' object.pk phase.name %}">
       {{ phase }}</a>
     {% endfor %}
   </div>

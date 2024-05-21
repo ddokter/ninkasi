@@ -68,11 +68,11 @@ def validate_float_range(value):
 
 def validate_duration(value):
 
-    """ Check whether the value is a '' separated tuple of float/str """
+    """ Check whether the value is a Duration object """
 
     if not value.amount and value.unit:
         raise ValidationError(
-            _("Enter a valid tuple of float/str."), code="invalid",
+            _("Enter a valid tuple of amount/unit"), code="invalid",
             params={"value": value}
         )
 
@@ -83,20 +83,6 @@ class DurationField(models.CharField):
     should be one of s, m, h, d. """
 
     default_validators = [validate_duration]
-
-    def get_parts(self, value):
-
-        """ Return the two parts of the duration, i.e. amount and unit """
-
-        res = DURATION_RE.match(value)
-
-        return (res.group(1), res.group(2))
-
-    def get_duration(self, value, unit="m"):
-
-        """ Get the duration in the given unit """
-
-        return convert_duration(value, unit=unit)
 
     def to_python(self, value):
 
@@ -180,8 +166,7 @@ class URNMixin:
         """
 
         # self.run_validators(value)
-        value = self.to_python(value)
-        return value
+        return self.to_python(value)
 
     def get_id(self, value):
 

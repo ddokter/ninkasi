@@ -4,7 +4,8 @@ from django.utils.translation import gettext_lazy as _
 
 class Category(models.Model):
 
-    """Category for ingredient, so as to be able to 'superclass' them."""
+    """Category for ingredient, so as to be able to 'superclass' them.
+    """
 
     name = models.CharField(_("Name"), max_length=100)
     synonyms = models.CharField(_("Synonyms"), max_length=255,

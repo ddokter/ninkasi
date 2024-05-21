@@ -36,13 +36,10 @@ class Recipe(models.Model, BaseRecipe, OrderedContainer):
 
     name = models.CharField(_("Name"), max_length=100)
     volume = models.SmallIntegerField(_("Volume"))
-    # ingredient = models.ManyToManyField(Ingredient, through="RecipeIngredient"
+    # ingredient = models.ManyToManyField(Ingredient,
+    # through="RecipeIngredient")
     phase = GenericRelation("Phase")
 
-    def get_child_qs(self):
-
-        return self.phase
-    
     def __str__(self):
 
         return self.name
@@ -65,14 +62,10 @@ class Recipe(models.Model, BaseRecipe, OrderedContainer):
             "ingredient",
             "unit")
 
-    def list_fermentables(self):
-
-        raise NotImplementedError
-
     def get_grist_weight(self):
 
         raise NotImplementedError
-        
+
     def list_steps(self):
 
         """ return both brewing steps and fermentation steps """
@@ -84,6 +77,12 @@ class Recipe(models.Model, BaseRecipe, OrderedContainer):
         """ return both brewing steps and fermentation steps """
 
         return self.phase.all()
+
+    def add_phase(self, metaphase):
+
+        """ Add phase of the metpahase given """
+
+        self.phase.create(metaphase=metaphase, order=self.phase.count())
 
     def get_total_duration(self):
 

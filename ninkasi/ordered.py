@@ -5,17 +5,18 @@ class OrderedContainer:
 
     """ Maintain some order... """
 
-    def get_child_qs(self):
+    def get_child_qs(self, qs):
 
-        """ Implement this method to recieve the right QS """
+        """ Implement this method to recieve the right QS, or use given
+        qs, and use getattr. """
 
-        return {}
+        return getattr(self, qs)
 
-    def move(self, phase_id, amount):
+    def move(self, phase_id, amount, qs):
 
         """ Move one up or one down """
 
-        qs = self.get_child_qs()
+        qs = self.get_child_qs(qs)
 
         current = qs.get(pk=phase_id)
 

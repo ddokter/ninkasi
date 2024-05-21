@@ -2,14 +2,15 @@ from django.db import models
 from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from django.apps import apps
-from .category import Category
 from .material import Material
 
 
 class Ingredient(Material):
 
     """ Specific material for beer, i.e. an ingredient that goes into
-    the brew. """
+    the brew. The Ingredient model may be subclassed to specify the role
+    of the ingredient in the brew. These are, somewhat traditionally,
+    defined as: fermentable, hop, yeast or misc. """
 
     def list_recipes(self):
 
@@ -31,3 +32,8 @@ class Ingredient(Material):
     class Meta:
         app_label = "ninkasi"
         ordering = ["name"]
+
+
+class Fermentable(Ingredient):
+
+    pass

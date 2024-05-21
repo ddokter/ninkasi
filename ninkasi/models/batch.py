@@ -8,12 +8,13 @@ from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
+from ..ordered import OrderedContainer
 from .tank import Tank
 from .material import Material, ParentedMaterial
 from .fields import Duration
 
 
-class Batch(models.Model):
+class Batch(models.Model, OrderedContainer):
 
     """A batch is a volume of beer that can be treated as a separate
     unit. This boils down to a volume that is brewed in one or more

@@ -5,14 +5,14 @@ from .views.base import (DeleteView, ListingView, DetailView, CreateView,
                          UpdateView, InlineCreateView, InlineUpdateView,
                          InlineDeleteView)
 from .views.batch import (BatchCreateView, BatchUpdateView, BatchDetailView,
-                          BatchImportPhasesView, BatchAddPhaseView)
-from .views.recipe import (RecipeCreateView, RecipeUpdateView, RecipeView,
-                           RecipeAddPhaseView, RecipeMovePhaseView,
-                           RecipeListingView)
+                          BatchImportPhasesView)
+from .views.recipe import (RecipeCreateView, RecipeUpdateView,
+                           RecipeDetailView, RecipeListingView)
 from .views.style import StyleListingView
 from .views.sample import SampleCreateView, SampleUpdateView
 from .views.brew import (BrewCreateView, BrewUpdateView, BrewImportPhasesView)
-from .views.phase import PhaseMoveStepView, PhaseView
+from .views.phase import (PhaseMoveStepView, PhaseView, AddPhaseView,
+                          MovePhaseView)
 from .views.beer import BeerCreateView, BeerUpdateView
 from .views.home import Home
 from .views.planner import PlannerView
@@ -73,29 +73,17 @@ urlpatterns = [
          BatchImportPhasesView.as_view(),
          name="batch_import_phases"),
 
-    path('batch/<int:pk>/add_phase',
-         BatchAddPhaseView.as_view(),
-         name="batch_add_phase"),
-
     path('recipe/add/',
          RecipeCreateView.as_view(),
          name="create_recipe"),
 
     path('recipe/<int:pk>',
-         RecipeView.as_view(),
+         RecipeDetailView.as_view(),
          name="view"),
 
     path('recipe/<int:pk>/edit',
          RecipeUpdateView.as_view(),
          name="edit_recipe"),
-
-    path('recipe/<int:pk>/addphase/<str:phase>',
-         RecipeAddPhaseView.as_view(),
-         name="recipe_addphase"),
-
-    path('recipe/<int:pk>/movephase/<int:phase>',
-         RecipeMovePhaseView.as_view(),
-         name="recipe_movephase"),
 
     path('recipe/list',
          RecipeListingView.as_view(),
@@ -148,6 +136,14 @@ urlpatterns = [
     path('phase/<int:pk>/movestep/<int:step>',
          PhaseMoveStepView.as_view(),
          name="phase_movestep"),
+
+    path('<str:model>/<int:pk>/addphase/<str:phase>',
+         AddPhaseView.as_view(),
+         name="addphase"),
+
+    path('<str:model>/<int:pk>/movephase/<int:phase>',
+         MovePhaseView.as_view(),
+         name="movephase"),
 
     # Tank
     #

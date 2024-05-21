@@ -2,26 +2,6 @@
 
 {% load i18n ninkasi_tags %}
 
-{% block extra_actions %}
-{% if user|push:'phase'|has_obj_perm:'add' %}
-<span class="dropdown show">
-  <a class="btn btn-sm btn-outline-success dropdown-toggle" href="#"
-     role="button" id="phase-dropdown" data-toggle="dropdown"
-     aria-haspopup="true" aria-expanded="false" title="{% trans 'Add phase' %}">
-    <span class="fas fa-plus" />
-    <span class="fas fa-hourglass" />
-  </a>
-  <div class="dropdown-menu" aria-labelledby="phase-dropdown">
-    {% for phase in view.phase_vocab %}
-    <a class="dropdown-item"
-       href="{% url 'recipe_addphase' view.object.id  phase.id %}">
-      {{ phase.name }}</a>
-    {% endfor %}
-  </div>
-</span>
-{% endif %}
-{% endblock %}
-
 
 {% block content %}
 
@@ -34,7 +14,7 @@
   <dd class="col-sm-9">{{ object.volume }}</dd>
 </dl>
 
-<h2>{% trans 'Fermentables' %}</h2>
+<h2>{% trans 'Ingredients' %}</h2>
 
 <table class="table table-striped">
   <thead>
@@ -46,7 +26,7 @@
     </tr>
   </thead>
   <tbody>
-  {% for ingredient in object.list_fermentables %}
+  {% for ingredient in object.list_ingredients %}
   <tr>
     <td>{{ ingredient.ingredient }}
       {% for cat in ingredient.ingredient.categories %}
@@ -62,60 +42,6 @@
 </table>
 
 
-<h2>{% trans 'Schema' %}</h2>
-
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th>{% trans 'Phase' %}</th>
-      <th>{% trans 'Duration' %}</th>
-      <th />
-    </tr>
-  </thead>
-  <tbody>
-  {% for phase in object.list_phases %}
-  <tr>
-    <td>
-      <a href="{{ phase|detail_url }}">
-	<span class="badge badge-pill badge-info">{{ phase }}
-	</span>
-      </a>
-    </td>
-    <td>{{ phase.get_duration }}</td>
-    <td>
-      <div class="float-right">
-
-	{% if not forloop.first %}
-	<a class="btn btn-outline-info btn-sm rounded-circle"
-	   href="{% url 'recipe_movephase' object.id phase.id %}?dir=-1"
-	   data-toggle="tooltip" data-placement="right"
-	   title="{% trans 'Move up' %}">
-	  <span class="fas fa-arrow-up" />
-	</a>
-	{% endif %}
-	{% if not forloop.last %}
-	<a class="btn btn-outline-info btn-sm rounded-circle"
-	   href="{% url 'recipe_movephase' object.id phase.id %}?dir=1"
-	   data-toggle="tooltip" data-placement="right"
-	   title="{% trans 'Move down' %}">
-	  <span class="fas fa-arrow-down" />
-	</a>
-	{% endif %}
-        {% if user|push:phase|has_obj_perm:'change' %}
-        <!-- {% edit_action phase %} -->
-        {% endif %}
-        {% if user|push:phase|has_obj_perm:'delete' %}
-        {% inline_delete_action phase object %}
-        {% endif %}
-      </div>
-    </td>
-  </tr>
-  {% endfor %}
-  <tr>
-    <th colspan="1" scope="row">{% trans 'Total' %}</th>
-    <td>{{ object.get_total_duration.days|floatformat:2 }} {% trans 'Days' %}</td>
-  </tr>
-  </tbody>
-</table>
+{% include 'snippets/schema.html' %}
 
 {% endblock content %}

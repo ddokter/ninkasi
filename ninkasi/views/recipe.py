@@ -3,6 +3,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.forms import inlineformset_factory
 from django.contrib.contenttypes.forms import generic_inlineformset_factory
+from django.contrib import messages
 from ninkasi.resource import ResourceRegistry
 from .base import CreateView, UpdateView, DetailView, ListingView
 from ..models.step import RecipeStep
@@ -16,16 +17,16 @@ class FormSetMixin:
 
         form = super().get_form(form_class=form_class)
 
-        form.fields.pop('ingredient')
+        # form.fields.pop('ingredient')
 
         return form
 
     @property
     def formsets(self):
 
-        factory1 = inlineformset_factory(
-            Recipe, Recipe.ingredient.through, exclude=[]
-        )
+        # factory1 = inlineformset_factory(
+        #    Recipe, Recipe.ingredient.through, exclude=[]
+        # )
 
         factory2 = generic_inlineformset_factory(
             RecipeStep, exclude=[]
@@ -53,7 +54,7 @@ class FormSetMixin:
         return HttpResponseRedirect(self.get_success_url())
 
 
-class RecipeView(DetailView):
+class RecipeDetailView(DetailView):
 
     model = Recipe
 
@@ -69,59 +70,10 @@ class RecipeCreateView(CreateView):
     model = Recipe
 
 
-#  class RecipeUpdateView(FormSetMixin, UpdateView):
-class RecipeUpdateView(UpdateView):
+class RecipeUpdateView(FormSetMixin, UpdateView):
+    #        class RecipeUpdateView(UpdateView):
 
     model = Recipe
-
-
-class RecipeAddPhaseView(DetailView):
-
-    model = Recipe
-
-    @property
-    def success_url(self):
-
-        obj = self.get_object()
-
-        return reverse("view", kwargs={
-            'pk': obj.pk,
-            'model': 'recipe'})
-
-    def get(self, *args, **kwargs):
-
-        """ Shortcut to creation of phases """
-
-        if kwargs.get('phase'):
-
-            parent = self.get_object()
-            phase = PhaseRegistry.get_phase(kwargs['phase'])
-
-            order = 0
-
-            try:
-                order = parent.phase.last().order + 1
-            except Exception:
-                pass
-
-            parent.phase.create(metaphase=phase.id, order=order)
-
-        return HttpResponseRedirect(self.success_url)
-
-
-class RecipeMovePhaseView(RecipeAddPhaseView):
-
-    def get(self, request, *args, **kwargs):
-
-        """ Shortcut to moving of phases """
-
-        if kwargs.get('phase'):
-
-            parent = self.get_object()
-
-            parent.move(kwargs['phase'], request.GET.get('dir'))
-
-        return HttpResponseRedirect(self.success_url)
 
 
 class RecipeListingView(ListingView):

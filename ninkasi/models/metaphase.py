@@ -4,9 +4,11 @@ from django.utils.translation import gettext_lazy as _
 
 class MetaPhase(models.Model):
 
-    """ MetaPhases are used to define what phases may occur in the brewing
-    process. They define the steps that may be added to a phase.
-
+    """MetaPhases are used to define what phases may occur in the
+    brewing process. Typically this would be stuff like 'mash',
+    'boil', 'fermentation' and 'maturation'. The metaphase also
+    defines the classes of steps that may be added to the phase in the
+    brew or batch.
     """
 
     name = models.CharField(unique=True, max_length=100)

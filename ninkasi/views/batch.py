@@ -223,24 +223,3 @@ class BatchImportPhasesView(BatchDetailView):
             messages.error(self.request, _("Recipe to import not provided."))
 
         return HttpResponseRedirect(self.success_url)
-
-
-class BatchAddPhaseView(BatchDetailView):
-
-    @property
-    def success_url(self):
-
-        return reverse("view", kwargs={'pk': self.get_object().pk,
-                                       'model': 'batch'})
-
-    def get(self, request, *args, **kwargs):
-
-        """ Shortcut to creation of phases """
-
-        if request.GET.get('metaphase'):
-
-            self.get_object().add_phase(request.GET['metaphase'])
-        else:
-            messages.error(self.request, _("MetaPhase not provided."))
-
-        return HttpResponseRedirect(self.success_url)
