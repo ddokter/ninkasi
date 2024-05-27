@@ -14,19 +14,25 @@ class URNSelect(forms.Select):
 
         """ Format for display in widget """
 
-        return [value.urn]
+        try:
+            return [value.urn]
+        except AttributeError:
+            return []
 
 
 class URNSelectMultiple(forms.SelectMultiple):
 
     """ Make sure the value is formatted to the URN, to enable select of
     set value """
-    
+
     def format_value(self, value):
 
         """ Format for display in widget """
 
-        return [val.urn for val in value]
+        try:
+            return [val.urn for val in value if getattr(val, "urn")]
+        except TypeError:
+            return []
 
 
 class BeerForm(forms.ModelForm):
@@ -34,6 +40,7 @@ class BeerForm(forms.ModelForm):
     """ Recipes field should be multiple choice. """
 
     recipes = forms.MultipleChoiceField(choices=list_recipes,
+                                        required=False,
                                         widget=URNSelectMultiple)
 
     style = forms.TypedChoiceField(choices=list_styles, widget=URNSelect)

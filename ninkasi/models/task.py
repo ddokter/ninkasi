@@ -3,6 +3,8 @@
 from datetime import datetime, date
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from .fields import DurationField
 from .base import BaseModel
 
@@ -33,9 +35,25 @@ class ScheduledTaskManager(models.Manager):
         for task in RepeatedScheduledTask.objects.filter(date__lt=_date):
             if task.is_due_date(_date):
 
-                task.spawn(_date)
+                task.generate_tasks(date=_date)
 
         return self.get_queryset().filter(date=_date)
+
+
+class TaskFactory:
+
+    """Generates tasks that stay linked to the factory, so the same
+    factory can generate those tasks again (and again). This is needed
+    to be able to produce tasks based on parent parameters and
+    recreate those tasks if any parameter of the parent changes.
+
+    """
+
+    def generate_tasks(self, **kwargs):
+
+        """Generate tasks. If the method is called again, the factory
+        is responsible for keeping track of already generated tasks, so
+        no orphaned or useless tasks stay around."""
 
 
 class Task(BaseModel):
@@ -100,6 +118,11 @@ class ScheduledTask(Task):
 
     def is_due(self):
 
+        """Is the task due yet? This is the deadline compared to the
+        current time.
+
+        """
+
         deadline = self.get_deadline()
 
         if isinstance(deadline, datetime):
@@ -120,31 +143,31 @@ EVENT_VOCAB = [(0, _("Container empty")),
 PRECISION_HELP = _("Use negative durations to specify before.")
 
 
-class EventScheduledTask(Task):
+class EventScheduledTask(Task, TaskFactory):
 
     """Task that is created based on an event. The precision field
     specifies how much slack there is around the scheduled time.
-    Events are specified by Ninkasi.
+    Events are specified by Ninkasi and are in terms of 'tank empty',
+    etc.
 
     TODO: somehow list events, maybe in a registry?
+
     """
 
+    precision = DurationField(max_length=5)
     event = models.SmallIntegerField(choices=EVENT_VOCAB)
-    precision = DurationField(max_length=10,
-                              help_text=PRECISION_HELP)
 
-    def __str__(self):
+    def generate_tasks(self, **kwargs):
 
-        if self.precision.amount < 0:
-            return (f"{ self.name } { self.precision.abs() } before"
-                    f" { self.get_event_display() }")
+        self.eventtasksub_set.filter(
+            name=kwargs['name'],
+            object_id=kwargs['parent'].id,
+            content_type=ContentType.objects.get_for_model(kwargs['parent']).id
+        ).delete()
 
-        return (f"{ self.name } within { self.precision } after "
-                f"{ self.get_event_display() }")
+        kwargs.update(priority=self.priority, precision=self.precision)
 
-    def get_deadline(self):
-
-        """ Add precision to date (and if set, time) """
+        return self.eventtasksub_set.create(**kwargs)
 
     class Meta:
         app_label = "ninkasi"
@@ -156,7 +179,7 @@ FREQUENCY_VOCAB = [(0, _("Daily")),
                    (3, _("Yearly"))]
 
 
-class RepeatedScheduledTask(ScheduledTask):
+class RepeatedScheduledTask(ScheduledTask, TaskFactory):
 
     """Task that is scheduled upon a frequency, based from a start
     date.  The frequency is taken from a vocabulary, that may be
@@ -194,10 +217,16 @@ class RepeatedScheduledTask(ScheduledTask):
         # TODO: implement monthly and yearly
         return False
 
-    def spawn(self, _date):
+    def generate_tasks(self, **kwargs):
 
-        return self.repeatedtasksub_set.get_or_create(
-            date=_date, priority=self.priority, precision=self.precision)
+        """Spawn a concrete task from an abstract repeat for the
+        given date, or update it, if it's already there.
+
+        """
+
+        kwargs.update(priority=self.priority, precision=self.precision)
+
+        return self.repeatedtasksub_set.get_or_create(**kwargs)
 
     class Meta:
         app_label = "ninkasi"
@@ -205,14 +234,26 @@ class RepeatedScheduledTask(ScheduledTask):
 
 class RepeatedTaskSub(ScheduledTask):
 
-    """Implement the task that is spawned from a
-    RepeatedScheduledTask whenever one needs to say something specific
-    about one single instance
+    """Implement the task that is spawned from a RepeatedScheduledTask
+    whenever one needs to say something specific about one single
+    instance, since a repeat is 'abstract'.
 
     """
 
-    parent = models.ForeignKey(RepeatedScheduledTask, on_delete=models.CASCADE)
+    factory = models.ForeignKey(RepeatedScheduledTask,
+                                on_delete=models.CASCADE)
 
     def __str__(self):
 
         return str(self.parent)
+
+
+class EventTaskSub(ScheduledTask):
+
+    """ Parented task created through planned event """
+
+    factory = models.ForeignKey(EventScheduledTask, on_delete=models.CASCADE)
+
+    parent = GenericForeignKey("content_type", "object_id")
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()

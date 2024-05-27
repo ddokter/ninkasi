@@ -1,0 +1,28 @@
+{% load i18n ninkasi_tags %}
+
+<div class="alert
+	    {% if task.is_done %}
+	    alert-success
+	    {% elif task.is_due %}
+	    alert-danger
+	    {% else %}
+	    alert-info
+	    {% endif %}
+	    ">
+  {% priority task %} {{ task }}
+  <div class="float-right">
+    {{ task.get_deadline }}
+    {% if task.is_due %}
+    <i class="fas fa-exclamation-triangle"></i>
+    {% endif %}
+
+    {% if not task.is_done %}
+    <a class="btn btn-outline-default btn-sm rounded-circle"
+       href="{% url 'fixtask' task.id %}"
+       data-toggle="tooltip" data-placement="right"
+       title="{% trans 'Set task status to done' %}">
+      <span class="fas fa-check" />
+    </a>
+    {% endif %}
+  </div>
+</div>

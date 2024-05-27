@@ -22,7 +22,6 @@ class Tank(Container):
                                      choices=TTYPE_VOCAB,
                                      )
 
-
     def __str__(self):
 
         return self.name
@@ -37,14 +36,18 @@ class Tank(Container):
         if self.batchcontainer_set.filter(
                 from_date__date__lte=date, to_date__date__gte=date).exists():
             return self.batchcontainer_set.filter(
-                from_date__date__lte=date, to_date__date__gte=date).first().batch
+                from_date__date__lte=date,
+                to_date__date__gte=date).first().batch
 
         return None
 
     def list_tasks(self):
 
+        """ List all tasks for this tank. This is the list of tasks in the
+        maintenance schema. """
+
         return self.maintenance_schema.all()
-        
+
     class Meta:
 
         app_label = "ninkasi"

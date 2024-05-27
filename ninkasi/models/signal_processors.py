@@ -2,10 +2,11 @@ from datetime import timedelta
 from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
-from .batch import Batch
+from .batch import Batch, BatchContainer
 from .transfer import Transfer
 from .step import Step, MashStep
 from .brew import Brew
+from .task import EventScheduledTask
 
 
 def recalc_end_dates(batch, transfer=None):
@@ -66,5 +67,31 @@ def step_pre_save(sender, instance, **kwargs):
 
 @receiver(pre_save, sender=MashStep)
 def mashstep_pre_save(sender, instance, **kwargs):
-    
+
     step_pre_save(sender, instance, **kwargs)
+
+
+@receiver(post_save, sender=BatchContainer)
+def batchcontainer_post_save(sender, instance, **kwargs):
+
+    """ Check on fill and empty date and generate tasks accordingly """
+
+    if instance.from_date:
+
+        for event in EventScheduledTask.objects.filter(event=1):
+
+            event.generate_tasks(parent=instance.batch,
+                                 date=instance.from_date.date(),
+                                 time=instance.from_date.time(),
+                                 name=f"{ event.name } { instance.tank }"
+                                 )
+
+    if instance.to_date:
+
+        for event in EventScheduledTask.objects.filter(event=0):
+
+            event.generate_tasks(parent=instance.batch,
+                                 date=instance.to_date.date(),
+                                 time=instance.to_date.time(),
+                                 name=f"{ event.name } { instance.tank }"
+                                 )

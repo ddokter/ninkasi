@@ -10,6 +10,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from ..ordered import OrderedContainer
 from .tank import Tank
+from .task import TaskFactory
 from .material import Material, ParentedMaterial
 from .fields import Duration
 
@@ -51,6 +52,8 @@ class Batch(models.Model, OrderedContainer):
 
     phase = GenericRelation("Phase")
     sample = GenericRelation("Sample")
+
+    # task = models.ManyToManyField("ScheduledTask")
 
     def __str__(self):
 
@@ -149,6 +152,19 @@ class Batch(models.Model, OrderedContainer):
     def get_recipe(self):
 
         """ Get the recipe set for this batch """
+
+    def generate_tasks(self):
+
+        """Get the tasks that are defined by this batch. Set batch as
+        parent and remove existing ones.
+
+        """
+
+        for tank in self.tank:
+
+            if tank.from_date:
+
+                pass
 
     class Meta:
 

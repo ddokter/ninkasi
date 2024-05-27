@@ -1,0 +1,7 @@
+{% if task.priority == 1 %}
+<span class="badge badge-danger">{{ task.get_priority_display }}</span>
+{% elif task.priority == 3 %}
+<span class="badge badge-warning">{{ task.get_priority_display }}</span>
+{% else %}
+<span class="badge badge-info">{{ task.get_priority_display }}</span>
+{% endif %}
