@@ -1,10 +1,11 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.contrib.contenttypes.fields import GenericRelation
+from ..ordered import OrderedContainer
 from .material import Material, ParentedMaterial
 
 
-class Brew(models.Model):
+class Brew(models.Model, OrderedContainer):
 
     """One brew. This boils down to one full brewing cycle on the
     brewhouse. One or more brews make up a batch.
@@ -44,6 +45,12 @@ class Brew(models.Model):
     def list_phases(self):
 
         return self.phase.all()
+
+    def add_phase(self, metaphase):
+
+        """ Add phase of the metpahase given """
+
+        self.phase.create(metaphase=metaphase, order=self.phase.count())
 
     def get_total_duration(self):
 

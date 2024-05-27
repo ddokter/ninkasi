@@ -10,6 +10,12 @@ ninkasi.recipe.BaseRecipe.
 """
 
 
+class NotFoundInResource(BaseException):
+
+    """ When a get call on the resource cannot deliver the object asked,
+    throw this """
+
+
 class ResourceRegistry:
 
     """ Singleton registry holding resources by it's NID """
@@ -56,6 +62,13 @@ class Resource:
     def list(self):
 
         """ Return an iterable of the objects queried """
+
+    def get(self, _id):
+
+        """Get the resource by it's id. Throw NotFoundInResource if
+        nothing is found.
+
+        """
 
 
 class ModelResource(Resource):

@@ -91,6 +91,10 @@ class Phase(OrderedContainer):
 
         """
 
+    def has_steps(self):
+
+        """ Wel, do we? """
+
     def get_metaphase(self):
 
         """ Return asociated meta phase. Use get_model to prevent cirular

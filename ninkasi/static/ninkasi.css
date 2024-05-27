@@ -28,3 +28,8 @@ a[data-toggle=collapse].collapsed i.hide {
 .step.badge {
     margin-left: 20px;
 }
+
+.tasks .list-group-item {
+    padding: 0px !important;
+    border: 0px !important;
+}

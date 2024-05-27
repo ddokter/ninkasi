@@ -56,6 +56,10 @@ class Phase(BasePhase, models.Model):
 
         model.objects.create(phase=self, **kwargs)
 
+    def has_steps(self):
+
+        return self.step_set.exists()
+
     @property
     def name(self):
 

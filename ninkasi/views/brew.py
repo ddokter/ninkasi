@@ -7,6 +7,7 @@ from django.contrib import messages
 from .base import CreateView, UpdateView, DetailView
 from ..models.brew import Brew
 from ..models.batch import Batch
+from ..models.metaphase import MetaPhase
 
 
 class FormSetMixin:
@@ -63,6 +64,19 @@ class FormSetMixin:
                 _formset.save()
 
         return HttpResponseRedirect(self.get_success_url())
+
+
+class BrewDetailView(DetailView):
+
+    """ Add phase vocab. TODO: could be a template_tag I guess """
+
+    model = Brew
+
+    def phase_vocab(self):
+
+        """ List phases defned for this system """
+
+        return MetaPhase.objects.filter(parents__model="brew")
 
 
 class BrewCreateView(FormSetMixin, CreateView):

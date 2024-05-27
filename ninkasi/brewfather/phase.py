@@ -34,6 +34,10 @@ class Phase(api.Phase):
 
         return self.steps
 
+    def has_steps(self):
+
+        return len(self.steps)
+
     def copy(self, parent):
 
         """ Copy onto parent, that must be a django Model """

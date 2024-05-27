@@ -8,6 +8,7 @@ class Material(models.Model):
     or labels.  """
 
     name = models.CharField(_("Name"), max_length=100)
+    description = models.TextField(_("Description"), null=True, blank=True)
     category = models.ManyToManyField("Category", blank=True)
 
     def __str__(self):

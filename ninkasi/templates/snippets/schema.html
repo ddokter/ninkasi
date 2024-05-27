@@ -1,139 +1,143 @@
 {% load i18n ninkasi_tags %}
 
-<h2>{% trans 'Schema' %}
+<section>
+  <h2>{% trans 'Schema' %}
 
-  <span class="dropdown show">
-    <a class="btn btn-sm btn-outline-success dropdown-toggle" href="#"
-       role="button" id="phase-dropdown" data-toggle="dropdown"
-       aria-haspopup="true" aria-expanded="false" title="{% trans 'Add phase' %}">
-      <span class="fas fa-plus" />
-      <span class="fas fa-hourglass" />
-    </a>
-    <div class="dropdown-menu" aria-labelledby="phase-dropdown">
-      {% for phase in view.phase_vocab %}
-      <a class="dropdown-item"
-	 href="{% url 'addphase' view.ctype object.pk phase.name %}">
-	{{ phase }}</a>
-      {% endfor %}
-    </div>
-  </span>
-</h2>
-
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th>{% trans 'Phase' %}</th>
-      <th>{% trans 'Duration (in minutes)' %}</th>
-      <th />
-    </tr>
-  </thead>
-  {% for phase in object.list_phases %}
-  <tr>
-    <td>
-      <span class="badge badge-pill badge-primary">{{ phase }}</span>
-    </td>
-    <td>{{ phase.get_duration }}</td>
-    <td>
-      <a data-toggle="collapse" class="collapsed"
-         href="#steps_{{ phase.id }}" role="button" aria-expanded="false"
-         aria-controls="steps_{{ phase.id }}">
-	<i class="show" data-toggle="tooltip" data-placement="right"
-	   title="{% trans 'Show steps' %}">	
-          <span class="fas fa-caret-down"></span>
-	</i>
-	<i class="hide" data-toggle="tooltip" data-placement="right"
-	   title="{% trans 'Hide steps' %}">	
-          <span class="fas fa-caret-up"></span>
-	</i>
+    <span class="dropdown show">
+      <a class="btn btn-sm btn-outline-success dropdown-toggle" href="#"
+	 role="button" id="phase-dropdown" data-toggle="dropdown"
+	 aria-haspopup="true" aria-expanded="false" title="{% trans 'Add phase' %}">
+	<span class="fas fa-plus" />
+	<span class="fas fa-hourglass" />
       </a>
-
-      <div class="float-right">
-
-	{% if not forloop.first %}
-	<a class="btn btn-outline-info btn-sm rounded-circle"
-	   href="{% url 'movephase' view.ctype object.id phase.id %}?dir=-1"
-	   data-toggle="tooltip" data-placement="right"
-	   title="{% trans 'Move up' %}">
-	  <span class="fas fa-arrow-up" />
-	</a>
-	{% endif %}
-	{% if not forloop.last %}
-	<a class="btn btn-outline-info btn-sm rounded-circle"
-	   href="{% url 'movephase' view.ctype object.id phase.id %}?dir=1"
-	   data-toggle="tooltip" data-placement="right"
-	   title="{% trans 'Move down' %}">
-	  <span class="fas fa-arrow-down" />
-	</a>
-	{% endif %}
-	
-        {% if user|push:phase|has_obj_perm:'delete' %}
-        {% inline_delete_action phase object %}
-        {% endif %}
-	</div>
-    </td>
-  </tr>
-  <tbody class="collapse" id="steps_{{ phase.id }}">
-    {% for step in phase.list_steps %}
+      <div class="dropdown-menu" aria-labelledby="phase-dropdown">
+	{% for phase in view.phase_vocab %}
+	<a class="dropdown-item"
+	   href="{% url 'addphase' view.ctype object.pk phase.name %}">
+	  {{ phase }}</a>
+	{% endfor %}
+      </div>
+    </span>
+  </h2>
+  
+  <table class="table table-striped">
+    <thead>
+      <tr>
+	<th>{% trans 'Phase' %}</th>
+	<th>{% trans 'Duration (in minutes)' %}</th>
+	<th />
+      </tr>
+    </thead>
+    {% for phase in object.list_phases %}
     <tr>
       <td>
-	<span class="step badge badge-pill badge-secondary">{{ step|safe }}</span>
+	<span class="badge badge-pill badge-primary">{{ phase }}</span>
       </td>
-      <td>{{ step.total_duration }}
-	{% if step.steplog %}
-	<i class="text-warning" data-toggle="tooltip" data-placement="top"
-	   title="{{ step.steplog }}">
-	  <span class="fas fa-exclamation-triangle">
-	  </span>
-	</i>	
-	{% endif %}
-      </td>
+      <td>{{ phase.get_duration }}</td>
       <td>
-	{% if object.mode != 'ro' %}
-	<button type="button" class="btn btn-outline-primary btn-sm"
-		{% if step.steplog %}
-		title="{% trans 'Edit log' %}"
-		{% else %}
-		title="{% trans 'Add log' %}"
-		{% endif %}
-		data-toggle="modal" data-target="#{{ phase.id }}_log">
-	  <span class="fas fa-plus" />
-	  <span class="fas fa-book" />
-	</button>
+	{% if phase.has_steps %}
+	<a data-toggle="collapse" class="collapsed"
+           href="#steps_{{ phase.id }}" role="button" aria-expanded="false"
+           aria-controls="steps_{{ phase.id }}">
+	  <i class="show" data-toggle="tooltip" data-placement="right"
+	     title="{% trans 'Show steps' %}">	
+            <span class="fas fa-caret-down"></span>
+	  </i>
+	  <i class="hide" data-toggle="tooltip" data-placement="right"
+	     title="{% trans 'Hide steps' %}">	
+            <span class="fas fa-caret-up"></span>
+	  </i>
+	</a>
+	{% endif %}
 	
-	<div class="modal fade" id="{{ phase.id }}_log" tabindex="-1"
-	     role="dialog" aria-labelledby="{{ phase.id }}_log_label"
-	     aria-hidden="true">
-	  <div class="modal-dialog" role="document">
-	    <div class="modal-content">
-	      <div class="modal-header">
-		<h5 class="modal-title" id="{{ phase.id }}_log_label">Log</h5>
-		<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-		  <span aria-hidden="true">&times;</span>
-		</button>
-	      </div>
-	      <div class="modal-body">
-		{% step_logform step %}
+	<div class="float-right">
+	  
+	  {% if not forloop.first %}
+	  <a class="btn btn-outline-info btn-sm rounded-circle"
+	     href="{% url 'movephase' view.ctype object.id phase.id %}?dir=-1"
+	     data-toggle="tooltip" data-placement="right"
+	     title="{% trans 'Move up' %}">
+	    <span class="fas fa-arrow-up" />
+	  </a>
+	  {% endif %}
+	  {% if not forloop.last %}
+	  <a class="btn btn-outline-info btn-sm rounded-circle"
+	     href="{% url 'movephase' view.ctype object.id phase.id %}?dir=1"
+	     data-toggle="tooltip" data-placement="right"
+	     title="{% trans 'Move down' %}">
+	    <span class="fas fa-arrow-down" />
+	  </a>
+	  {% endif %}
+	  
+          {% if user|push:phase|has_obj_perm:'delete' %}
+          {% inline_delete_action phase object %}
+          {% endif %}
+	</div>
+      </td>
+    </tr>
+    <tbody class="collapse" id="steps_{{ phase.id }}">
+      {% for step in phase.list_steps %}
+      <tr>
+	<td>
+	  <span class="step badge badge-pill badge-secondary">{{ step|safe }}</span>
+	</td>
+	<td>{{ step.total_duration }}
+	  {% if step.steplog %}
+	  <i class="text-warning" data-toggle="tooltip" data-placement="top"
+	     title="{{ step.steplog }}">
+	    <span class="fas fa-exclamation-triangle">
+	    </span>
+	  </i>	
+	  {% endif %}
+	</td>
+	<td>
+	  {% if object.mode != 'ro' %}
+	  <button type="button" class="btn btn-outline-primary btn-sm"
+		  {% if step.steplog %}
+		  title="{% trans 'Edit log' %}"
+		  {% else %}
+		  title="{% trans 'Add log' %}"
+		  {% endif %}
+		  data-toggle="modal" data-target="#{{ phase.id }}_log">
+	    <span class="fas fa-plus" />
+	    <span class="fas fa-book" />
+	  </button>
+	  
+	  <div class="modal fade" id="{{ phase.id }}_log" tabindex="-1"
+	       role="dialog" aria-labelledby="{{ phase.id }}_log_label"
+	       aria-hidden="true">
+	    <div class="modal-dialog" role="document">
+	      <div class="modal-content">
+		<div class="modal-header">
+		  <h5 class="modal-title" id="{{ phase.id }}_log_label">Log</h5>
+		  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+		    <span aria-hidden="true">&times;</span>
+		  </button>
+		</div>
+		<div class="modal-body">
+		  {% step_logform step %}
+		</div>
 	      </div>
 	    </div>
 	  </div>
-	</div>
-	{% endif %}
-
-	<div class="float-right">
-          {% if user|push:step|has_obj_perm:'delete' %}
-          {% inline_delete_action step phase %}
-          {% endif %}
-	</div>
-	
-      </td>
-    </tr>
+	  {% endif %}
+	  
+	  <div class="float-right">
+            {% if user|push:step|has_obj_perm:'delete' %}
+            {% inline_delete_action step phase %}
+            {% endif %}
+	  </div>
+	  
+	</td>
+      </tr>
+      {% endfor %}
+    </tbody>
     {% endfor %}
-  </tbody>
-  {% endfor %}
-  <tfoot>
-    <tr>
-      <th colspan="1" scope="row">{% trans 'Total' %}</th>
-      <td>{{ object.get_total_duration }}</td>
-    </tr>
-  </tfoot>
-</table>
+    <tfoot>
+      <tr>
+	<th colspan="1" scope="row">{% trans 'Total' %}</th>
+	<td>{{ object.get_total_duration }}</td>
+      </tr>
+    </tfoot>
+  </table>
+</section>

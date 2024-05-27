@@ -13,6 +13,7 @@ from ..models.batch import Batch
 from ..models.beer import Beer
 from ..models.metaphase import MetaPhase
 from ..utils import get_model_name
+from ..resource import NotFoundInResource
 
 
 class FormSetMixin:
@@ -145,7 +146,10 @@ class BatchDetailView(DetailView):
 
         """ List possible recipes for this batch """
 
-        return self.object.beer.recipes
+        try:
+            return self.object.beer.recipes
+        except NotFoundInResource:
+            return []
 
     def get_color(self):
 

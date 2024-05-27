@@ -1,6 +1,7 @@
 """ BrewFather resource """
 
-from ninkasi.resource import Resource, ResourceRegistry
+from ninkasi.api import APIConnectionException
+from ninkasi.resource import Resource, NotFoundInResource
 from .api import list_recipes, get_recipe, list_batches, get_batch
 from .recipe import Recipe
 from .batch import Batch
@@ -19,7 +20,10 @@ class RecipeResource(Resource):
 
         """ Wrap data in Recipe class """
 
-        return Recipe(get_recipe(_id))
+        try:
+            return Recipe(get_recipe(_id))
+        except APIConnectionException as exc:
+            return None
 
 
 class BatchResource(Resource):

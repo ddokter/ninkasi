@@ -6,7 +6,7 @@ from django.apps import apps
 from django.utils.translation import gettext_lazy as _
 from django.contrib.contenttypes.fields import GenericRelation
 from django.conf import settings
-from ninkasi.resource import Resource, ResourceRegistry
+from ninkasi.resource import Resource, ResourceRegistry, NotFoundInResource
 from ..api import Recipe as BaseRecipe
 from .unit import Unit
 from .ingredient import Ingredient
@@ -21,7 +21,10 @@ class RecipeResource(Resource):
 
     def get(self, _id):
 
-        return Recipe.objects.get(pk=_id)
+        try:
+            return Recipe.objects.get(pk=_id)
+        except Recipe.objects.DoesNotExist as exc:
+            raise NotFoundInResource from exc
 
 
 ResourceRegistry.register("recipe", "django", RecipeResource())
@@ -31,6 +34,11 @@ class Recipe(models.Model, BaseRecipe, OrderedContainer):
 
     """Brew recipe for a given beer, including ingredients,
     processing aids, mash and fermentation profiles, etc.
+
+    A beer may be connected to more than one recipe. This may sound
+    weird, but imagine a strong beer that can be brewed on a given
+    brewhouse in one go, but on another one, with different geometry,
+    only with a double mash.
 
     """
 

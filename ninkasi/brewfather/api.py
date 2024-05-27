@@ -4,6 +4,7 @@ import requests
 from requests.auth import HTTPBasicAuth
 from django.conf import settings
 from ninkasi.utils import cache
+from ninkasi.api import APIConnectionException
 
 
 def _call(url):
@@ -14,8 +15,8 @@ def _call(url):
 
     try:
         return requests.get(url, auth=basic, timeout=10).json()
-    except requests.exceptions.ConnectionError:
-        return []
+    except requests.exceptions.ConnectionError as exc:
+        raise APIConnectionException from exc
 
 
 def list_fermentables():

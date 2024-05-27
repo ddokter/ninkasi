@@ -12,14 +12,14 @@ class AgendaView(TemplateView, Calendar):
     """
 
     template_name = "agenda.html"
-    
+
     def get_data(self):
 
         """ Generate data for calendar. Loop over tanks and brewhouses,
         and display the calendar. """
 
         data = {}
-        
+
         for mday in self.month['days']:
 
             day = datetime(self.month['year'], self.month['month'], mday,
@@ -30,5 +30,5 @@ class AgendaView(TemplateView, Calendar):
             for task in RepeatedScheduledTask.objects.filter(date__lt=day):
                 if task.is_due_date(day):
                     data[mday].append(task)
-            
+
         return data

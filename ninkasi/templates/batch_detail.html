@@ -3,23 +3,6 @@
 {% load i18n ninkasi_tags %}
 
 {% block extra_actions %}
-{% if user|push:'phase'|has_obj_perm:'add' %}
-<span class="dropdown show">
-  <a class="btn btn-sm btn-outline-success dropdown-toggle" href="#"
-     role="button" id="phase-dropdown" data-toggle="dropdown"
-     aria-haspopup="true" aria-expanded="false" title="{% trans 'Add phase' %}">
-    <span class="fas fa-plus" />
-    <span class="fas fa-hourglass" />
-  </a>
-  <div class="dropdown-menu" aria-labelledby="phase-dropdown">
-    {% for phase in view.phase_vocab %}
-    <a class="dropdown-item"
-       href="{% url 'addphase' 'batch' object.pk phase.name %}">
-      {{ phase }}</a>
-    {% endfor %}
-  </div>
-</span>
-{% endif %}
 
 {% if user|push:'brew'|has_model_perm:'add' %}
 <a class="btn btn-outline-success btn-sm"

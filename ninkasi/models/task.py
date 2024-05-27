@@ -1,5 +1,6 @@
 """ Task definitions """
 
+from datetime import datetime, date
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from .fields import DurationField
@@ -14,6 +15,27 @@ STATUS_VOCAB = [(0, _("Open")),
                 (1, _("Done")),
                 (2, _("Cancelled")),
                 (3, _("Forfeited"))]
+
+
+class ScheduledTaskManager(models.Manager):
+
+    """ Taskmanager that can generate on the fly tasks in case of repeated
+    tasks """
+
+    def for_date(self, _date):
+
+        """Return a list of tasks for the given day. If the task
+        retrieved is a repeated task, generate specific tasks on the
+        fly.
+
+        """
+
+        for task in RepeatedScheduledTask.objects.filter(date__lt=_date):
+            if task.is_due_date(_date):
+
+                task.spawn(_date)
+
+        return self.get_queryset().filter(date=_date)
 
 
 class Task(BaseModel):
@@ -31,6 +53,13 @@ class Task(BaseModel):
                                       editable=False,
                                       choices=STATUS_VOCAB)
 
+    @property
+    def is_done(self):
+
+        """ Shortcut to done status """
+
+        return self.status == 1
+
     def __str__(self):
 
         real = self.get_real()
@@ -38,7 +67,7 @@ class Task(BaseModel):
         if self == real:
             return self.name
 
-        return str(real)
+        return f"{ str(real) } [{ real.get_status_display() }]"
 
     class Meta:
         app_label = "ninkasi"
@@ -52,6 +81,8 @@ class ScheduledTask(Task):
 
     """
 
+    objects = ScheduledTaskManager()
+
     date = models.DateField()
     time = models.TimeField(blank=True, null=True)
     precision = DurationField(max_length=5)
@@ -62,18 +93,28 @@ class ScheduledTask(Task):
 
         deadline = self.date
 
-        # TODO: Add time
+        if self.time:
+            deadline = datetime.combine(self.date, self.time)
 
         return deadline + self.precision.as_timedelta()
+
+    def is_due(self):
+
+        deadline = self.get_deadline()
+
+        if isinstance(deadline, datetime):
+            return deadline < datetime.now()
+
+        return deadline < date.today()
 
     class Meta:
         app_label = "ninkasi"
 
 
-EVENT_VOCAB =[(0, _("Container empty")),
-              (1, _("Container fill")),
-              (2, _("Brew start")),
-              (3, _("Brew finish"))]
+EVENT_VOCAB = [(0, _("Container empty")),
+               (1, _("Container fill")),
+               (2, _("Brew start")),
+               (3, _("Brew finish"))]
 
 
 PRECISION_HELP = _("Use negative durations to specify before.")
@@ -129,23 +170,49 @@ class RepeatedScheduledTask(ScheduledTask):
         help_text=_("For instance, to specify 'every two weeks'")
     )
 
-    def is_due_date(self, date):
+    def set_status(self, status, _date):
+
+        """ Set the status for this task for the given date. This is the
+        moment to spawn an actual task. """
+
+    def is_due_date(self, _date):
 
         """ Check whether the task should be done on this date """
 
-        if self.date == date:
+        if self.date == _date:
             return True
 
         if self.frequency == 0:
             return True
 
         if self.frequency == 1:
-            if (abs((self.date - date.date()).days) %
-                (7 * self.frequency_modifier) == 0):
+            if (
+                    abs((self.date - _date.date()).days) %
+                    (7 * self.frequency_modifier) == 0):
                 return True
 
         # TODO: implement monthly and yearly
         return False
 
+    def spawn(self, _date):
+
+        return self.repeatedtasksub_set.get_or_create(
+            date=_date, priority=self.priority, precision=self.precision)
+
     class Meta:
         app_label = "ninkasi"
+
+
+class RepeatedTaskSub(ScheduledTask):
+
+    """Implement the task that is spawned from a
+    RepeatedScheduledTask whenever one needs to say something specific
+    about one single instance
+
+    """
+
+    parent = models.ForeignKey(RepeatedScheduledTask, on_delete=models.CASCADE)
+
+    def __str__(self):
+
+        return str(self.parent)

@@ -73,7 +73,9 @@ class Duration:
 
         return Duration(f"{ (end - start).total_seconds() / 60 }m")
 
-    def to_timedelta(self):
+    def as_timedelta(self):
+
+        """ Return the duration as timedelta object """
 
         return timedelta(days=self.days)
 

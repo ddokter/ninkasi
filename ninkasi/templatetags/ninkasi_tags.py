@@ -306,3 +306,19 @@ def url_is_remote(url):
     """ Poor man's implementation of the remote check """
 
     return url.startswith("http")
+
+
+@register.inclusion_tag("snippets/priority.html", takes_context=False)
+def priority(_task):
+
+    """ Render snippet for task priority """
+
+    return {'task': _task}
+
+
+@register.inclusion_tag("snippets/task.html", takes_context=False)
+def task(_task):
+
+    """ Render snippet for task """
+
+    return {'task': _task}

@@ -10,11 +10,12 @@ from .views.recipe import (RecipeCreateView, RecipeUpdateView,
                            RecipeDetailView, RecipeListingView)
 from .views.style import StyleListingView
 from .views.sample import SampleCreateView, SampleUpdateView
-from .views.brew import (BrewCreateView, BrewUpdateView, BrewImportPhasesView)
+from .views.brew import (BrewDetailView, BrewCreateView, BrewUpdateView,
+                         BrewImportPhasesView)
 from .views.phase import (PhaseMoveStepView, PhaseView, AddPhaseView,
                           MovePhaseView)
 from .views.beer import BeerCreateView, BeerUpdateView
-from .views.home import Home
+from .views.home import Home, FixTask
 from .views.planner import PlannerView
 from .views.agenda import AgendaView
 from .views.transfer import TransferView
@@ -52,6 +53,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     path('', Home.as_view(), name="home"),
+
+    path('task/fix/<int:task>/',
+         FixTask.as_view(),
+         name="fixtask"),
 
     path('batch/add/',
          BatchCreateView.as_view(),
@@ -104,6 +109,10 @@ urlpatterns = [
     path('sample/add/<int:batch>',
          SampleCreateView.as_view(),
          name="create_sample"),
+
+    path('brew/<int:pk>',
+         BrewDetailView.as_view(),
+         name="view"),
 
     path('brew/add/',
          BrewCreateView.as_view(),

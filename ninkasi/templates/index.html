@@ -1,12 +1,35 @@
 {% extends 'base.html' %}
 
+{% load i18n ninkasi_tags %}
+
 {% block content %}
 
 <h1>Ninkasi - Beer QA</h1>
 
-<hr>
+<section class="tasks">
+  <h2>{% trans "Today's tasks" %}</h2>
 
-Dashboard... met taken.
+  <ul class="list-group">
+    {% for task in view.tasks_today %}
+    <li class="list-group-item">
+      {% task task %}
+    </li>
+    {% endfor %}
+  </ul>
+  
+</section>
+  
+<section class="tasks">
+  <h2>{% trans "Open tasks" %}</h2>
 
+  <ul class="list-group">
+    {% for task in view.tasks_open %}
+    <li class="list-group-item">
+      {% task task %}      
+    <li>
+    {% endfor %}
+  </ul>
+  
+</section>
 
 {% endblock %}
