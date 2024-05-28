@@ -70,7 +70,7 @@ def validate_duration(value):
 
     """ Check whether the value is a Duration object """
 
-    if not value.amount and value.unit:
+    if not isinstance(value.amount, float) and value.unit:
         raise ValidationError(
             _("Enter a valid tuple of amount/unit"), code="invalid",
             params={"value": value}

@@ -55,24 +55,43 @@
   <dd class="col-sm-9">{{ object.volume_projected }}/{{ object.volume }}
     {% if object.volume_projected > object.volume %}
     <i class="text-warning" data-toggle="tooltip" data-placement="top"
-             title="{% trans 'Brew volume too low' %}">
+	     title="{% trans 'Brew volume too low' %}">
       <span class="fas fa-exclamation-triangle">
       </span>
-    </i>    
+    </i>
     {% endif %}
   </dd>
   <dt class="col-sm-3">Beer</dt>
   <dd class="col-sm-9">
     <a href="{{ object.beer|detail_url }}">{{ object.beer }}</a>
-  </dd>  
+  </dd>
   <dt class="col-sm-3">Processing time</dt>
   <dd class="col-sm-9">
     {{ object.get_processing_time.days|floatformat:2 }} days
   </dd>
-  <dt class="col-sm-3">{% trans 'Delivery date' %}</dt>
-  <dd class="col-sm-9">{{ object.delivery_date|date:"d-m-Y" }}</dd>  
-  <dt class="col-sm-3">{% trans 'Start date' %}</dt>
-  <dd class="col-sm-9">{{ object.start_date|date:"d-m-Y" }}</dd>
+  <dt class="col-sm-3">{% trans 'Delivery date (planned/actual)' %}</dt>
+  <dd class="col-sm-9">
+    {{ object.delivery_date_projected|date:"d-m-Y" }}/
+    {{ object.delivery_date|date:"d-m-Y" }}
+    {% if object.delivery_date_projected < object.delivery_date %}
+    <i class="text-warning" data-toggle="tooltip" data-placement="top"
+	     title="{% trans 'Delivery too late' %}">
+      <span class="fas fa-exclamation-triangle">
+      </span>
+    </i>
+    {% endif %}
+  </dd>
+  <dt class="col-sm-3">{% trans 'Start date (planned/actual)' %}</dt>
+  <dd class="col-sm-9">
+    {{ object.start_date_projected|date:"d-m-Y" }}/{{ object.start_date|date:"d-m-Y" }}
+    {% if object.start_date_projected < object.start_date %}
+    <i class="text-warning" data-toggle="tooltip" data-placement="top"
+	     title="{% trans 'Start date too late' %}">
+      <span class="fas fa-exclamation-triangle">
+      </span>
+    </i>
+    {% endif %}
+  </dd>
 </dl>
 
 
@@ -136,29 +155,29 @@
   {% endfor %}
   </tbody>
 </table-->
-  
+
   {% with dates=view.get_calendar %}
   {% if dates %}
   <h2>Planning</h2>
-  
+
   <table class="table table-bordered table-sm">
     <thead>
       <tr>
 	<th scope="col" />
 	{% for year in dates.years %}
-	<th scope="col" colspan="{{ year.1 }}">{{ year.0 }}</th> 
+	<th scope="col" colspan="{{ year.1 }}">{{ year.0 }}</th>
 	{% endfor %}
-    </tr>          
+    </tr>
     <tr>
       <th scope="col" />
       {% for month in dates.months %}
-      <th scope="col" colspan="{{ month.1 }}">{{ month.0|month_name }}</th> 
+      <th scope="col" colspan="{{ month.1 }}">{{ month.0|month_name }}</th>
       {% endfor %}
-    </tr>     
+    </tr>
     <tr>
       <th scope="col" />
       {% for day in dates.days %}
-      <th scope="col">{{ day.day }}</th> 
+      <th scope="col">{{ day.day }}</th>
       {% endfor %}
     </tr>
     </thead>
@@ -170,7 +189,7 @@
 	{% for day in row %}
 	{% if day %}
 	{% if forloop.parentloop.last %}
-	<td style="background-color: #ff0000"></td>	
+	<td style="background-color: #ff0000"></td>
 	{% else %}
 	<td style="background-color: {{ view.get_color }}"></td>
 	{% endif %}
@@ -185,7 +204,7 @@
   </table>
   {% endif %}
   {% endwith %}
-  
+
 {% include 'snippets/schema.html' %}
 
 {% endblock content %}

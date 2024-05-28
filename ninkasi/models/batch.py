@@ -61,9 +61,11 @@ class Batch(models.Model, OrderedContainer):
         return f"{self.beer.name} - #{self.nr}"
 
     @property
-    def start_date(self):
+    def start_date_projected(self):
 
-        """ Return start date, either calculated or from field """
+        """ The start date as planned. That is either the date field
+        set and the mode 'start date', or the delivery date minus the
+        processing time. """
 
         if self.date_mode == 0:
 
@@ -72,7 +74,18 @@ class Batch(models.Model, OrderedContainer):
         return self.date - self.get_processing_time().as_timedelta()
 
     @property
-    def delivery_date(self):
+    def start_date(self):
+
+        """ Return the actual start date. This is the date of the first
+        brew or None """
+
+        if self.list_brews().exists():
+            return self.list_brews().first().date.date()
+
+        return self.start_date_projected
+
+    @property
+    def delivery_date_projected(self):
 
         """ Return delivery date, either calculated or from field """
 
@@ -81,6 +94,14 @@ class Batch(models.Model, OrderedContainer):
             return self.date
 
         return self.date + self.get_processing_time().as_timedelta()
+
+    @property
+    def delivery_date(self):
+
+        """ Return the actual delivery date, calulated from start_date if
+        possible. """
+
+        return self.start_date + self.get_processing_time().as_timedelta()
 
     @property
     def volume(self):
@@ -146,7 +167,7 @@ class Batch(models.Model, OrderedContainer):
         """
 
         try:
-            return self.get_recipe().get_total_duration()
+            return self.get_total_duration()
         except AttributeError:
             return Duration(settings.DEFAULT_PROCESSING_TIME)
 

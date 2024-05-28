@@ -13,8 +13,5 @@
   - configurable for a given date.
 * add warning when inventory not sufficient for planned brews
 
-* pass around duration values as-is, so the receiver can determine how
-to show
-
 * use batch projected volume and subtract losses to calculate brew
   volumes

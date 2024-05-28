@@ -28,6 +28,8 @@ class Brew(models.Model, OrderedContainer):
 
     def list_recipes(self):
 
+        """ List all recipes possible for this brew """
+
         return self.batch.beer.recipes
 
     def list_materials(self):
@@ -65,7 +67,7 @@ class Brew(models.Model, OrderedContainer):
         TODO: implement me
         """
 
-        return 0
+        return self.volume_projected
 
     def import_phases(self, recipe_id):
 

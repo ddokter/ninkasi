@@ -35,7 +35,7 @@ a[data-toggle=collapse].collapsed i.hide {
 }
 
 table.calendar td {
-    height: 50px;
+    height: 80px;
 }
 
 table.calendar td, th {
@@ -44,4 +44,8 @@ table.calendar td, th {
 
 table.month td, th {
     width: 3%;
+}
+
+table.calendar {
+    background-color: #e0e0e0;
 }
