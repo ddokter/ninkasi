@@ -33,3 +33,15 @@ a[data-toggle=collapse].collapsed i.hide {
     padding: 0px !important;
     border: 0px !important;
 }
+
+table.calendar td {
+    height: 50px;
+}
+
+table.calendar td, th {
+    width: 14%;
+}
+
+table.month td, th {
+    width: 3%;
+}

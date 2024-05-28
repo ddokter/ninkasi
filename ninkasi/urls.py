@@ -154,6 +154,10 @@ urlpatterns = [
          MovePhaseView.as_view(),
          name="movephase"),
 
+    path('<str:model>/<int:pk>/addstep/<int:phase>/<str:step>',
+         AddPhaseView.as_view(),
+         name="addstep"),
+
     # Tank
     #
     # path('tank/add/<int:batch>',

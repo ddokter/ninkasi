@@ -1,5 +1,5 @@
 from datetime import datetime, date
-from calendar import monthrange
+import calendar
 
 
 class Calendar:
@@ -32,9 +32,24 @@ class Calendar:
         else:
             _prev = date(now.year, now.month - 1, 1)
 
+        cal = calendar.Calendar()
+
+        days = list(cal.itermonthdates(now.year, now.month))
+
+        weeks = []
+        week = []
+
+        for idx, val in enumerate(days):
+            week.append(val)
+
+            if (idx + 1) % 7 == 0:
+                weeks.append(week)
+                week = []
+
         return {
             'title': now.strftime("%B %Y"),
-            'days': range(1, monthrange(now.year, now.month)[1] + 1),
+            'days': days,
+            'weeks': weeks,
             'next': _next.strftime("%Y-%m"),
             'prev': _prev.strftime("%Y-%m"),
             'month': now.month,

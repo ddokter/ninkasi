@@ -13,10 +13,10 @@ class PhaseView(DetailView):
 
     def step_vocab(self):
 
-        """ List phases defined for this system """
+        """ List steps defined for this system """
 
-        return [(model.split(".")[1], model) for model in
-                self.object.list_step_models()]
+        return [(ct.model, ct.name) for ct in
+                self.object.list_step_models().all()]
 
 
 class PhaseMoveStepView(PhaseView):
@@ -87,5 +87,36 @@ class MovePhaseView(AddPhaseView):
             parent = self.get_object()
 
             parent.move(kwargs['phase'], request.GET.get('dir'), 'phase')
+
+        return HttpResponseRedirect(self.success_url)
+
+
+class AddStepView(DetailView):
+
+    """ Add step to phase """
+
+    def get_object(self):
+
+        """ Override to get model from kwargs """
+
+        _model = apps.get_model("ninkasi", self.kwargs['model'])
+
+        return _model.objects.get(id=self.kwargs['pk'])
+
+    @property
+    def success_url(self):
+
+        return reverse("view", kwargs={'pk': self.get_object().pk,
+                                       'model': self.kwargs['model']})
+
+    def get(self, request, *args, **kwargs):
+
+        """ Shortcut to creation of phases """
+
+        if kwargs.get('step'):
+
+            self.get_object().get_phase(kwargs['phase']).add_step()
+        else:
+            messages.error(self.request, _("MetaPhase not provided."))
 
         return HttpResponseRedirect(self.success_url)

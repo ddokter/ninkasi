@@ -25,8 +25,10 @@ class Measurement(models.Model):
     """
 
     sample = models.ForeignKey(Sample, on_delete=models.CASCADE)
-    quantity = models.SmallIntegerField(_("Quantity"),
-                                        choices=Q_VOCAB)
+    quantity = models.SmallIntegerField(
+        _("Quantity"),
+        help_text=_("What are we measuring"),
+        choices=Q_VOCAB)
     unit = models.SmallIntegerField(_("Unit"),
                                     choices=U_VOCAB)
     value = models.FloatField(_("Value"))
@@ -38,9 +40,9 @@ class Measurement(models.Model):
 
     @property
     def label(self):
-    
+
         return _("Measurements")
-    
+
     class Meta:
-        
+
         app_label = "ninkasi"

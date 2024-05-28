@@ -31,7 +31,9 @@
     {% for phase in object.list_phases %}
     <tr>
       <td>
-	<span class="badge badge-pill badge-primary">{{ phase }}</span>
+	<span class="badge badge-pill badge-primary">
+	  {{ phase }}
+	</span>
       </td>
       <td>{{ phase.get_duration }}</td>
       <td>
@@ -52,7 +54,7 @@
 	
 	<div class="float-right">
 	  
-	  {% if not forloop.first %}
+	  {% if not phase.order == 0 %}
 	  <a class="btn btn-outline-info btn-sm rounded-circle"
 	     href="{% url 'movephase' view.ctype object.id phase.id %}?dir=-1"
 	     data-toggle="tooltip" data-placement="right"
@@ -60,7 +62,7 @@
 	    <span class="fas fa-arrow-up" />
 	  </a>
 	  {% endif %}
-	  {% if not forloop.last %}
+	  {% if not phase == object.list_phases.last %}
 	  <a class="btn btn-outline-info btn-sm rounded-circle"
 	     href="{% url 'movephase' view.ctype object.id phase.id %}?dir=1"
 	     data-toggle="tooltip" data-placement="right"
@@ -68,6 +70,14 @@
 	    <span class="fas fa-arrow-down" />
 	  </a>
 	  {% endif %}
+
+          {% if user|push:phase|has_obj_perm:'view' %}
+          {% view_action phase %}
+          {% endif %}
+	  
+          {% if user|push:phase|has_obj_perm:'edit' %}
+          {% inline_edit_action phase object %}
+          {% endif %}
 	  
           {% if user|push:phase|has_obj_perm:'delete' %}
           {% inline_delete_action phase object %}
@@ -91,7 +101,7 @@
 	  {% endif %}
 	</td>
 	<td>
-	  {% if object.mode != 'ro' %}
+	  {% if view.can_log and object.mode != 'ro' %}
 	  <button type="button" class="btn btn-outline-primary btn-sm"
 		  {% if step.steplog %}
 		  title="{% trans 'Edit log' %}"
@@ -99,7 +109,11 @@
 		  title="{% trans 'Add log' %}"
 		  {% endif %}
 		  data-toggle="modal" data-target="#{{ phase.id }}_log">
+	    {% if step.steplog %}
+	    <span class="fas fa-pencil" />	    
+	    {% else %}
 	    <span class="fas fa-plus" />
+	    {% endif %}
 	    <span class="fas fa-book" />
 	  </button>
 	  

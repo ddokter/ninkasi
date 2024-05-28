@@ -4,15 +4,6 @@
 
 {% block extra_actions %}
 
-{% if user|push:'brew'|has_model_perm:'add' %}
-<a class="btn btn-outline-success btn-sm"
-   href="{% url 'create_brew' %}{{ object.pk }}"
-   data-toggle="tooltip" data-placement="right" title="{% trans 'Add brew' %}">
-  <span class="fas fa-plus" />
-  <span class="fas fa-beer-mug-empty" />
-</a>
-{% endif %}
-
 {% if user|push:object|has_obj_perm:'change' %}
 <span class="dropdown show">
   <a class="btn btn-sm btn-outline-info dropdown-toggle" href="#"
@@ -60,8 +51,16 @@
 
 
 <dl class="row">
-  <dt class="col-sm-3">Volume (planned)</dt>
-  <dd class="col-sm-9">{{ object.volume_projected }}</dd>
+  <dt class="col-sm-3">Volume (planned/actual)</dt>
+  <dd class="col-sm-9">{{ object.volume_projected }}/{{ object.volume }}
+    {% if object.volume_projected > object.volume %}
+    <i class="text-warning" data-toggle="tooltip" data-placement="top"
+             title="{% trans 'Brew volume too low' %}">
+      <span class="fas fa-exclamation-triangle">
+      </span>
+    </i>    
+    {% endif %}
+  </dd>
   <dt class="col-sm-3">Beer</dt>
   <dd class="col-sm-9">
     <a href="{{ object.beer|detail_url }}">{{ object.beer }}</a>
@@ -77,28 +76,40 @@
 </dl>
 
 
-<h2>{% icon 'brew' %} Brews</h2>
+<section>
+  <h2>{% icon 'brew' %} Brews
+    {% if user|push:'brew'|has_model_perm:'add' %}
+    <a class="btn btn-outline-success btn-sm"
+       href="{% url 'create_brew' %}{{ object.pk }}"
+       data-toggle="tooltip" data-placement="right" title="{% trans 'Add brew' %}">
+      <span class="fas fa-plus" />
+      <span class="fas fa-beer-mug-empty" />
+    </a>
+    {% endif %}
 
-<table class="table table-striped">
-  <thead>
-    <tr>
-      <th>Brew</th>
-      <th>Date</th>
-      <th>Volume</th>
-    </tr>
-  </thead>
-  <tbody>
-  {% for brew in object.list_brews %}
-  <tr>
-    <td>
-      <a href="{{ brew|detail_url }}">{{ brew }}</a>
-    </td>
-    <td>{{ brew.date|date:"d-m-Y H:i " }}</td>
-    <td>{{ brew.volume }}</td>
-  </tr>
-  {% endfor %}
-  </tbody>
-</table>
+  </h2>
+
+  <table class="table table-striped">
+    <thead>
+      <tr>
+	<th>Brew</th>
+	<th>Date</th>
+	<th>Volume</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for brew in object.list_brews %}
+      <tr>
+	<td>
+	  <a href="{{ brew|detail_url }}">{{ brew }}</a>
+	</td>
+	<td>{{ brew.date|date:"d-m-Y H:i " }}</td>
+	<td>{{ brew.volume }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
 
 
 <!--h2>{% icon 'material' %} Materials</h2>

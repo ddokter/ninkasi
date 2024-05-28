@@ -6,7 +6,6 @@ from django.contrib.contenttypes.forms import generic_inlineformset_factory
 from django.contrib import messages
 from ninkasi.resource import ResourceRegistry
 from .base import CreateView, UpdateView, DetailView, ListingView
-from ..models.step import RecipeStep
 from ..models.recipe import Recipe
 from ..models.metaphase import MetaPhase
 
@@ -24,12 +23,8 @@ class FormSetMixin:
     @property
     def formsets(self):
 
-        # factory1 = inlineformset_factory(
-        #    Recipe, Recipe.ingredient.through, exclude=[]
-        # )
-
-        factory2 = generic_inlineformset_factory(
-            RecipeStep, exclude=[]
+        factory1 = inlineformset_factory(
+            Recipe, Recipe.ingredient.through, exclude=[]
         )
 
         kwargs = {}
@@ -40,7 +35,7 @@ class FormSetMixin:
         if self.object:
             kwargs['instance'] = self.object
 
-        return [factory1(**kwargs), factory2(**kwargs)]
+        return [factory1(**kwargs)]
 
     def form_valid(self, form):
 

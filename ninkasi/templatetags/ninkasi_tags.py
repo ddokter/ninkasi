@@ -123,6 +123,8 @@ def delete_action(obj, extra_args=""):
 @register.inclusion_tag('snippets/delete_action.html')
 def inline_delete_action(obj, parent, extra_args=""):
 
+    """ Render delete link as inline action """
+
     return {'delete_url': "%s%s" % (
         reverse("inline_delete", kwargs={
             'pk': obj.id,
@@ -132,8 +134,18 @@ def inline_delete_action(obj, parent, extra_args=""):
         extra_args)}
 
 
+@register.inclusion_tag('snippets/view_action.html')
+def view_action(obj, extra_args=""):
+
+    """ render link to detail view as action button """
+
+    return {'url': f"{ detail_url(obj) }{ extra_args }"}
+
+
 @register.inclusion_tag('snippets/path_detail.html')
 def path_detail(path):
+
+    """ Render the path as template """
 
     return {'path': path}
 
@@ -295,7 +307,11 @@ def step_logform(context, step):
                                                           'step',
                                                           'end_time'])
 
-    context.update({'step': step, 'form': form(initial={'step': step.id})})
+    form = form(initial={'step': step.id})
+
+    form.fields['step'].widget = form.fields['step'].hidden_widget()
+
+    context.update({'step': step, 'form': form})
 
     return context
 

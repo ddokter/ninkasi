@@ -131,27 +131,6 @@ class BoilStep(MashStep):
     """ Same """
 
 
-class RecipeStep(Step):
-
-    """ Step in the scheme for a recipe.
-    """
-
-    recipe_step = models.ForeignKey("RecipeStep", null=True, blank=True,
-                                    on_delete=models.SET_NULL)
-
-    def __str__(self):
-
-        return f"{self.phase} - {self.temperature}°C"
-
-    def __hash__(self):
-
-        return self.pk
-
-    class Meta:
-
-        ordering = ["order"]
-
-
 class StepLog(models.Model):
 
     """ Within a batch or brew, a step should be logged in terms of start

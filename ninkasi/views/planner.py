@@ -46,10 +46,7 @@ class PlannerView(TemplateView, Calendar):
 
             tankdata = {}
 
-            for mday in self.month['days']:
-
-                day = datetime(self.month['year'], self.month['month'], mday,
-                               tzinfo=timezone.get_current_timezone())
+            for day in self.month['days']:
 
                 batch = tank.content(day)
 
@@ -61,7 +58,7 @@ class PlannerView(TemplateView, Calendar):
                 if batch and batch not in batches:
                     batches[batch] = self.get_color()
 
-                tankdata[mday] = (batch, batches.get(batch, None))
+                tankdata[day] = (batch, batches.get(batch, None))
 
             tanks[tank] = tankdata
 

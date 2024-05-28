@@ -26,27 +26,43 @@
   </a>
 </h2>
 
-<table class="table table-bordered table-sm">
+<table class="table table-bordered table-sm calendar">
   <thead>
     <tr>
-      {% for day in month.days %}
-      <th scope="col">{{ day|stringformat:'02i' }}</th>
-      {% endfor %}
+      <th>{% trans 'Monday' %}</th>
+      <th>{% trans 'Tuesday' %}</th>
+      <th>{% trans 'Wednessday' %}</th>
+      <th>{% trans 'Thursday' %}</th>
+      <th>{% trans 'Friday' %}</th>
+      <th>{% trans 'Saturday' %}</th>
+      <th>{% trans 'Sunday' %}</th>
     </tr>
   </thead>
   <tbody>
     {% with data=view.get_data %}
+
+    {% for week in month.weeks %}
     <tr>
-      {% for day, tasks in data.items %}
+      {% for day in week %}
       <td>
+	{% if day.month != month.month %}
+	<span class="badge badge-pill badge-secondary">
+	  {{ day.day }}
+	</span>
+	{% else %}
+	<span class="badge badge-pill badge-primary">
+	  {{ day.day }}
+	</span>
+	{% endif %}
 	<ul>
-	  {% for task in tasks %}
-	  <li>{{ task }}</li>
-	  {% endfor %}
+	{% for task in data|get:day %}
+	<li>{{ task }}</li>
+	{% endfor %}
 	</ul>
       </td>
       {% endfor %}
     </tr>
+    {% endfor %}
     {% endwith %}
   </tbody>
 </table>

@@ -30,7 +30,7 @@ class FormSetMixin:
 
         factory = inlineformset_factory(
             Sample, Measurement, exclude=[],
-            #widgets={'date_from': DateTimeInput(),
+            # widgets={'date_from': DateTimeInput(),
             #         'date_to': DateTimeInput()}
             )
 
@@ -66,7 +66,7 @@ class SampleCreateView(FormSetMixin, CreateView):
         if self.kwargs.get('batch'):
 
             batch = Batch.objects.get(pk=self.kwargs['batch'])
-            
+
             return {'batch': batch,
                     'content_type': ContentType.objects.get(
                         app_label="ninkasi", model="batch"),
@@ -87,7 +87,13 @@ class SampleCreateView(FormSetMixin, CreateView):
             form.fields['content_type'].widget = HiddenInput()
             form.fields['object_id'].widget = HiddenInput()
 
-            form.fields['step'].widget.choices.queryset = batch.step.all()
+            steps = []
+
+            for phase in batch.list_phases():
+                for step in phase.list_steps():
+                    steps.append((step.id, step))
+
+            form.fields['step'].widget.choices = steps
 
         return form
 
@@ -114,7 +120,7 @@ class SampleUpdateView(FormSetMixin, UpdateView):
 
         if self.kwargs.get('batch'):
             batch = Batch.objects.get(pk=self.kwargs['batch'])
-            
+
             form.fields['step'].widget.choices.queryset = batch.step.all()
 
         return form

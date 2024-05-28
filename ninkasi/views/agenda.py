@@ -20,15 +20,12 @@ class AgendaView(TemplateView, Calendar):
 
         data = {}
 
-        for mday in self.month['days']:
+        for day in self.month['days']:
 
-            day = datetime(self.month['year'], self.month['month'], mday,
-                           tzinfo=timezone.get_current_timezone())
-
-            data[mday] = list(ScheduledTask.objects.filter(date=day))
+            data[day] = list(ScheduledTask.objects.filter(date=day))
 
             for task in RepeatedScheduledTask.objects.filter(date__lt=day):
                 if task.is_due_date(day):
-                    data[mday].append(task)
+                    data[day].append(task)
 
         return data

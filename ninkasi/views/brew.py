@@ -71,6 +71,7 @@ class BrewDetailView(DetailView):
     """ Add phase vocab. TODO: could be a template_tag I guess """
 
     model = Brew
+    can_log = True
 
     def phase_vocab(self):
 

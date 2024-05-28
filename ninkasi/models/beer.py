@@ -44,10 +44,11 @@ class Beer(models.Model):
 
     def get_recipe(self, _id):
 
-        """ Return the recipe by it's id. """
+        """ Return the recipe by it's id. Convert to str to be on the safe
+        side. """
 
         for recipe in self.recipes:
-            if recipe.id == _id:
+            if str(recipe.id) == str(_id):
                 return recipe
 
         return None

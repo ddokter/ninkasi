@@ -44,8 +44,7 @@ class Recipe(models.Model, BaseRecipe, OrderedContainer):
 
     name = models.CharField(_("Name"), max_length=100)
     volume = models.SmallIntegerField(_("Volume"))
-    # ingredient = models.ManyToManyField(Ingredient,
-    # through="RecipeIngredient")
+    ingredient = models.ManyToManyField(Ingredient, through="RecipeIngredient")
     phase = GenericRelation("Phase")
 
     def __str__(self):
@@ -125,8 +124,8 @@ class RecipeIngredient(models.Model):
     unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
     recipe = models.ForeignKey("Recipe", on_delete=models.CASCADE)
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
-    addition = models.ForeignKey("RecipeStep", on_delete=models.SET_NULL,
-                                 blank=True, null=True)
+    # addition = models.ForeignKey("RecipeStep", on_delete=models.SET_NULL,
+    #                             blank=True, null=True)
     addition_time = models.FloatField(blank=True, null=True)
 
     def __str__(self):

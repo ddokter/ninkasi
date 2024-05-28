@@ -10,9 +10,11 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from ..ordered import OrderedContainer
 from .tank import Tank
-from .task import TaskFactory
 from .material import Material, ParentedMaterial
 from .fields import Duration
+
+
+DATE_MODE_VOCAB = [(0, _("Start")), (1, _("Delivery"))]
 
 
 class Batch(models.Model, OrderedContainer):
@@ -45,7 +47,8 @@ class Batch(models.Model, OrderedContainer):
     nr = models.CharField(_("Nr"), max_length=100, unique=True)
     beer = models.ForeignKey("Beer", on_delete=models.CASCADE)
     volume_projected = models.FloatField(_("Planned volume"))
-    delivery_date = models.DateField()
+    date = models.DateField()
+    date_mode = models.SmallIntegerField(choices=DATE_MODE_VOCAB)
 
     material = models.ManyToManyField(Material, through="BatchMaterial")
     tank = models.ManyToManyField(Tank, through="BatchContainer")
@@ -53,17 +56,38 @@ class Batch(models.Model, OrderedContainer):
     phase = GenericRelation("Phase")
     sample = GenericRelation("Sample")
 
-    # task = models.ManyToManyField("ScheduledTask")
-
     def __str__(self):
 
         return f"{self.beer.name} - #{self.nr}"
 
-    def get_status(self):
+    @property
+    def start_date(self):
 
-        """ Return a list of problems, if any.  """
+        """ Return start date, either calculated or from field """
 
-        return []
+        if self.date_mode == 0:
+
+            return self.date
+
+        return self.date - self.get_processing_time().as_timedelta()
+
+    @property
+    def delivery_date(self):
+
+        """ Return delivery date, either calculated or from field """
+
+        if self.date_mode == 1:
+
+            return self.date
+
+        return self.date + self.get_processing_time().as_timedelta()
+
+    @property
+    def volume(self):
+
+        """ Volume of brew total """
+
+        return sum(brew.volume for brew in self.list_brews())
 
     def list_brews(self):
 
@@ -76,6 +100,10 @@ class Batch(models.Model, OrderedContainer):
         """ Get all phases defined for this batch """
 
         return self.phase.all()
+
+    def get_phase(self, _id):
+
+        return self.phase.get(_id)
 
     def add_phase(self, metaphase):
 
@@ -105,20 +133,6 @@ class Batch(models.Model, OrderedContainer):
         """ samples may be taken from a batch. List them. """
 
         return self.sample_set.all()
-
-    @property
-    def start_date(self):
-
-        """ The start date calculated from the delivery_date. Time needed
-        will be subtracted to determine start date. The start date
-        is projected. If a brew is added, it may reset the start date."""
-
-        if self.list_brews().exists():
-
-            return self.list_brews().first().date.date()
-
-        return self.delivery_date - timedelta(
-            days=self.get_processing_time().days)
 
     def get_total_duration(self):
 
@@ -152,19 +166,6 @@ class Batch(models.Model, OrderedContainer):
     def get_recipe(self):
 
         """ Get the recipe set for this batch """
-
-    def generate_tasks(self):
-
-        """Get the tasks that are defined by this batch. Set batch as
-        parent and remove existing ones.
-
-        """
-
-        for tank in self.tank:
-
-            if tank.from_date:
-
-                pass
 
     class Meta:
 
