@@ -3,10 +3,9 @@ from django.http import HttpResponseRedirect
 from django.forms import inlineformset_factory, HiddenInput
 from django.forms.models import ModelChoiceIterator
 from django.contrib.contenttypes.models import ContentType
-from django.contrib.contenttypes.forms import generic_inlineformset_factory
 from .base import CreateView, UpdateView
-from ..models.sample import Sample
 from ..models.batch import Batch
+from ..models.sample import Sample
 from ..models.measurement import Measurement
 from ..forms.dtinput import DateTimeInput
 
@@ -17,7 +16,7 @@ class FormSetMixin:
 
         form = super().get_form(form_class=form_class)
 
-        # form.fields.pop('measurements')
+        # form.fields.pop('measurement')
 
         return form
 
@@ -29,9 +28,11 @@ class FormSetMixin:
     @property
     def formsets(self):
 
-        factory = generic_inlineformset_factory(
-            Measurement, exclude=[]
-        )
+        factory = inlineformset_factory(
+            Sample, Measurement, exclude=[],
+            # widgets={'date_from': DateTimeInput(),
+            #         'date_to': DateTimeInput()}
+            )
 
         kwargs = {}
 
@@ -55,9 +56,9 @@ class FormSetMixin:
         return HttpResponseRedirect(self.get_success_url())
 
 
-class SampleCreateView(FormSetMixin, CreateView):
+class MeasurementCreateView(FormSetMixin, CreateView):
 
-    model = Sample
+    model = Measurement
     expanded_formset = True
 
     def get_initial(self):
@@ -90,7 +91,7 @@ class SampleCreateView(FormSetMixin, CreateView):
 
             for phase in batch.list_phases():
                 for step in phase.list_steps():
-                    steps.append((step.id, f"{ phase } -> { step }"))
+                    steps.append((step.id, step))
 
             form.fields['step'].widget.choices = steps
 

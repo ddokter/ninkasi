@@ -1,6 +1,7 @@
 from datetime import datetime
 from django.views.generic import TemplateView
-from ..models.task import ScheduledTask, RepeatedScheduledTask, Task
+from ..models.task import (ScheduledTask, RepeatedScheduledTask, Task,
+                           TaskFactory)
 
 
 class Home(TemplateView):
@@ -21,9 +22,17 @@ class Home(TemplateView):
 
         """ Return all tasks not cancelled or done """
 
-        tasks = [task.get_real() for task in Task.objects.all()]
+        tasks = []
 
-        return [task for task in tasks if task.status == 0]
+        for task in Task.objects.filter(status=0):
+
+            task = task.get_real()
+
+            if not isinstance(task, TaskFactory):
+
+                tasks.append(task)
+
+        return tasks
 
 
 class FixTask(Home):

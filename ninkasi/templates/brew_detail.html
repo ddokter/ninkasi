@@ -7,9 +7,20 @@
 {% if user|push:'sample'|has_obj_perm:'add' %}
 <a class="btn btn-outline-success btn-sm"
    href="{% url 'create_sample' %}{{ object.pk }}"
-   data-toggle="tooltip" data-placement="right" title="{% trans 'Add sample' %}">
+   data-toggle="tooltip" data-placement="right"
+   title="{% trans 'Add sample' %}">
   <span class="fas fa-plus" />
   <span class="fas fa-vial" />
+</a>
+{% endif %}
+
+{% if user|push:'measurement'|has_obj_perm:'add' %}
+<a class="btn btn-outline-success btn-sm"
+   href="{% url 'create_sample' %}{{ object.pk }}"
+   data-toggle="tooltip" data-placement="right"
+   title="{% trans 'Add measurement' %}">
+  <span class="fas fa-plus" />
+  <span class="fas fa-scales" />
 </a>
 {% endif %}
 

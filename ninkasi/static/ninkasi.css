@@ -38,6 +38,10 @@ table.calendar td {
     height: 80px;
 }
 
+table.calendar td.today {
+    border: 2px solid #900000 !important;
+}
+
 table.calendar td, th {
     width: 14%;
 }

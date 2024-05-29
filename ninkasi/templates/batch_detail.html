@@ -24,6 +24,16 @@
 </span>
 {% endif %}
 
+{% if user|push:'measurement'|has_model_perm:'add' %}
+<a class="btn btn-outline-success btn-sm"
+   href="{% url 'inline_create' 'batch' object.id 'measurement' %}"
+   data-toggle="tooltip" data-placement="right"
+   title="{% trans 'Add measurement' %}">
+  <span class="fas fa-plus" />
+  <span class="fas fa-scale-balanced" />
+</a>
+{% endif %}
+
 
 <!--a class="btn btn-outline-success btn-sm"
    href="{% url 'transfer' view.ct_id object.id %}"
@@ -52,7 +62,7 @@
 
 <dl class="row">
   <dt class="col-sm-3">Volume (planned/actual)</dt>
-  <dd class="col-sm-9">{{ object.volume_projected }}/{{ object.volume }}
+  <dd class="col-sm-9">{{ object.volume_projected }} / {{ object.volume }}
     {% if object.volume_projected > object.volume %}
     <i class="text-warning" data-toggle="tooltip" data-placement="top"
 	     title="{% trans 'Brew volume too low' %}">
@@ -71,7 +81,7 @@
   </dd>
   <dt class="col-sm-3">{% trans 'Delivery date (planned/actual)' %}</dt>
   <dd class="col-sm-9">
-    {{ object.delivery_date_projected|date:"d-m-Y" }}/
+    {{ object.delivery_date_projected|date:"d-m-Y" }} /
     {{ object.delivery_date|date:"d-m-Y" }}
     {% if object.delivery_date_projected < object.delivery_date %}
     <i class="text-warning" data-toggle="tooltip" data-placement="top"
@@ -83,7 +93,8 @@
   </dd>
   <dt class="col-sm-3">{% trans 'Start date (planned/actual)' %}</dt>
   <dd class="col-sm-9">
-    {{ object.start_date_projected|date:"d-m-Y" }}/{{ object.start_date|date:"d-m-Y" }}
+    {{ object.start_date_projected|date:"d-m-Y" }} /
+    {{ object.start_date|date:"d-m-Y" }}
     {% if object.start_date_projected < object.start_date %}
     <i class="text-warning" data-toggle="tooltip" data-placement="top"
 	     title="{% trans 'Start date too late' %}">

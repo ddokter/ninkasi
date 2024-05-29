@@ -91,12 +91,13 @@ class GenericMixin:
 
             if mdl._meta.swappable:
 
-                module, model = getattr(settings, mdl._meta.swappable).split(".")
+                module, model = getattr(settings,
+                                        mdl._meta.swappable).split(".")
 
                 return apps.get_model(module, model)
 
             return mdl
-            
+
         else:
             return self._model
 
@@ -129,7 +130,15 @@ class InlineActionMixin:
 
     def get_initial(self):
 
-        return {self.fk_field: self.parent}
+        """May also be parented by contenttypes, so set those values
+        as well
+
+        """
+
+        return {
+            self.fk_field: self.parent,
+            'content_type': ContentType.objects.get_for_model(self.parent).id,
+            'object_id': self.parent.id}
 
     @property
     def fk_field(self):
@@ -154,7 +163,7 @@ class InlineActionMixin:
             for field in field_defs.keys():
                 form.fields[field].queryset = field_defs[field]
 
-        except:
+        except KeyError:
             pass
 
         # Always use DateTimeWidget...
@@ -165,11 +174,12 @@ class InlineActionMixin:
 
         # Hide parent, if possible
         #
-        try:
-            form.fields[self.fk_field].widget = forms.HiddenInput()
-        except KeyError:
-            pass
-            
+        for fname in [self.fk_field, "object_id", "content_type"]:
+            try:
+                form.fields[fname].widget = forms.HiddenInput()
+            except KeyError:
+                pass
+
         return form
 
 
@@ -189,10 +199,10 @@ class CreateView(GenericMixin, BaseCreateView, CTypeMixin):
 
         try:
             obj = self.get_object()
-        except:
+        except BaseException:
             try:
                 obj = self.get_parent()
-            except:
+            except BaseException:
                 obj = None
 
         return request.user.has_perm(permission, obj=obj)
@@ -206,7 +216,7 @@ class CreateView(GenericMixin, BaseCreateView, CTypeMixin):
 
         if self.template_name:
             return [self.template_name]
-        
+
         return ["%s_create.html" % self.ctype, "base_create.html"]
 
     @property
@@ -313,7 +323,7 @@ class DetailView(GenericMixin, BaseDetailView, CTypeMixin):
             try:
                 _props.append((field.verbose_name,
                                getattr(self.object,
-                                       f"get_{ field.name }_display" )()))
+                                       f"get_{ field.name }_display")()))
             except AttributeError:
 
                 _props.append((field.verbose_name,

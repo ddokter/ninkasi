@@ -10,6 +10,7 @@ from .views.recipe import (RecipeCreateView, RecipeUpdateView,
                            RecipeDetailView, RecipeListingView)
 from .views.style import StyleListingView
 from .views.sample import SampleCreateView, SampleUpdateView
+# from .views.measurement import MeasurementCreateView
 from .views.brew import (BrewDetailView, BrewCreateView, BrewUpdateView,
                          BrewImportPhasesView)
 from .views.phase import (PhaseMoveStepView, PhaseView, AddPhaseView,

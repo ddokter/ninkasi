@@ -105,12 +105,11 @@ class Phase(BasePhase, models.Model):
         if self.step_set.count() != thing.list_steps(raw=True).count():
             return False
 
-        steps_old = list(self.list_steps())
         steps_new = list(thing.list_steps())
 
-        for i in range(len(steps_old)):
+        for idx, val in enumerate(self.list_steps()):
 
-            if steps_old[i] != steps_new[i]:
+            if val != steps_new[idx]:
                 return False
 
         return True

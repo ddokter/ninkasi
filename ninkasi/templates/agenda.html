@@ -44,7 +44,7 @@
     {% for week in month.weeks %}
     <tr>
       {% for day in week %}
-      <td>
+      <td {% if day == month.today.date %}class="today"{% endif %}>
 	{% if day.month != month.month %}
 	<span class="badge badge-pill badge-secondary">
 	  {{ day.day }}
