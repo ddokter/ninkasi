@@ -12,6 +12,7 @@ from django.apps import apps
 from django.conf import settings
 from ..utils import get_model_name
 from ..forms.dtinput import DateTimeInput
+from .formset import FormSetMixin
 
 
 class SearchForm(forms.Form):
@@ -183,7 +184,7 @@ class InlineActionMixin:
         return form
 
 
-class CreateView(GenericMixin, BaseCreateView, CTypeMixin):
+class CreateView(GenericMixin, BaseCreateView, CTypeMixin, FormSetMixin):
 
     """ Base create view that enables creation within a parent """
 
@@ -241,7 +242,7 @@ class CreateView(GenericMixin, BaseCreateView, CTypeMixin):
         return action_url
 
 
-class UpdateView(GenericMixin, BaseUpdateView, CTypeMixin):
+class UpdateView(GenericMixin, FormSetMixin, BaseUpdateView, CTypeMixin):
 
     view_type = "edit"
 

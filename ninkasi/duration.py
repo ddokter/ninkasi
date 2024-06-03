@@ -1,7 +1,4 @@
-""" All duration stuff
-
-TODO: remove Django stuff and move upwards
-"""
+""" All duration stuff """
 
 import re
 from datetime import timedelta
@@ -91,6 +88,14 @@ class Duration:
 
         return self
 
+    def __sub__(self, value):
+
+        """ Subtract another duration. Convert to same unit. """
+
+        self.amount -= convert_duration(str(value), unit=self.unit)
+
+        return self
+
     def __radd__(self, other):
 
         """ Allow summation """
@@ -102,7 +107,7 @@ class Duration:
 
     def __eq__(self, thing):
 
-        if not thing:
+        if not isinstance(thing, self.__class__):
             return False
 
         return (self.amount == thing.amount and self.unit == thing.unit)

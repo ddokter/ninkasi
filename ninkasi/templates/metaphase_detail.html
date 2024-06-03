@@ -1,0 +1,37 @@
+{% extends 'base_detail.html' %}
+
+{% load i18n ninkasi_tags %}
+
+{% block content %}
+
+
+<dl class="row">
+  <dt class="col-sm-3">{% trans 'Name' %}</dt>
+  <dd class="col-sm-9">{{ object.name }}</dd>
+  <dt class="col-sm-3">{% trans 'Default step' %}</dt>
+  <dd class="col-sm-9">{{ object.default_step }}</dd>
+</dl>
+
+
+<section>
+  <h2>Measurements</h2>
+  
+  <table class="table table-striped">
+    <thead>
+      <tr>
+	<th>{% trans 'Quantity' %}</th>
+	<th>{% trans 'Time' %}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for measurement in object.list_measurements %}
+      <tr>
+	<td>{{ measurement.quantity }}</td>
+	<td>{{ measurement.time }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+  
+{% endblock content %}

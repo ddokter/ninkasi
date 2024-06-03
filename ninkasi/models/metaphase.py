@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from .fields import DurationField
 
 
 class MetaPhase(models.Model):
@@ -30,6 +31,10 @@ class MetaPhase(models.Model):
         limit_choices_to=models.Q(app_label="ninkasi",
                                   model__in=["batch", "brew", "recipe"])
     )
+    measurements = models.ManyToManyField(
+        "Quantity", through="MetaPhaseMeasurements",
+        blank=True, null=True
+    )
 
     def __str__(self):
 
@@ -48,8 +53,33 @@ class MetaPhase(models.Model):
 
         return self.default_step.model_class()
 
+    def list_measurements(self):
+
+        return self.metaphasemeasurements_set.all()
+
+    @property
+    def m2m_fields(self):
+
+        return ["measurements"]
+
     class Meta:
 
         app_label = "ninkasi"
         ordering = ["name"]
         verbose_name_plural = _("MetaPhases")
+
+
+TIME_HELP_TEXT = _("Specify timing from start of phase, or from end"
+                   "using negative durations")
+
+
+class MetaPhaseMeasurements(models.Model):
+
+    """ Define measurements to take during this phase """
+
+    metaphase = models.ForeignKey("MetaPhase", on_delete=models.CASCADE)
+    quantity = models.ForeignKey("Quantity", on_delete=models.CASCADE)
+    time = DurationField(
+        max_length=5, null=True, blank=True,
+        help_text=TIME_HELP_TEXT
+    )

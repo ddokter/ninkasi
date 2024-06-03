@@ -32,6 +32,12 @@ a[data-toggle=collapse].collapsed i.hide {
 .tasks .list-group-item {
     padding: 0px !important;
     border: 0px !important;
+    background-color: transparent;
+}
+
+.card.tasks {
+    background-color: #e0e0e0;
+    margin-bottom: 20px;
 }
 
 table.calendar td {
