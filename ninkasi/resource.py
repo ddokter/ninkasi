@@ -91,9 +91,13 @@ class ModelResource(Resource):
 
     def get(self, _id):
 
+        """Get the instance specified by _id. Throw
+        NotFoundInResource if the instance can nog be found.
+        """
+
         try:
-            return self.model.objects.get(_id)
-        except self.model.objects.DoesNotExist as exc:
+            return self.model.objects.get(pk=_id)
+        except self.model.DoesNotExist as exc:
             raise NotFoundInResource from exc
 
 

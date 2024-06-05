@@ -4,7 +4,7 @@ from .views.auth import LoginView, LogoutView
 from .views.base import (DeleteView, ListingView, DetailView, CreateView,
                          UpdateView, InlineCreateView, InlineUpdateView,
                          InlineDeleteView)
-from .views.batch import (BatchCreateView, BatchDetailView,
+from .views.batch import (BatchCreateView, BatchDetailView, BatchTasks,
                           BatchImportPhasesView, BatchMeasurements)
 from .views.recipe import RecipeDetailView, RecipeListingView
 from .views.style import StyleListingView
@@ -73,6 +73,10 @@ urlpatterns = [
     path('batch/<int:pk>/measurements',
          BatchMeasurements.as_view(),
          name="batch_measurements"),
+
+    path('batch/<int:pk>/tasks',
+         BatchTasks.as_view(),
+         name="batch_tasks"),
 
     path('batch/<int:pk>/importphases',
          BatchImportPhasesView.as_view(),

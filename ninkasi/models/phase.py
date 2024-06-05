@@ -3,11 +3,12 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
 from ninkasi.api import Phase as BasePhase
 from ninkasi.duration import Duration
-from .task import TaskFactory, EventScheduledTask
+from .task import TaskFactory, EventScheduledTask, Task
 
 
 class Phase(BasePhase, models.Model, TaskFactory):
@@ -22,7 +23,7 @@ class Phase(BasePhase, models.Model, TaskFactory):
     recipe.
 
     A phase is a task factory, that is there may be tasks attached to
-    the phase defned by it's 'events': start and end.
+    the phase defined by it's 'events': start and end.
 
     """
 
@@ -31,6 +32,8 @@ class Phase(BasePhase, models.Model, TaskFactory):
     object_id = models.PositiveIntegerField()
     order = models.PositiveIntegerField()
     metaphase = models.CharField(max_length=100, editable=False)
+
+    tasks = GenericRelation("EventTaskSub")
 
     def __str__(self):
 
@@ -125,8 +128,19 @@ class Phase(BasePhase, models.Model, TaskFactory):
 
         events = [f"{ self.name }.start", f"{ self.name }.end"]
 
-        for task in EventScheduledTask.objects.filter(name__in=events):
-            task.generate_tasks(**kwargs)
+        kwargs['parent'] = self
+
+        self.tasks.all().delete()
+
+        if self.parent._meta.model_name == "batch":
+
+            for task in EventScheduledTask.objects.filter(event=events[0]):
+
+                start = self.parent.get_phase_start(self.id)
+                kwargs['name'] = f"{ task.name } - { self.parent }"
+
+                if start:
+                    task.generate_tasks(date=start, **kwargs)
 
     class Meta:
 

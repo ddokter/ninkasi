@@ -1,6 +1,6 @@
 """ Hold batch model """
 
-from datetime import timedelta
+from datetime import datetime
 from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
@@ -13,6 +13,7 @@ from .tank import Tank
 from .material import Material, ParentedMaterial
 from .fields import Duration
 from ..events import EventProviderModel
+from .task import EventScheduledTask
 
 
 DATE_MODE_VOCAB = [(0, _("Start")), (1, _("Delivery"))]
@@ -58,6 +59,8 @@ class Batch(models.Model, OrderedContainer, EventProviderModel):
     sample = GenericRelation("Sample")
     measurement = GenericRelation("Measurement")
 
+    task = GenericRelation("Task")
+
     def __str__(self):
 
         return f"{self.beer.name} - #{self.nr}"
@@ -85,6 +88,16 @@ class Batch(models.Model, OrderedContainer, EventProviderModel):
             return self.list_brews().first().date.date()
 
         return self.start_date_projected
+
+    @property
+    def start_time(self):
+
+        """ Return the start time, if set at all. """
+
+        if self.list_brews().exists():
+            return self.list_brews().first().date
+
+        return None
 
     @property
     def delivery_date_projected(self):
@@ -133,6 +146,27 @@ class Batch(models.Model, OrderedContainer, EventProviderModel):
         """ Add phase of the metpahase given """
 
         self.phase.create(metaphase=metaphase, order=self.phase.count())
+
+    def get_phase_start(self, _id):
+
+        """ Retrieve the time this phase starts. This is based on the
+        batch start, with all phases in between added. """
+
+        start = self.start_time
+
+        if not isinstance(start, datetime):
+
+            return None
+
+        for phase in self.list_phases():
+
+            if phase.id == _id:
+
+                break
+
+            start += phase.get_duration().as_timedelta()
+
+        return start
 
     def list_materials(self):
 
@@ -193,6 +227,28 @@ class Batch(models.Model, OrderedContainer, EventProviderModel):
     def list_measurements(self):
 
         return self.measurement.all()
+
+    def generate_tasks(self, **kwargs):
+
+        """Create tasks associated with this batch, if at all
+        possible.  Batch tasks are event based, and the start_time of
+        the batch must be set to be able to determine this.
+
+        """
+
+        if not self.start_time:
+            return False
+
+        for event in self.list_events():
+
+            if event == "ninkasi.batch.start":
+                date = self.start_time
+            elif event == "ninkasi.batch.end":
+                date = self.end_time
+
+            for task in EventScheduledTask.objects.filter(event=event):
+
+                task.generate_tasks(date=date, **kwargs)
 
     class Meta:
 

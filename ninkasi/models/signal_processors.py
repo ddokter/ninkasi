@@ -10,6 +10,7 @@ from .brew import Brew
 from .task import EventScheduledTask
 from .metaphase import MetaPhase
 from ..events import EventRegistry
+from .phase import Phase
 
 
 def recalc_end_dates(batch, transfer=None):
@@ -98,3 +99,14 @@ def batchcontainer_post_save(sender, instance, **kwargs):
                                  time=instance.to_date.time(),
                                  name=f"{ event.name } { instance.tank }"
                                  )
+
+
+@receiver(post_save, sender=Phase)
+def phase_post_save(sender, instance, **kwargs):
+
+    """Whenever a phase changes, recreate any tasks associated with
+    it to make sure timings are correct
+
+    """
+
+    instance.generate_tasks()

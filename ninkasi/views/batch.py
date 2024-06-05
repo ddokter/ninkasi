@@ -244,3 +244,16 @@ class BatchMeasurements(BatchDetailView):
             forms.append(form)
 
         return forms
+
+
+class BatchTasks(BatchDetailView):
+
+    """ View on all tasks associated with this batch """
+
+    template_name = "batch_tasks.html"
+
+    def list_tasks(self):
+
+        """ List all tasks for the batch """
+
+        return self.object.task.all()
