@@ -5,48 +5,9 @@ from django.forms import inlineformset_factory
 from django.contrib.contenttypes.forms import generic_inlineformset_factory
 from django.contrib import messages
 from ninkasi.resource import ResourceRegistry
-from .base import CreateView, UpdateView, DetailView, ListingView
+from .base import DetailView, ListingView
 from ..models.recipe import Recipe
 from ..models.metaphase import MetaPhase
-
-
-class FormSetMixin:
-
-    def get_form(self, form_class=None):
-
-        form = super().get_form(form_class=form_class)
-
-        # form.fields.pop('ingredient')
-
-        return form
-
-    @property
-    def formsets(self):
-
-        factory1 = inlineformset_factory(
-            Recipe, Recipe.ingredient.through, exclude=[]
-        )
-
-        kwargs = {}
-
-        if self.request.method == "POST":
-            kwargs['data'] = self.request.POST
-
-        if self.object:
-            kwargs['instance'] = self.object
-
-        return [factory1(**kwargs)]
-
-    def form_valid(self, form):
-
-        self.object = form.save()
-
-        for _formset in self.formsets:
-
-            if _formset.is_valid():
-                _formset.save()
-
-        return HttpResponseRedirect(self.get_success_url())
 
 
 class RecipeDetailView(DetailView):
@@ -58,17 +19,6 @@ class RecipeDetailView(DetailView):
         """ List phases defned for this system """
 
         return MetaPhase.objects.filter(parents__model="recipe")
-
-
-class RecipeCreateView(CreateView):
-
-    model = Recipe
-
-
-class RecipeUpdateView(FormSetMixin, UpdateView):
-    #        class RecipeUpdateView(UpdateView):
-
-    model = Recipe
 
 
 class RecipeListingView(ListingView):

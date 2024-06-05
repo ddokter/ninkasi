@@ -30,7 +30,7 @@ class Step(BaseModel, BaseStep):
     name = models.CharField(max_length=100, blank=True, null=True)
     phase = models.ForeignKey("Phase", on_delete=models.CASCADE)
     temperature = models.FloatField(_("Temperature"), blank=True, null=True)
-    duration = DurationField(_("Duration"), max_length=10)
+    duration = DurationField(_("Duration"))
     order = models.SmallIntegerField(default=0, editable=False)
 
     def __hash__(self):
@@ -89,7 +89,7 @@ class MashStep(Step):
 
     """ Step for basic mash with heatup. Includes ramp-up time """
 
-    rampup = DurationField(_("Ramp-up"), max_length=10)
+    rampup = DurationField(_("Ramp-up"))
 
     def __str__(self):
 

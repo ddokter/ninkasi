@@ -10,12 +10,28 @@
   <dd class="col-sm-9">{{ object.name }}</dd>
   <dt class="col-sm-3">{% trans 'Default step' %}</dt>
   <dd class="col-sm-9">{{ object.default_step }}</dd>
+  <dt class="col-sm-3">{% trans 'Possible steps' %}</dt>
+  <dd class="col-sm-9">
+    <ul>
+    {% for step in object.list_step_models %}
+    <li>{{ step }}</li>
+    {% endfor %}
+    </ul>
+  </dd>
+  <dt class="col-sm-3">{% trans 'Parents' %}</dt>
+  <dd class="col-sm-9">
+    <ul>
+    {% for step in object.list_parent_models %}
+    <li>{{ step }}</li>
+    {% endfor %}
+    </ul>
+  </dd>
 </dl>
 
 
 <section>
   <h2>Measurements</h2>
-  
+
   <table class="table table-striped">
     <thead>
       <tr>
@@ -33,5 +49,5 @@
     </tbody>
   </table>
 </section>
-  
+
 {% endblock content %}

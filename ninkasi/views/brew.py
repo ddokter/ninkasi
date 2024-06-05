@@ -10,62 +10,6 @@ from ..models.batch import Batch
 from ..models.metaphase import MetaPhase
 
 
-class FormSetMixin:
-
-    def get_form(self, form_class=None):
-
-        form = super().get_form(form_class=form_class)
-
-        form.fields['batch'].widget = HiddenInput()
-
-        form.fields.pop('material')
-        # form.fields.pop('tank')
-
-        return form
-
-    @property
-    def formsets(self):
-
-        """ Return all formsets for the brew. That amounts to a whopping 3 """
-
-        factory1 = inlineformset_factory(
-            Brew, Brew.material.through, exclude=[],
-        )
-
-        # factory2 = generic_inlineformset_factory(
-        #    BatchStep, exclude=[],
-        #    can_order=True
-        # )
-
-        # factory3 = generic_inlineformset_factory(
-        #    Transfer, exclude=[],
-        #    extra=1,
-        # )
-
-        kwargs = {}
-
-        if self.request.method == "POST":
-            kwargs['data'] = self.request.POST
-
-        if self.object:
-            kwargs['instance'] = self.object
-
-        # formset_3 = factory3(**kwargs)
-        # setattr(formset_3, "expanded", True)
-
-        return [factory1(**kwargs)]
-
-    def form_valid(self, form):
-
-        self.object = form.save()
-
-        for _formset in self.formsets:
-            if _formset.is_valid():
-                _formset.save()
-
-        return HttpResponseRedirect(self.get_success_url())
-
-
 class BrewDetailView(DetailView):
 
     """ Add phase vocab. TODO: could be a template_tag I guess """
@@ -75,12 +19,12 @@ class BrewDetailView(DetailView):
 
     def phase_vocab(self):
 
-        """ List phases defned for this system """
+        """ List phases defined for this system """
 
         return MetaPhase.objects.filter(parents__model="brew")
 
 
-class BrewCreateView(FormSetMixin, CreateView):
+class BrewCreateView(CreateView):
 
     model = Brew
 
@@ -94,9 +38,17 @@ class BrewCreateView(FormSetMixin, CreateView):
         return {}
 
 
-class BrewUpdateView(FormSetMixin, UpdateView):
+class BrewUpdateView(UpdateView):
 
     model = Brew
+
+    def get_form(self, form_class=None):
+
+        form = super().get_form(form_class=form_class)
+
+        form.fields['batch'].widget = HiddenInput()
+
+        return form
 
 
 class BrewImportPhasesView(DetailView):

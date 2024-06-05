@@ -1,3 +1,5 @@
+""" All phase definitions """
+
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -5,10 +7,10 @@ from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
 from ninkasi.api import Phase as BasePhase
 from ninkasi.duration import Duration
-from .metaphase import MetaPhase
+from .task import TaskFactory, EventScheduledTask
 
 
-class Phase(BasePhase, models.Model):
+class Phase(BasePhase, models.Model, TaskFactory):
 
     """Phases in the production process, relevant to the lifecycle of
     a batch or brew. This could be anything, from 'boil' to
@@ -18,6 +20,9 @@ class Phase(BasePhase, models.Model):
     ferment and mature. The phase is defined upon the batch and the
     brew but also recipe. Batch and brew import phases from the
     recipe.
+
+    A phase is a task factory, that is there may be tasks attached to
+    the phase defned by it's 'events': start and end.
 
     """
 
@@ -113,6 +118,15 @@ class Phase(BasePhase, models.Model):
                 return False
 
         return True
+
+    def generate_tasks(self, **kwargs):
+
+        """ Generate any defined tasks if need be for the phase's events """
+
+        events = [f"{ self.name }.start", f"{ self.name }.end"]
+
+        for task in EventScheduledTask.objects.filter(name__in=events):
+            task.generate_tasks(**kwargs)
 
     class Meta:
 

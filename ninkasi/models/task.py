@@ -3,10 +3,12 @@
 from datetime import datetime, date
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from .fields import DurationField
+from .fields import DurationField, EventField
 from .base import BaseModel
+from ..events import EventRegistry
 
 
 PRIO_VOCAB = [(1, _("High")),
@@ -43,9 +45,8 @@ class ScheduledTaskManager(models.Manager):
 class TaskFactory:
 
     """Generates tasks that stay linked to the factory, so the same
-    factory can generate those tasks again (and again). This is needed
-    to be able to produce tasks based on parent parameters and
-    recreate those tasks if any parameter of the parent changes.
+    factory can generate those tasks again (and again). The factory is
+    responsible for preventing inadvert copies.
 
     """
 
@@ -58,8 +59,8 @@ class TaskFactory:
 
 class Task(BaseModel):
 
-    """Base class for tasks. A task may be related to the apparatus of
-    the brewery, or may be stand-alone.
+    """Base class for tasks. Any actual task should be a subclass, so
+    the get_real method may be used to get the actual task.
 
     """
 
@@ -103,7 +104,7 @@ class ScheduledTask(Task):
 
     date = models.DateField()
     time = models.TimeField(blank=True, null=True)
-    precision = DurationField(max_length=5)
+    precision = DurationField()
 
     def get_deadline(self):
 
@@ -119,7 +120,7 @@ class ScheduledTask(Task):
     def is_due(self):
 
         """Is the task due yet? This is the deadline compared to the
-        current time.
+        current time or date.
 
         """
 
@@ -134,13 +135,19 @@ class ScheduledTask(Task):
         app_label = "ninkasi"
 
 
-EVENT_VOCAB = [(0, _("Container empty")),
-               (1, _("Container fill")),
-               (2, _("Brew start")),
-               (3, _("Brew finish"))]
+PRECISION_HELP = _("How much slack is allowed around the specified time?")
 
 
-PRECISION_HELP = _("Use negative durations to specify before.")
+OFFSET_HELP = _("Offset from time of event. Use negative durations"
+                " to specify before the event"
+                )
+
+
+def event_vocab():
+
+    """ Provide vocabulary for events """
+
+    return [(evt, evt) for evt in EventRegistry.list_events()]
 
 
 class EventScheduledTask(Task, TaskFactory):
@@ -148,16 +155,21 @@ class EventScheduledTask(Task, TaskFactory):
     """Task that is created based on an event. The precision field
     specifies how much slack there is around the scheduled time.
     Events are specified by Ninkasi and are in terms of 'tank empty',
-    etc.
-
-    TODO: somehow list events, maybe in a registry?
+    'batch start', etc.
 
     """
 
-    precision = DurationField(max_length=5)
-    event = models.SmallIntegerField(choices=EVENT_VOCAB)
+    precision = DurationField(help_text=PRECISION_HELP)
+    event = EventField(max_length=100, choices=event_vocab)
+    offset = DurationField(help_text=OFFSET_HELP, null=True, blank=True)
 
     def generate_tasks(self, **kwargs):
+
+        """ Generate tasks based on the given event. The kwargs must
+        contain a date and may contain a time. """
+
+        if 'date' not in kwargs:
+            raise KeyError("'date' must be specified in kwargs")
 
         self.eventtasksub_set.filter(
             name=kwargs['name'],

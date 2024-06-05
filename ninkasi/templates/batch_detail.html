@@ -59,6 +59,9 @@
 
 {% block content %}
 
+{% with active_tab='details' %}
+{% include 'snippets/batch_tabs.html' %}
+{% endwith %}
 
 <dl class="row">
   <dt class="col-sm-3">Volume (planned/actual)</dt>

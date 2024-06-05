@@ -13,23 +13,6 @@ from .ingredient import Ingredient
 from ..ordered import OrderedContainer
 
 
-class RecipeResource(Resource):
-
-    def list(self):
-
-        return Recipe.objects.all()
-
-    def get(self, _id):
-
-        try:
-            return Recipe.objects.get(pk=_id)
-        except Recipe.objects.DoesNotExist as exc:
-            raise NotFoundInResource from exc
-
-
-ResourceRegistry.register("recipe", "django", RecipeResource())
-
-
 class Recipe(models.Model, BaseRecipe, OrderedContainer):
 
     """Brew recipe for a given beer, including ingredients,

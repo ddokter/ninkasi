@@ -7,11 +7,26 @@ from django.contrib import messages
 
 class FormSetMixin:
 
+    def get_m2m_fields(self, obj):
+
+        """ Generate list of m2m fields that have a defined through """
+
+        for field in obj._meta.many_to_many:
+            if not getattr(obj, field.name).through._meta.auto_created:
+                yield field.name
+
     def get_form(self, form_class=None):
+
+        """We need to pop m2m fields from regular fields, to prevent
+        the field to show up in the regular form fields.
+
+        """
 
         form = super().get_form(form_class=form_class)
 
-        # pop fields we don't wanna use
+        for fname in self.get_m2m_fields(self.object):
+
+            form.fields.pop(fname)
 
         return form
 
@@ -30,13 +45,13 @@ class FormSetMixin:
 
         factories = []
 
-        for fname in getattr(self.object, 'm2m_fields', []):
+        for fname in self.get_m2m_fields(self.model):
             factory = inlineformset_factory(
                 self.model, getattr(self.model, fname).through, exclude=[],
             )
             factories.append(factory(**kwargs))
 
-        return [factory(**kwargs)]
+        return factories
 
     def form_valid(self, form):
 

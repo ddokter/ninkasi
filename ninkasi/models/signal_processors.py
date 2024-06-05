@@ -1,5 +1,6 @@
-from datetime import timedelta
-from django.db.models.signals import post_save, pre_save
+""" Register event handlers for Django's signals """
+
+from django.db.models.signals import post_save, pre_save, post_delete
 from django.dispatch import receiver
 from django.utils import timezone
 from .batch import Batch, BatchContainer
@@ -7,6 +8,8 @@ from .transfer import Transfer
 from .step import Step, MashStep
 from .brew import Brew
 from .task import EventScheduledTask
+from .metaphase import MetaPhase
+from ..events import EventRegistry
 
 
 def recalc_end_dates(batch, transfer=None):

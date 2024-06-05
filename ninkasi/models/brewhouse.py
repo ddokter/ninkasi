@@ -12,6 +12,7 @@ FILTER_LOSS = _("Amount of wordt lost in filter dead space.")
 
 WHIRLPOOL_LOSS = _("Amount of wordt lost in whirlpool dead space.")
 
+
 class Brewhouse(Container):
 
     """Represent brewing installation. This defines a few parameters
@@ -22,7 +23,6 @@ class Brewhouse(Container):
     warmup = models.SmallIntegerField(_("Warmup time per degree C"),
                                       help_text=WARMUP_HELP)
     next_brew_delay = DurationField(_("Minimal brewtime before next brew"),
-                                    max_length=10,
                                     help_text=NEXT_HELP)
     filter_loss = models.SmallIntegerField(_("Amount lost in filter"),
                                            help_text=FILTER_LOSS)

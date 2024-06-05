@@ -1,9 +1,13 @@
+""" All batch views """
+
 import datetime
 from random import choice
 from django.utils.translation import gettext_lazy as _
 from django.http import HttpResponseRedirect
-from django.forms import inlineformset_factory, Form, Select
+from django.forms import inlineformset_factory, Form, Select, HiddenInput
+from django.forms.models import modelform_factory
 from django.contrib.contenttypes.forms import generic_inlineformset_factory
+from django.contrib.contenttypes.models import ContentType
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic import FormView
 from django.urls import reverse_lazy, reverse
@@ -12,56 +16,15 @@ from .base import CreateView, UpdateView, DetailView
 from ..models.batch import Batch
 from ..models.beer import Beer
 from ..models.metaphase import MetaPhase
+from ..models.measurement import Measurement
 from ..utils import get_model_name
 from ..resource import NotFoundInResource
+from .formset import FormSetMixin
 
 
-class FormSetMixin:
+class BatchCreateView(CreateView):
 
-    def get_form(self, form_class=None):
-
-        form = super().get_form(form_class=form_class)
-
-        # form.fields['color'].widget = ColorInput()
-
-        for field in ['tank', 'material']:
-            form.fields.pop(field)
-
-        return form
-
-    @property
-    def formsets(self):
-
-        factory1 = inlineformset_factory(
-            Batch, Batch.material.through, exclude=[])
-
-        factory2 = inlineformset_factory(
-            Batch, Batch.tank.through, exclude=[])
-
-        kwargs = {}
-
-        if self.request.method == "POST":
-            kwargs['data'] = self.request.POST
-
-        if self.object:
-            kwargs['instance'] = self.object
-
-        return [factory1(**kwargs), factory2(**kwargs)]
-
-    def form_valid(self, form):
-
-        """ Check the form and all formsets """
-
-        self.object = form.save()
-
-        for _formset in self.formsets:
-            if _formset.is_valid():
-                _formset.save()
-
-        return HttpResponseRedirect(self.get_success_url())
-
-
-class BatchCreateView(FormSetMixin, CreateView):
+    """ Override initial values """
 
     model = Batch
 
@@ -73,11 +36,6 @@ class BatchCreateView(FormSetMixin, CreateView):
             return {'beer': Beer.objects.get(pk=self.kwargs['beer'])}
 
         return {}
-
-
-class BatchUpdateView(FormSetMixin, UpdateView):
-
-    model = Batch
 
 
 class BatchDetailView(DetailView):
@@ -227,3 +185,62 @@ class BatchImportPhasesView(BatchDetailView):
             messages.error(self.request, _("Recipe to import not provided."))
 
         return HttpResponseRedirect(self.success_url)
+
+
+class BatchMeasurements(BatchDetailView):
+
+    template_name = "batch_measurements.html"
+
+    @property
+    def forms(self):
+
+        """Specify measurements forms for the batch. This is defined
+        by the batch phases. Each form needs to be saved seperately.
+
+        """
+
+        kwargs = {}
+
+        if self.request.method == "POST":
+            kwargs['data'] = self.request.POST
+
+        if self.object:
+            kwargs['instance'] = self.object
+
+        # Set up initial data
+        #
+        measurements = []
+
+        for phase in self.object.list_phases():
+            for measurement in phase.get_metaphase().list_measurements():
+                measurements.append(measurement)
+
+        forms = []
+
+        for measurement in measurements:
+
+            # create form
+            #
+            factory = modelform_factory(
+                Measurement, exclude=[],
+            )
+
+            kwargs['initial'] = {
+                'object_id': self.object.id,
+                'content_type': ContentType.objects.get_for_model(
+                    self.object).id,
+                'quantity': measurement.quantity.id}
+
+            form = factory(**kwargs)
+
+            form.fields['object_id'].widget = HiddenInput()
+            form.fields['content_type'].widget = HiddenInput()
+            form.fields['quantity'].widget = HiddenInput()
+
+            title = f"{ measurement.quantity } [{ measurement.time }]"
+
+            setattr(form, "title", title)
+
+            forms.append(form)
+
+        return forms

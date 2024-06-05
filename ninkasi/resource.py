@@ -89,5 +89,12 @@ class ModelResource(Resource):
 
         return self.model.objects.all()
 
+    def get(self, _id):
+
+        try:
+            return self.model.objects.get(_id)
+        except self.model.objects.DoesNotExist as exc:
+            raise NotFoundInResource from exc
+
 
 registry = ResourceRegistry()

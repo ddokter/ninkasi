@@ -12,12 +12,13 @@ from ..ordered import OrderedContainer
 from .tank import Tank
 from .material import Material, ParentedMaterial
 from .fields import Duration
+from ..events import EventProviderModel
 
 
 DATE_MODE_VOCAB = [(0, _("Start")), (1, _("Delivery"))]
 
 
-class Batch(models.Model, OrderedContainer):
+class Batch(models.Model, OrderedContainer, EventProviderModel):
 
     """A batch is a volume of beer that can be treated as a separate
     unit. This boils down to a volume that is brewed in one or more
@@ -55,6 +56,7 @@ class Batch(models.Model, OrderedContainer):
 
     phase = GenericRelation("Phase")
     sample = GenericRelation("Sample")
+    measurement = GenericRelation("Measurement")
 
     def __str__(self):
 
@@ -187,6 +189,10 @@ class Batch(models.Model, OrderedContainer):
     def get_recipe(self):
 
         """ Get the recipe set for this batch """
+
+    def list_measurements(self):
+
+        return self.measurement.all()
 
     class Meta:
 

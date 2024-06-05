@@ -3,12 +3,15 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.contenttypes.fields import GenericRelation
 from ..ordered import OrderedContainer
 from .material import Material, ParentedMaterial
+from ..events import EventProviderModel
 
 
-class Brew(models.Model, OrderedContainer):
+class Brew(models.Model, OrderedContainer, EventProviderModel):
 
     """One brew. This boils down to one full brewing cycle on the
-    brewhouse. One or more brews make up a batch.
+    brewhouse. One or more brews make up a batch. The Brew consists of
+    phases, phases consist of steps. Recipe for a brew is inherited
+    from the batch, but may be adjusted on the brew.
 
     """
 
@@ -90,5 +93,7 @@ class Brew(models.Model, OrderedContainer):
 
 
 class BrewMaterial(ParentedMaterial):
+
+    """ M2M definition for a brew to materials. """
 
     brew = models.ForeignKey(Brew, on_delete=models.CASCADE)

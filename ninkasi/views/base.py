@@ -164,7 +164,7 @@ class InlineActionMixin:
             for field in field_defs.keys():
                 form.fields[field].queryset = field_defs[field]
 
-        except KeyError:
+        except (KeyError, AttributeError):
             pass
 
         # Always use DateTimeWidget...
@@ -298,7 +298,7 @@ class DetailView(GenericMixin, BaseDetailView, CTypeMixin):
 
         """ provide content type specific permission """
 
-        return "ninkasi.view_%s" % self.ctype
+        return f"ninkasi.view_{ self.ctype }"
 
     def get_template_names(self):
 

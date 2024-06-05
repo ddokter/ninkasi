@@ -1,9 +1,10 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from .fields import DurationField
+from ..events import EventProvider
 
 
-class MetaPhase(models.Model):
+class MetaPhase(models.Model, EventProvider):
 
     """MetaPhases are used to define what phases may occur in the
     brewing process. Typically this would be stuff like 'mash',
@@ -40,12 +41,18 @@ class MetaPhase(models.Model):
 
         return self.name
 
+    def list_parent_models(self):
+
+        """ Show what parents are possible for this phase. """
+
+        return self.parents.all()
+
     def list_step_models(self):
 
         """ return a list of step models that may be added to this phase.
         The returned steps are actually ContentTypes """
 
-        return self.steps
+        return self.steps.all()
 
     def get_default_step_model(self):
 
@@ -57,10 +64,11 @@ class MetaPhase(models.Model):
 
         return self.metaphasemeasurements_set.all()
 
-    @property
-    def m2m_fields(self):
+    def list_events(self):
 
-        return ["measurements"]
+        """ The metahase is an event provider, but per instance """
+
+        return [f"ninkasi.{ self.name }.start", f"ninkasi.{ self.name }.end"]
 
     class Meta:
 
@@ -79,7 +87,4 @@ class MetaPhaseMeasurements(models.Model):
 
     metaphase = models.ForeignKey("MetaPhase", on_delete=models.CASCADE)
     quantity = models.ForeignKey("Quantity", on_delete=models.CASCADE)
-    time = DurationField(
-        max_length=5, null=True, blank=True,
-        help_text=TIME_HELP_TEXT
-    )
+    time = DurationField(null=True, blank=True, help_text=TIME_HELP_TEXT)

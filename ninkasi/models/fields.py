@@ -84,6 +84,13 @@ class DurationField(models.CharField):
 
     default_validators = [validate_duration]
 
+    def __init__(self, *args, **kwargs):
+
+        if 'max_length' not in kwargs:
+            kwargs['max_length'] = 10
+
+        super().__init__(*args, **kwargs)
+
     def to_python(self, value):
 
         """ Return Duration object, but gracefully """
@@ -103,7 +110,10 @@ class DurationField(models.CharField):
         if value is None or value == '':
             return value
 
-        return Duration(value)
+        try:
+            return Duration(value)
+        except BaseException:
+            return None
 
     def get_prep_value(self, value):
 
@@ -276,3 +286,14 @@ class URNListField(URNMixin, models.JSONField):
         value = super().from_db_value(value, *args)
 
         return self.__to_python(value)
+
+
+class EventField(models.CharField):
+
+    """ Skip check choices given that events is a dynamic list """
+
+    def _check_choices(self):
+
+        """ Do not check choices, as they are provided dynamically """
+
+        return []
