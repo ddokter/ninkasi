@@ -16,7 +16,7 @@ class RecipeDetailView(DetailView):
 
     def phase_vocab(self):
 
-        """ List phases defned for this system """
+        """ List phases defined for this system """
 
         return MetaPhase.objects.filter(parents__model="recipe")
 
