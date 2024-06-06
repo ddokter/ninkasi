@@ -1,5 +1,6 @@
 """ All phase definitions """
 
+from datetime import datetime
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -8,7 +9,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
 from ninkasi.api import Phase as BasePhase
 from ninkasi.duration import Duration
-from .task import TaskFactory, EventScheduledTask, Task
+from .task import TaskFactory, EventScheduledTask
 
 
 class Phase(BasePhase, models.Model, TaskFactory):
@@ -126,9 +127,7 @@ class Phase(BasePhase, models.Model, TaskFactory):
 
         """ Generate any defined tasks if need be for the phase's events """
 
-        events = [f"{ self.name }.start", f"{ self.name }.end"]
-
-        kwargs['parent'] = self
+        events = [f"ninkasi.{ self.name }.start", f"ninkasi.{ self.name }.end"]
 
         self.tasks.all().delete()
 
@@ -138,8 +137,13 @@ class Phase(BasePhase, models.Model, TaskFactory):
 
                 start = self.parent.get_phase_start(self.id)
                 kwargs['name'] = f"{ task.name } - { self.parent }"
+                kwargs['parent'] = self.parent
 
                 if start:
+
+                    if isinstance(start, datetime):
+                        kwargs['time'] = start.time()
+
                     task.generate_tasks(date=start, **kwargs)
 
     class Meta:

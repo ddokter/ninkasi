@@ -88,6 +88,13 @@ class Task(BaseModel):
 
         return f"{ str(real) } [{ real.get_status_display() }]"
 
+    def get_details(self):
+
+        """ Return a more detailed description of the task. This should
+        be a tuple of (str, dict) """
+
+        return (self.description, {})
+
     class Meta:
         app_label = "ninkasi"
 
@@ -177,7 +184,10 @@ class EventScheduledTask(Task, TaskFactory):
             content_type=ContentType.objects.get_for_model(kwargs['parent']).id
         ).delete()
 
-        kwargs.update(priority=self.priority, precision=self.precision)
+        kwargs.update(priority=self.priority,
+                      precision=self.precision,
+                      description=self.description
+                      )
 
         return self.eventtasksub_set.create(**kwargs)
 
@@ -269,3 +279,11 @@ class EventTaskSub(ScheduledTask):
     parent = GenericForeignKey("content_type", "object_id")
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
+
+    def get_details(self):
+
+        details = super().get_details()
+
+        details[1]['event'] = self.factory.event
+
+        return details

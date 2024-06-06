@@ -59,7 +59,7 @@ class Batch(models.Model, OrderedContainer, EventProviderModel):
     sample = GenericRelation("Sample")
     measurement = GenericRelation("Measurement")
 
-    task = GenericRelation("Task")
+    task = GenericRelation("EventTaskSub")
 
     def __str__(self):
 

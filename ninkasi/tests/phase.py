@@ -138,7 +138,7 @@ class TestPhase(TestCase):
             name="Doe dingen",
             description="Wat ik zeg",
             precision="5m",
-            event="fermentation.start"
+            event="ninkasi.Fermentation.start"
         )
 
         phase0.generate_tasks(parent=batch)
