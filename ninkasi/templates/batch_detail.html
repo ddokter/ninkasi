@@ -2,6 +2,7 @@
 
 {% load i18n ninkasi_tags %}
 
+
 {% block extra_actions %}
 
 {% if user|push:object|has_obj_perm:'change' %}
@@ -23,17 +24,6 @@
   </div>
 </span>
 {% endif %}
-
-{% if user|push:'measurement'|has_model_perm:'add' %}
-<a class="btn btn-outline-success btn-sm"
-   href="{% url 'inline_create' 'batch' object.id 'measurement' %}"
-   data-toggle="tooltip" data-placement="right"
-   title="{% trans 'Add measurement' %}">
-  <span class="fas fa-plus" />
-  <span class="fas fa-scale-balanced" />
-</a>
-{% endif %}
-
 
 <!--a class="btn btn-outline-success btn-sm"
    href="{% url 'transfer' view.ct_id object.id %}"
@@ -105,6 +95,12 @@
       </span>
     </i>
     {% endif %}
+  </dd>
+  <dt class="col-sm-3">{% trans 'Color' %}</dt>
+  <dd class="col-sm-9">
+    <div class="rounded-circle batch-marker"
+	 style="background-color: {{ view.get_color }}">
+    </div>
   </dd>
 </dl>
 

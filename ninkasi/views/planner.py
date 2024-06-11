@@ -17,17 +17,6 @@ class PlannerView(TemplateView, Calendar):
 
     template_name = "planner.html"
 
-    def get_color(self):
-
-        """Return a random color from the given palette
-        """
-
-        # TODO: make color a permanent feature of the batch somehow
-
-        return choice([
-            '#d9ed92', '#b5e48c', '#99d98c', '#76c893', '#52b69a',
-            '#34a0a4', '#168aad', '#1a759f', '#1e6091', '#184e77'])
-
     def list_tanks(self):
 
         """ Return list of all tanks in the brewery """
@@ -56,7 +45,7 @@ class PlannerView(TemplateView, Calendar):
                 batch = self.get_batch(batch)
 
                 if batch and batch not in batches:
-                    batches[batch] = self.get_color()
+                    batches[batch] = batch.color
 
                 tankdata[day] = (batch, batches.get(batch, None))
 

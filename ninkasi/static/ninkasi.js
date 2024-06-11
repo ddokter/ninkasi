@@ -81,4 +81,14 @@ $(document).ready(function() {
 
 	return false;
     });
+
+    $(".form-group").each(function(idx, elt) {
+
+	var label = $(elt).find("label").eq(0);
+	var input = $(elt).find(".form-control").eq(0);
+
+	if (input.attr("required")) {
+	    $(elt).addClass("required");
+	}
+    });
 });

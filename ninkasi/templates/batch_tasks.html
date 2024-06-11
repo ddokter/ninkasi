@@ -1,21 +1,22 @@
-{% extends 'base.html' %}
+{% extends 'batch_detail.html' %}
 
 {% load i18n ninkasi_tags %}
 
 {% block content %}
 
-<section class="tasks card">
-  <h2 class="card-title">{% trans "All tasks for " %}{{ object }}</h2>
+{% with active_tab='tasks' %}
+{% include 'snippets/batch_tabs.html' %}
+{% endwith %}
 
-  <div class="card-body">
-    <ul class="list-group">
-      {% for task in view.list_tasks %}
-      <li class="list-group-item">
-	{% task task %}
-      </li>
-      {% endfor %}
-    </ul>
-  </div>
+<section class="tasks">
+
+  <ul class="list-group">
+    {% for task in view.list_tasks %}
+    <li class="list-group-item">
+      {% task task %}
+    </li>
+    {% endfor %}
+  </ul>
 </section>
 
 {% endblock %}

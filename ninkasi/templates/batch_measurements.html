@@ -1,27 +1,34 @@
-{% extends 'base.html' %}
+{% extends 'batch_detail.html' %}
 
 {% load i18n bootstrap4 ninkasi_tags %}
-
-{% block title %}
-<h1>{% trans 'Batch measurements' %}</h1>
-{% endblock %}
 
 {% block content %}
 
 {% bootstrap_messages %}
 
+{% with active_tab='measurements' %}
+{% include 'snippets/batch_tabs.html' %}
+{% endwith %}
 
-<h2>Measured</h2>
+<h2>{% trans 'Measurements' %}
 
-<ul>
-{% for measurement in object.list_measurements %}
-<li>{{ measurement }}</li>
-{% endfor %}
-</ul>
+  {% if user|push:'measurement'|has_model_perm:'add' %}
+  <a class="btn btn-outline-success btn-sm"
+     href="{% url 'inline_create' 'batch' object.id 'measurement' %}"
+     data-toggle="tooltip" data-placement="right"
+     title="{% trans 'Add measurement' %}">
+    <span class="fas fa-plus" />
+    <span class="fas fa-scale-balanced" />
+  </a>
+  {% endif %}
+
+</h2>
+
+{% listing '' object.list_measurements %}
 
 
 {% block form %}
-{% for form in view.forms %}
+{% for form in view.formsxxx %}
 <h2>{{ form.title }}</h2>
 <form action="{% url 'inline_create' 'batch' object.id 'measurement' %}"
       method="POST" 

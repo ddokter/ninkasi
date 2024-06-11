@@ -42,6 +42,7 @@ a[data-toggle=collapse].collapsed i.hide {
 
 table.calendar td {
     height: 80px;
+    border: 2px solid #c0c0c0 !important;    
 }
 
 table.calendar td.today {
@@ -60,6 +61,12 @@ table.calendar {
     background-color: #e0e0e0;
 }
 
-label > input[required] {
-    color: #ff0000;
+.batch-marker {
+    width: 30px;
+    height: 30px;
+}
+
+.form-group.required label:after {
+  content:" *";
+  color:red;
 }

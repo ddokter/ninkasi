@@ -11,7 +11,7 @@ from django.core.exceptions import ValidationError
 from ..ordered import OrderedContainer
 from .tank import Tank
 from .material import Material, ParentedMaterial
-from .fields import Duration
+from .fields import Duration, ColorField
 from ..events import EventProviderModel
 from .task import EventScheduledTask
 
@@ -58,6 +58,8 @@ class Batch(models.Model, OrderedContainer, EventProviderModel):
     phase = GenericRelation("Phase")
     sample = GenericRelation("Sample")
     measurement = GenericRelation("Measurement")
+
+    color = ColorField(_("Color"), max_length=7, null=True, blank=True)
 
     task = GenericRelation("EventTaskSub")
 

@@ -12,6 +12,7 @@ from django.apps import apps
 from django.conf import settings
 from ..utils import get_model_name
 from ..forms.dtinput import DateTimeInput
+from ..forms.colorpicker import ColorInput
 from .formset import FormSetMixin
 
 
@@ -172,6 +173,12 @@ class InlineActionMixin:
         for field in form.fields:
             if form.fields[field].__class__.__name__ == 'DateTimeField':
                 form.fields[field].widget = DateTimeInput()
+
+        # Patch Textarea
+        #
+        for field in form.fields:
+            if form.fields[field].widget.__class__.__name__ == "Textarea":
+                form.fields[field].widget.attrs['rows'] = 3
 
         # Hide parent, if possible
         #

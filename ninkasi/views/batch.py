@@ -4,22 +4,18 @@ import datetime
 from random import choice
 from django.utils.translation import gettext_lazy as _
 from django.http import HttpResponseRedirect
-from django.forms import inlineformset_factory, Form, Select, HiddenInput
+from django.forms import HiddenInput
 from django.forms.models import modelform_factory
-from django.contrib.contenttypes.forms import generic_inlineformset_factory
 from django.contrib.contenttypes.models import ContentType
-from django.views.generic.detail import SingleObjectMixin
-from django.views.generic import FormView
-from django.urls import reverse_lazy, reverse
+from django.urls import reverse
 from django.contrib import messages
-from .base import CreateView, UpdateView, DetailView
+from .base import CreateView, DetailView
 from ..models.batch import Batch
 from ..models.beer import Beer
 from ..models.metaphase import MetaPhase
 from ..models.measurement import Measurement
 from ..utils import get_model_name
 from ..resource import NotFoundInResource
-from .formset import FormSetMixin
 
 
 class BatchCreateView(CreateView):
@@ -111,16 +107,7 @@ class BatchDetailView(DetailView):
 
     def get_color(self):
 
-        """Return a random color from the given palette
-        """
-
-        if not self._color:
-
-            self._color = choice([
-                '#d9ed92', '#b5e48c', '#99d98c', '#76c893', '#52b69a',
-                '#34a0a4', '#168aad', '#1a759f', '#1e6091', '#184e77'])
-
-        return self._color
+        return self.object.color
 
     def get_batch(self, thing):
 
@@ -190,6 +177,10 @@ class BatchImportPhasesView(BatchDetailView):
 class BatchMeasurements(BatchDetailView):
 
     template_name = "batch_measurements.html"
+
+    def list_measurements(self):
+
+        return self.measurements.all()
 
     @property
     def forms(self):

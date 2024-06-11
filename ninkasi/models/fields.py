@@ -5,6 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
 from ninkasi.resource import ResourceRegistry
 from ninkasi.duration import Duration
+from ninkasi.forms.colorpicker import ColorField as ColorFormField
 
 
 RANGE_FIELD_SEP = ","
@@ -297,3 +298,18 @@ class EventField(models.CharField):
         """ Do not check choices, as they are provided dynamically """
 
         return []
+
+
+class ColorField(models.CharField):
+
+    """ Make sure colorinput is used """
+
+    def formfield(self, **kwargs):
+
+        """ Make sure the colorfield gets a modern color input """
+
+        defaults = {"form_class": ColorFormField}
+
+        defaults.update(kwargs)
+
+        return super().formfield(**defaults)
