@@ -30,6 +30,8 @@ class Brewhouse(Container):
     whirlpool_loss = models.SmallIntegerField(_("Amount lost in whirlpool"),
                                               help_text=WHIRLPOOL_LOSS)
 
+    delays = models.ManyToManyField("MetaPhase", through="BrewhouseDelays")
+
     def __str__(self):
 
         return f"{ self.name } { self.volume }L"
@@ -47,8 +49,30 @@ class Brewhouse(Container):
         return (recipe.get_grist_weigth() * self.spent_grain_loss +
                 self.filter_loss + self.whirlpool_loss)
 
+    def list_delays(self):
+
+        return self.brewhousedelays_set.all()
+
     class Meta:
 
         app_label = "ninkasi"
         ordering = ["name"]
         verbose_name_plural = _("Brewhouses")
+
+
+DELAY_HELP = _("Specify the delay as a duration BEFORE the phase can start")
+
+
+class BrewhouseDelays(models.Model):
+
+    """ Any amount of time loss on the brewhouse, defined in
+    time before the next step can be performed. """
+
+    brewhouse = models.ForeignKey("Brewhouse", on_delete=models.CASCADE)
+    metaphase = models.ForeignKey("MetaPhase", on_delete=models.CASCADE)
+    delay = DurationField(help_text=DELAY_HELP)
+
+    class Meta:
+
+        app_label = "ninkasi"
+        verbose_name_plural = _("Delays")

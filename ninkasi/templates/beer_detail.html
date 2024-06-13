@@ -13,27 +13,8 @@
 {% endif %}
 {% endblock %}
 
-{% block content %}
-
-<dl class="row">
-  <dt class="col-sm-3">{% trans 'Style' %}</dt>
-  <dd class="col-sm-9">{{ object.style }}</dd>
-  
-  <dt class="col-sm-3">{% trans 'Recipes' %}</dt>
-  <dd>
-    <ul>
-      {% for recipe in object.recipes %}
-      <li>{{ recipe }}</li>
-      {% endfor %}
-    </ul>
-  </dd>
-</dl>
-
-
-{% if object.descr %}
-<p>{{ object.descr }}</p>
-{% endif %}
+{% block after_content %}
 
 {% sublisting 'Batches' object.list_batches 'batch' %}
 
-{% endblock content %}
+{% endblock after_content %}

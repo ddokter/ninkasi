@@ -37,6 +37,13 @@ class Step(BaseModel, BaseStep):
 
         return self.pk
 
+    def __str__(self):
+
+        if self.name:
+            return self.name
+
+        return f"{ self.name } { self.temperature } &deg;C"
+
     class Meta:
 
         app_label = "ninkasi"
@@ -89,46 +96,25 @@ class MashStep(Step):
 
     """ Step for basic mash with heatup. Includes ramp-up time """
 
-    rampup = DurationField(_("Ramp-up"))
 
-    def __str__(self):
-
-        return f"{ self.temperature } &deg;C"
-
-    def __hash__(self):
-
-        return self.pk
-
-    def get_total_duration(self):
-
-        """ Get total duration """
-
-        return self.duration + self.rampup
-
-    def copy(self, parent, **kwargs):
-
-        kwargs['rampup'] = self.rampup
-
-        return super().copy(parent, **kwargs)
-
-    def __eq__(self, thing):
-
-        return super().__eq__(thing) and self.rampup == thing.rampup
-
-
-class FermentationStep(MashStep):
+class FermentationStep(Step):
 
     """ Same """
 
 
-class MaturationStep(MashStep):
+class MaturationStep(Step):
 
     """ Same """
 
 
-class BoilStep(MashStep):
+class BoilStep(Step):
 
     """ Same """
+
+
+class FilterStep(Step):
+
+    """ Basic filtering step """
 
 
 class StepLog(models.Model):

@@ -1,12 +1,9 @@
-* use doc string of class for page listing
-* make phase more clear: phases for measurement/phases in brewing.
 * each beer has own scheme, but abstract:
     - glucanrest
     - ferularest
     - proteinrest
     - saccharification
     - mash out
-* add settings for critical parameters, like warm-up time
 * add option to relate one batch to another for slurry use
 
 * make shopping list, based on inventory, for planned batches.
@@ -16,4 +13,4 @@
 * use batch projected volume and subtract losses to calculate brew
   volumes
 
-* show required fields in forms by adding an asterisk to label (css)
+* calculate timings of brewhouse based on measurements 

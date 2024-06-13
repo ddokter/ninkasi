@@ -1,3 +1,4 @@
+from django.apps import apps
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
@@ -35,6 +36,14 @@ class Style(models.Model, BaseStyle):
     def urn(self):
 
         return f"urn:django:{ self.id }"
+
+    def list_beers(self):
+
+        """ List beers in the system using this style """
+
+        beer_model = apps.get_model("ninkasi", "Beer")
+
+        return beer_model.objects.filter(style=self.urn)
 
     class Meta:
 

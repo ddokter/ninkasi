@@ -1,6 +1,7 @@
+""" Metaphase definition """
+
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from .fields import DurationField
 from ..events import EventProvider
 
 
@@ -32,10 +33,6 @@ class MetaPhase(models.Model, EventProvider):
         limit_choices_to=models.Q(app_label="ninkasi",
                                   model__in=["batch", "brew", "recipe"])
     )
-    measurements = models.ManyToManyField(
-        "Quantity", through="MetaPhaseMeasurements",
-        blank=True, null=True
-    )
 
     def __str__(self):
 
@@ -60,10 +57,6 @@ class MetaPhase(models.Model, EventProvider):
 
         return self.default_step.model_class()
 
-    def list_measurements(self):
-
-        return self.metaphasemeasurements_set.all()
-
     def list_events(self):
 
         """ The metahase is an event provider, but per instance """
@@ -75,16 +68,3 @@ class MetaPhase(models.Model, EventProvider):
         app_label = "ninkasi"
         ordering = ["name"]
         verbose_name_plural = _("MetaPhases")
-
-
-TIME_HELP_TEXT = _("Specify timing from start of phase, or from end"
-                   "using negative durations")
-
-
-class MetaPhaseMeasurements(models.Model):
-
-    """ Define measurements to take during this phase """
-
-    metaphase = models.ForeignKey("MetaPhase", on_delete=models.CASCADE)
-    quantity = models.ForeignKey("Quantity", on_delete=models.CASCADE)
-    time = DurationField(null=True, blank=True, help_text=TIME_HELP_TEXT)

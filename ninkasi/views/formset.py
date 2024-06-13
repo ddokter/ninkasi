@@ -7,12 +7,12 @@ from django.contrib import messages
 
 class FormSetMixin:
 
-    def get_m2m_fields(self, obj):
+    def get_m2m_fields(self, model):
 
         """ Generate list of m2m fields that have a defined through """
 
-        for field in obj._meta.many_to_many:
-            if not getattr(obj, field.name).through._meta.auto_created:
+        for field in model._meta.many_to_many:
+            if not getattr(model, field.name).through._meta.auto_created:
                 yield field.name
 
     def get_form(self, form_class=None):
@@ -24,7 +24,7 @@ class FormSetMixin:
 
         form = super().get_form(form_class=form_class)
 
-        for fname in self.get_m2m_fields(self.object):
+        for fname in self.get_m2m_fields(self.model):
 
             form.fields.pop(fname)
 

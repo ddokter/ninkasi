@@ -1,0 +1,22 @@
+{% extends 'base_detail.html' %}
+
+{% load i18n ninkasi_tags %}
+
+{% block content %}
+
+<dl class="row">
+  <dt class="col-sm-3">{% trans 'color' %}</dt>
+  <dd class="col-sm-9">{{ object.color }} EBC</dd>
+  <dt class="col-sm-3">{% trans 'Source' %}</dt>
+  <dd class="col-sm-9">{{ object.source }}</dd>
+</dl>
+
+
+{% if object.description %}
+<p>{{ object.description }}</p>
+{% endif %}
+
+{% sublisting 'Beers' object.list_beers 'beer' %}
+
+
+{% endblock content %}

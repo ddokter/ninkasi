@@ -53,6 +53,12 @@ class Beer(models.Model):
 
         return None
 
+    def get_recipes_display(self):
+
+        """ Override generated method """
+
+        return ", ".join([str(recipe) for recipe in self.recipes])
+
     def __str__(self):
 
         return f"{ self.name } ({ self.style })"

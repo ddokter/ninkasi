@@ -1,9 +1,13 @@
+"""Brew model and related models for m2m relations."""
+
+from django.conf import settings
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.contrib.contenttypes.fields import GenericRelation
 from ..ordered import OrderedContainer
 from .material import Material, ParentedMaterial
 from ..events import EventProviderModel
+from ..duration import Duration
 
 
 class Brew(models.Model, OrderedContainer, EventProviderModel):
@@ -57,11 +61,33 @@ class Brew(models.Model, OrderedContainer, EventProviderModel):
 
         self.phase.create(metaphase=metaphase, order=self.phase.count())
 
+    def get_delay(self, phase):
+
+        """Return delay specified on the brewhouse for given phase,
+        if any."""
+
+        if self.brewhouse.list_delays().filter(
+                metaphase__name=phase.metaphase).exists():
+            return self.brewhouse.list_delays().filter(
+                metaphase__name=phase.metaphase).first().delay
+
+        return Duration("0m")
+
     def get_total_duration(self):
 
         """ Return total duration of the brew """
 
-        return sum(phase.get_duration() for phase in self.phase.all())
+        if not self.list_phases().exists():
+            return Duration(settings.DEFAULT_BREW_TIME)
+
+        total = Duration("0m")
+
+        for phase in self.list_phases():
+
+            total += phase.get_duration()
+            total += self.get_delay(phase)
+
+        return total
 
     @property
     def volume(self):
@@ -74,11 +100,12 @@ class Brew(models.Model, OrderedContainer, EventProviderModel):
 
     def import_phases(self, recipe_id):
 
-        """Import all phases from the bre recipe, that is in fact the
-        recipe of the beer for this batch. In the future, this could
-        be a choice of many.
+        """Import all phases from the brew recipe, that is in fact the
+        recipe of the beer for this batch.
 
         """
+
+        self.list_phases().delete()
 
         for phase in self.batch.beer.get_recipe(recipe_id).list_phases():
 

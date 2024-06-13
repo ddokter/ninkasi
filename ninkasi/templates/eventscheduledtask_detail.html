@@ -1,0 +1,24 @@
+{% extends 'base_detail.html' %}
+
+{% load i18n ninkasi_tags %}
+
+{% block content %}
+
+<dl class="row">
+  <dt class="col-sm-3">{% trans 'Priority' %}</dt>
+  <dd class="col-sm-9">{% priority object %}</dd>
+  <dt class="col-sm-3">{% trans 'Event' %}</dt>
+  <dd class="col-sm-9">{{ object.event }}</dd>
+  <dt class="col-sm-3">{% trans 'Offset' %}</dt>
+  <dd class="col-sm-9">{{ object.offset }}</dd>
+  <dt class="col-sm-3">{% trans 'Precision' %}</dt>
+  <dd class="col-sm-9">{{ object.precision }}</dd>
+  <dt class="col-sm-3">{% trans 'Estimated time' %}</dt>
+  <dd class="col-sm-9">{{ object.estimated_time }}</dd>  
+</dl>
+
+<p>{{ object.h10nized }}</p>
+
+<p>{{ object.description }}</p>
+
+{% endblock content %}

@@ -176,6 +176,8 @@ class BatchImportPhasesView(BatchDetailView):
 
 class BatchMeasurements(BatchDetailView):
 
+    """ Show measurements for the batch """
+
     template_name = "batch_measurements.html"
 
     def list_measurements(self):

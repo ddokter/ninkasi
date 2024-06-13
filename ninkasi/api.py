@@ -91,6 +91,10 @@ class Phase(OrderedContainer):
 
         """
 
+    def get_duration(self):
+
+        """ How lon is this step? Should return a Duration object. """
+
     def has_steps(self):
 
         """ Wel, do we? """

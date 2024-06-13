@@ -29,3 +29,4 @@ class Measurement(models.Model):
     class Meta:
 
         app_label = "ninkasi"
+        ordering = ['time']

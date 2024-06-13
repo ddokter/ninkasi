@@ -54,6 +54,7 @@ class Batch(models.Model, OrderedContainer, EventProviderModel):
 
     material = models.ManyToManyField(Material, through="BatchMaterial")
     tank = models.ManyToManyField(Tank, through="BatchContainer")
+    product = models.ManyToManyField("Product", through="BatchProduct")
 
     phase = GenericRelation("Phase")
     sample = GenericRelation("Sample")
@@ -139,6 +140,16 @@ class Batch(models.Model, OrderedContainer, EventProviderModel):
 
         return self.phase.all()
 
+    def list_products(self):
+
+        """ Get all products defined for this batch """
+
+        return self.batchproduct_set.all()
+
+    def total_product_volume(self):
+
+        return sum(product.total_volume() for product in self.list_products())
+
     def get_phase(self, _id):
 
         return self.phase.get(_id)
@@ -197,17 +208,22 @@ class Batch(models.Model, OrderedContainer, EventProviderModel):
 
         """ Get duration based on phases """
 
-        return sum(phase.get_duration() for phase in self.list_phases())
+        if self.list_phases().exists():
+            total = sum(phase.get_duration() for phase in self.list_phases())
+
+            for brew in self.list_brews():
+                total += brew.get_total_duration()
+        else:
+            total = Duration(settings.DEFAULT_PROCESSING_TIME)
+
+        return total
 
     def get_processing_time(self):
 
         """ Get the time needed to process this batch.
         """
 
-        try:
-            return self.get_total_duration()
-        except AttributeError:
-            return Duration(settings.DEFAULT_PROCESSING_TIME)
+        return self.get_total_duration()
 
     def import_phases(self, recipe_id):
 
@@ -215,6 +231,8 @@ class Batch(models.Model, OrderedContainer, EventProviderModel):
         the recipe of the beer for this batch. In the future, this
         could be a choice of many.
         """
+
+        self.list_phases().delete()
 
         for phase in self.beer.get_recipe(recipe_id).list_phases():
 
@@ -292,3 +310,18 @@ class BatchContainer(models.Model):
 
     # TODO: make validator for checking on whether the tank is already
     # filled on these dates.
+
+
+class BatchProduct(models.Model):
+
+    """ Relate batch to proucts """
+
+    batch = models.ForeignKey(Batch, on_delete=models.CASCADE)
+    product = models.ForeignKey("Product", on_delete=models.CASCADE)
+    amount = models.SmallIntegerField()
+
+    def total_volume(self):
+
+        """ Return the total volume of the batchproduct """
+
+        return self.amount * self.product.get_liter_volume()

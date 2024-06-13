@@ -1,0 +1,26 @@
+{% extends 'base_detail.html' %}
+
+{% load i18n ninkasi_tags %}
+
+{% block after_content %}
+
+<h2>{% trans 'Delays' %}</h2>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Delay before</th>
+      <th>Phase</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for delay in object.list_delays %}
+  <tr>
+    <td>{{ delay.delay }}</td>
+    <td>{{ delay.metaphase }}</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+{% endblock after_content %}

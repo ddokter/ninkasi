@@ -71,6 +71,7 @@ class Task(BaseModel):
     status = models.SmallIntegerField(default=0,
                                       editable=False,
                                       choices=STATUS_VOCAB)
+    estimated_time = DurationField()
 
     @property
     def is_done(self):
@@ -190,6 +191,18 @@ class EventScheduledTask(Task, TaskFactory):
                       )
 
         return self.eventtasksub_set.create(**kwargs)
+
+    def h10nized(self):
+
+        """ Provide a human readable version"""
+
+        sign = self.offset.get_sign()
+
+        if sign == "-":
+            sign = ""
+
+        return _(f"{ self.name } within { self.precision } of { self.event } "
+                 f"{ sign }{ self.offset }")
 
     class Meta:
         app_label = "ninkasi"

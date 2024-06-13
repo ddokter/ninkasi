@@ -10,6 +10,10 @@ from django.utils.translation import gettext_lazy as _
 #
 DURATION_RE = re.compile(r"^(\-?[0-9]+\.?[0-9]*)\s*([smhd])$")
 
+# All valid durations
+#
+DURATION_UNITS = ["s", "m", "h", "d"]
+
 # Map duration to minutes
 #
 DURATION_MAP = {
@@ -76,6 +80,15 @@ class Duration:
 
         return timedelta(days=self.days)
 
+    def get_sign(self):
+
+        """ Get whether the duration is negatove or positive """
+
+        if self.amount < 0:
+            return "-"
+
+        return "+"
+
     def __len__(self):
 
         return len(str(self))
@@ -116,3 +129,20 @@ class Duration:
         """ Return abs for amount """
 
         return f"{abs(self.amount):.2f}{ self.unit }"
+
+    def h10n(self):
+
+        """ Provide a humanized version of the duration """
+
+        amount = self.amount
+        idx = DURATION_UNITS.index(self.unit)
+
+        while amount < 1 and idx > 0:
+            amount = self.convert(DURATION_UNITS[idx - 1])
+            idx -= 1
+
+        while amount > 100 and idx < len(DURATION_UNITS):
+            amount = self.convert(DURATION_UNITS[idx + 1])
+            idx += 1
+
+        return Duration(f"{ amount }{ DURATION_UNITS[idx] }")

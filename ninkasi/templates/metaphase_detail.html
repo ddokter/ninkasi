@@ -28,26 +28,4 @@
   </dd>
 </dl>
 
-
-<section>
-  <h2>Measurements</h2>
-
-  <table class="table table-striped">
-    <thead>
-      <tr>
-	<th>{% trans 'Quantity' %}</th>
-	<th>{% trans 'Time' %}</th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for measurement in object.list_measurements %}
-      <tr>
-	<td>{{ measurement.quantity }}</td>
-	<td>{{ measurement.time }}</td>
-      </tr>
-      {% endfor %}
-    </tbody>
-  </table>
-</section>
-
 {% endblock content %}

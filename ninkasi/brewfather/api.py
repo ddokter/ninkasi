@@ -33,7 +33,7 @@ def list_recipes():
 
     """ Get the recipes """
 
-    return _call("https://api.brewfather.app/v2/recipes")
+    return _call("https://api.brewfather.app/v2/recipes?limit=50")
 
 
 @cache(time=3600)

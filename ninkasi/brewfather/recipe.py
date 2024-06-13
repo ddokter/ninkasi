@@ -1,9 +1,9 @@
 from django.conf import settings
 from django.urls import reverse
 from ninkasi.api import Recipe as BaseRecipe
-from ninkasi.brewfather import api
 from ninkasi.duration import Duration
-from .phase import Phase, MashStep, FermentationStep, BoilStep
+from .phase import (Phase, MashStep, FermentationStep, BoilStep, FilterStep,
+                    WhirlpoolStep)
 
 
 BASE_URL = "https://web.brewfather.app/tabs/recipes/recipe/"
@@ -48,6 +48,11 @@ class Recipe(BaseRecipe):
 
     def list_phases(self):
 
+        """BF only provides data on mash, boil and fermentation, so
+        other phases we'll add on defaults
+
+        """
+
         phases = []
 
         phase = Phase("mash")
@@ -58,10 +63,42 @@ class Recipe(BaseRecipe):
 
         phases.append(phase)
 
+        phase = Phase("filter")
+
+        phase.add_step(FilterStep(
+            name="Circulate",
+            temperature=80,
+            duration=Duration("10m")
+        ))
+
+        phase.add_step(FilterStep(
+            name="Filter",
+            temperature=80,
+            duration=Duration(settings.BF_FILTER_TIME)
+        ))
+
+        phase.add_step(FilterStep(
+            name="Sparge",
+            temperature=80,
+            duration=Duration(settings.BF_SPARGE_TIME)
+        ))
+
+        phases.append(phase)
+
         phase = Phase("boil")
 
         phase.add_step(BoilStep({'stepTime': self.data['boilTime'],
                                  'stepTemp': 100}))
+
+        phases.append(phase)
+
+        phase = Phase("whirlpool")
+
+        phase.add_step(WhirlpoolStep(
+            name="Whirlpool",
+            temperature=70,
+            duration=Duration("10m")
+        ))
 
         phases.append(phase)
 
@@ -101,7 +138,7 @@ class Recipe(BaseRecipe):
 
         """ Return total of all mash steps in minutes """
 
-        return sum(step.total_duration for step in self.list_mash_steps())
+        return sum(step.duration for step in self.list_mash_steps())
 
     def list_mash_steps(self):
 
@@ -127,8 +164,7 @@ class Recipe(BaseRecipe):
 
         """ Return total of all fermentation steps in days """
 
-        return sum(step.total_duration for step in
-                   self.list_fermentation_steps())
+        return sum(step.duration for step in self.list_fermentation_steps())
 
     def get_url(self, mode):
 

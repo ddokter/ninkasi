@@ -1,5 +1,6 @@
 """ Brewfather implementatins for phase and steps """
 
+from django.core.exceptions import ValidationError
 from ninkasi import api
 from ninkasi.duration import Duration
 
@@ -51,6 +52,13 @@ class Phase(api.Phase):
 
         return new_phase
 
+    def get_duration(self):
+
+        """ Get duration of this phase. """
+
+        return (sum(step.duration for step in self.list_steps()) or
+                Duration("0m"))
+
 
 class StepMixin:
 
@@ -63,10 +71,11 @@ class StepMixin:
 
         """ Copy self onto parent """
 
-        kwargs.update({"order": self.order,
-                       "rampup": self.ramp,
-                       "duration": self.total_duration,
-                       "temperature": self.temperature})
+        kwargs.update({
+            "name": self.name,
+            "order": self.order,
+            "duration": self.duration,
+            "temperature": self.temperature})
 
         return parent.add_step(**kwargs)
 
@@ -77,9 +86,14 @@ class StepMixin:
 
         return self.data['stepTemp']
 
+    @property
+    def duration(self):
+
+        """ Unimplemented """
+
     def __str__(self):
 
-        return f"{ self.temperature } &deg;C"
+        return self.name
 
 
 class MashStep(StepMixin, api.Step):
@@ -90,25 +104,14 @@ class MashStep(StepMixin, api.Step):
 
         self.data = data
 
+    def __str__(self):
+
+        return f"{ self.temperature } &deg;C"
+
     @property
     def duration(self):
 
         return Duration(f"{ self.data['stepTime'] }m")
-
-    @property
-    def ramp(self):
-
-        try:
-            return Duration(f"{ self.data['ramp'] }m")
-        except KeyError:
-            return Duration("0m")
-
-    @property
-    def total_duration(self):
-
-        """ For Brewfather mash steps, total time is time + ramp """
-
-        return self.duration + self.ramp
 
 
 BoilStep = MashStep
@@ -122,7 +125,8 @@ class FermentationStep(StepMixin, api.Step):
 
         self.data = data
 
-    def __str__(self):
+    @property
+    def name(self):
 
         return self.data['type']
 
@@ -131,17 +135,29 @@ class FermentationStep(StepMixin, api.Step):
 
         return Duration(f"{ self.data['stepTime'] }d")
 
+
+class FilterStep(StepMixin, api.Step):
+
+    def __init__(self, **kwargs):
+
+        self._data = kwargs
+
     @property
-    def ramp(self):
+    def name(self):
 
-        try:
-            return Duration(f"{ self.data['ramp'] }d")
-        except KeyError:
-            return Duration("0m")
+        return self._data['name']
 
     @property
-    def total_duration(self):
+    def temperature(self):
 
-        """ For Brewfather mash steps, total time is time + ramp """
+        return self._data['temperature']
 
-        return self.duration + self.ramp
+    @property
+    def duration(self):
+
+        return self._data['duration']
+
+
+class WhirlpoolStep(FilterStep):
+
+    """ same. """

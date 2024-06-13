@@ -191,7 +191,7 @@ class InlineActionMixin:
         return form
 
 
-class CreateView(GenericMixin, BaseCreateView, CTypeMixin, FormSetMixin):
+class CreateView(GenericMixin, FormSetMixin, BaseCreateView, CTypeMixin):
 
     """ Base create view that enables creation within a parent """
 
@@ -329,13 +329,21 @@ class DetailView(GenericMixin, BaseDetailView, CTypeMixin):
                 continue
 
             try:
-                _props.append((field.verbose_name,
-                               getattr(self.object,
-                                       f"get_{ field.name }_display")()))
+                value = getattr(self.object, f"get_{ field.name }_display")()
             except AttributeError:
+                value = getattr(self.object, field.name)
 
-                _props.append((field.verbose_name,
-                               getattr(self.object, field.name)))
+            if isinstance(value, list):
+                value = ", ".join([str(part) for part in value])
+
+            _props.append((field.verbose_name, value))
+
+        for field in self.object._meta.many_to_many:
+
+            values = [str(val) for val in
+                      list(getattr(self.object, field.name).all())]
+
+            _props.append((field.verbose_name, ", ".join(values)))
 
         return _props
 
