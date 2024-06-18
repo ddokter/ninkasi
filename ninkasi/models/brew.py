@@ -26,6 +26,7 @@ class Brew(models.Model, OrderedContainer, EventProviderModel):
     volume_projected = models.FloatField()
 
     phase = GenericRelation("Phase")
+    measurement = GenericRelation("Measurement")
 
     # sample = GenericRelation("Sample")
 
@@ -54,6 +55,12 @@ class Brew(models.Model, OrderedContainer, EventProviderModel):
     def list_phases(self):
 
         return self.phase.all()
+
+    def list_measurements(self):
+
+        """Return list of all related measurments."""
+
+        return self.measurement.all()
 
     def add_phase(self, metaphase):
 
@@ -92,9 +99,16 @@ class Brew(models.Model, OrderedContainer, EventProviderModel):
     @property
     def volume(self):
 
-        """ The brew volume is the volume of the final transfer
-        TODO: implement me
+        """The brew volume is the volume of the last measurement
+        taken.
+
+        TODO: how to make volume configurable?
         """
+
+        if self.list_measurements().filter(quantity__name="Volume").exists():
+            return self.list_measurements().filter(
+                quantity__name="Volume"
+            ).last().value
 
         return self.volume_projected
 

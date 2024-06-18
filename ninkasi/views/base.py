@@ -340,8 +340,9 @@ class DetailView(GenericMixin, BaseDetailView, CTypeMixin):
 
         for field in self.object._meta.many_to_many:
 
-            values = [str(val) for val in
-                      list(getattr(self.object, field.name).all())]
+            qs = getattr(self.object._meta.model, field.name).through
+
+            values = [str(val) for val in list(qs.objects.all())]
 
             _props.append((field.verbose_name, ", ".join(values)))
 

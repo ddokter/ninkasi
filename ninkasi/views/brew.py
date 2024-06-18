@@ -74,3 +74,14 @@ class BrewImportPhasesView(DetailView):
             messages.error(self.request, _("Recipe to import not provided."))
 
         return HttpResponseRedirect(self.success_url)
+
+
+class BrewMeasurements(BrewDetailView):
+
+    """ Show measurements for the brew """
+
+    template_name = "brew_measurements.html"
+
+    def list_measurements(self):
+
+        return self.measurements.all()

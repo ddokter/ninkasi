@@ -59,7 +59,7 @@ class MetaPhase(models.Model, EventProvider):
 
     def list_events(self):
 
-        """ The metahase is an event provider, but per instance """
+        """The metaphase is an event provider, but per instance"""
 
         return [f"ninkasi.{ self.name }.start", f"ninkasi.{ self.name }.end"]
 

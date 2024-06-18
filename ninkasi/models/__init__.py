@@ -14,5 +14,6 @@ from .task import Task, ScheduledTask  # noqa
 from .metaphase import MetaPhase
 from .quantity import Quantity  # noqa
 from .product import Product  # noqa
+from .unit import Unit, Conversion  # noqa
 
 from .signal_processors import *  # noqa

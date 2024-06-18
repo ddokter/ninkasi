@@ -2,13 +2,6 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
-CONVERSION_TABLE = {
-    'cl': 0.01,
-    'ml': 0.001,
-    'l': 1
-}
-
-
 class Product(models.Model):
 
     """Final product that the brewery turns out. This is the end
@@ -28,9 +21,7 @@ class Product(models.Model):
 
         """ Return the volume in liters """
 
-        # TODO: this should really be part of the unit
-
-        return self.volume * CONVERSION_TABLE[self.unit.abbreviation.lower()]
+        return self.unit.convert(self.volume, "Liter")
 
     class Meta:
 

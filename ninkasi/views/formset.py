@@ -46,8 +46,12 @@ class FormSetMixin:
         factories = []
 
         for fname in self.get_m2m_fields(self.model):
+
+            submodel = getattr(self.model, fname).through
+
             factory = inlineformset_factory(
-                self.model, getattr(self.model, fname).through, exclude=[],
+                self.model, submodel, exclude=[],
+                fk_name=getattr(submodel, "fk_name", None)
             )
             factories.append(factory(**kwargs))
 

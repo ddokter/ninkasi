@@ -12,6 +12,8 @@ FILTER_LOSS = _("Amount of wordt lost in filter dead space.")
 
 WHIRLPOOL_LOSS = _("Amount of wordt lost in whirlpool dead space.")
 
+BOIL_LOSS = _("Loss during boil in L/h")
+
 
 class Brewhouse(Container):
 
@@ -29,6 +31,8 @@ class Brewhouse(Container):
     spent_grain_loss = models.SmallIntegerField(_("Spent grain loss per Kg"))
     whirlpool_loss = models.SmallIntegerField(_("Amount lost in whirlpool"),
                                               help_text=WHIRLPOOL_LOSS)
+    evaporation_rate = models.SmallIntegerField(_("Amount lost in boil"),
+                                                help_text=BOIL_LOSS)
 
     delays = models.ManyToManyField("MetaPhase", through="BrewhouseDelays")
 

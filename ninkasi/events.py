@@ -36,12 +36,13 @@ class EventProviderBase:
 
 class EventProvider(EventProviderBase):
 
-    """ Samesame. But different """
+    """Define interface for providers of events that do so per
+    instance."""
 
 
 class EventProviderModel(EventProviderBase):
 
-    """ Samesame. But different """
+    """Interface for providers that do so as model."""
 
 
 class EventRegistry:

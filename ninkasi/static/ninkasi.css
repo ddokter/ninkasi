@@ -57,6 +57,10 @@ table.month td, th {
     width: 3%;
 }
 
+th[scope=row] {
+    white-space: nowrap;
+}
+
 table.calendar {
     background-color: #e0e0e0;
 }
