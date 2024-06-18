@@ -13,4 +13,6 @@
 * use batch projected volume and subtract losses to calculate brew
   volumes
 
-* calculate timings of brewhouse based on measurements 
+* calculate timings of brewhouse based on measurements
+
+* Make metaphase measurements into targets for brew/batch

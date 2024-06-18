@@ -28,4 +28,24 @@
   </dd>
 </dl>
 
+<h2>{% trans 'Quality checks' %}</h2>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>{% trans 'Quantity' %}</th>
+      <th>{% trans 'Time' %}</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for qc in object.list_qualitychecks %}
+  <tr>
+    <td>{{ qc.quantity }}</td>
+    <td>{{ qc.time }}</td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+
 {% endblock content %}

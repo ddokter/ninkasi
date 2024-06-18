@@ -106,7 +106,7 @@
 
 
 <section>
-  <h2>{% icon 'product' %} {% trans 'Products' %}</h2>
+  <h2>{% icon 'product' %} {% trans 'Deliverables' %}</h2>
 
   <table class="table table-striped">
     <thead>
@@ -117,7 +117,7 @@
       </tr>
     </thead>
     <tbody>
-      {% for product in object.list_products %}
+      {% for product in object.list_deliverables %}
       <tr>
 	<td>
 	  <a href="{{ product.product|detail_url }}">{{ product.product }}</a>

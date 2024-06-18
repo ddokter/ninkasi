@@ -54,7 +54,7 @@ class Batch(models.Model, OrderedContainer, EventProviderModel):
 
     material = models.ManyToManyField(Material, through="BatchMaterial")
     tank = models.ManyToManyField(Tank, through="BatchContainer")
-    product = models.ManyToManyField("Product", through="BatchProduct")
+    product = models.ManyToManyField("Product", through="Deliverable")
 
     phase = GenericRelation("Phase")
     sample = GenericRelation("Sample")
@@ -140,15 +140,16 @@ class Batch(models.Model, OrderedContainer, EventProviderModel):
 
         return self.phase.all()
 
-    def list_products(self):
+    def list_deliverables(self):
 
         """ Get all products defined for this batch """
 
-        return self.batchproduct_set.all()
+        return self.deliverable_set.all()
 
     def total_product_volume(self):
 
-        return sum(product.total_volume() for product in self.list_products())
+        return sum(product.total_volume() for product in
+                   self.list_deliverables())
 
     def get_phase(self, _id):
 
@@ -246,6 +247,8 @@ class Batch(models.Model, OrderedContainer, EventProviderModel):
 
     def list_measurements(self):
 
+        """ Return all related measurements """
+
         return self.measurement.all()
 
     def generate_tasks(self, **kwargs):
@@ -312,7 +315,7 @@ class BatchContainer(models.Model):
     # filled on these dates.
 
 
-class BatchProduct(models.Model):
+class Deliverable(models.Model):
 
     """ Relate batch to proucts """
 

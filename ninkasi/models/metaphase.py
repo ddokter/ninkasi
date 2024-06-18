@@ -3,6 +3,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from ..events import EventProvider
+from .fields import DurationField
 
 
 class MetaPhase(models.Model, EventProvider):
@@ -32,6 +33,10 @@ class MetaPhase(models.Model, EventProvider):
         related_name="mp_parents",
         limit_choices_to=models.Q(app_label="ninkasi",
                                   model__in=["batch", "brew", "recipe"])
+    )
+    qualitychecks = models.ManyToManyField(
+        "Quantity", through="MetaPhaseQualityCheck",
+        blank=True, null=True
     )
 
     def __str__(self):
@@ -63,8 +68,27 @@ class MetaPhase(models.Model, EventProvider):
 
         return [f"ninkasi.{ self.name }.start", f"ninkasi.{ self.name }.end"]
 
+    def list_qualitychecks(self):
+
+        """ List all measurements that should be taken in this phase. """
+
+        return self.metaphasequalitycheck_set.all()
+
     class Meta:
 
         app_label = "ninkasi"
         ordering = ["name"]
         verbose_name_plural = _("MetaPhases")
+
+
+TIME_HELP_TEXT = _("Specify timing from start of phase, or from end"
+                   "using negative durations")
+
+
+class MetaPhaseQualityCheck(models.Model):
+
+    """ Define measurements to take during this phase """
+
+    metaphase = models.ForeignKey("MetaPhase", on_delete=models.CASCADE)
+    quantity = models.ForeignKey("Quantity", on_delete=models.CASCADE)
+    time = DurationField(null=True, blank=True, help_text=TIME_HELP_TEXT)
