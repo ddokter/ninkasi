@@ -6,9 +6,9 @@ from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from .fields import DurationField, EventField
+from .fields import DurationField, MilestoneField
 from .base import BaseModel
-from ..events import EventRegistry
+from ..milestones import MilestoneRegistry
 
 
 PRIO_VOCAB = [(1, _("High")),
@@ -146,40 +146,40 @@ class ScheduledTask(Task):
 PRECISION_HELP = _("How much slack is allowed around the specified time?")
 
 
-OFFSET_HELP = _("Offset from time of event. Use negative durations"
-                " to specify before the event"
+OFFSET_HELP = _("Offset from time of milestone. Use negative durations"
+                " to specify before the milestone"
                 )
 
 
-def event_vocab():
+def milestone_vocab():
 
-    """ Provide vocabulary for events """
+    """ Provide vocabulary for milestones """
 
-    return [(evt, evt) for evt in EventRegistry.list_events()]
+    return [(evt, evt) for evt in MilestoneRegistry.list_milestones()]
 
 
-class EventScheduledTask(Task, TaskFactory):
+class MilestoneScheduledTask(Task, TaskFactory):
 
-    """Task that is created based on an event. The precision field
+    """Task that is created based on an milestone. The precision field
     specifies how much slack there is around the scheduled time.
-    Events are specified by Ninkasi and are in terms of 'tank empty',
+    Milestones are specified by Ninkasi and are in terms of 'tank empty',
     'batch start', etc.
 
     """
 
     precision = DurationField(help_text=PRECISION_HELP)
-    event = EventField(max_length=100, choices=event_vocab)
+    milestone = MilestoneField(max_length=100, choices=milestone_vocab)
     offset = DurationField(help_text=OFFSET_HELP, null=True, blank=True)
 
     def generate_tasks(self, **kwargs):
 
-        """ Generate tasks based on the given event. The kwargs must
+        """ Generate tasks based on the given milestone. The kwargs must
         contain a date and may contain a time. """
 
         if 'date' not in kwargs:
             raise KeyError("'date' must be specified in kwargs")
 
-        self.eventtasksub_set.filter(
+        self.milestonetasksub_set.filter(
             name=kwargs['name'],
             object_id=kwargs['parent'].id,
             content_type=ContentType.objects.get_for_model(kwargs['parent']).id
@@ -190,7 +190,7 @@ class EventScheduledTask(Task, TaskFactory):
                       description=self.description
                       )
 
-        return self.eventtasksub_set.create(**kwargs)
+        return self.milestonetasksub_set.create(**kwargs)
 
     def h10nized(self):
 
@@ -201,8 +201,8 @@ class EventScheduledTask(Task, TaskFactory):
         if sign == "-":
             sign = ""
 
-        return _(f"{ self.name } within { self.precision } of { self.event } "
-                 f"{ sign }{ self.offset }")
+        return _(f"{ self.name } within { self.precision } of "
+                 f"{ self.milestone } { sign }{ self.offset }")
 
     class Meta:
         app_label = "ninkasi"
@@ -283,12 +283,12 @@ class RepeatedTaskSub(ScheduledTask):
         return str(self.parent)
 
 
-class EventTaskSub(ScheduledTask):
+class MilestoneTaskSub(ScheduledTask):
 
-    """ Parented task created through planned event """
+    """ Parented task created through planned milestone """
 
-    factory = models.ForeignKey(EventScheduledTask, on_delete=models.CASCADE)
-
+    factory = models.ForeignKey(MilestoneScheduledTask,
+                                on_delete=models.CASCADE)
     parent = GenericForeignKey("content_type", "object_id")
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
@@ -297,6 +297,6 @@ class EventTaskSub(ScheduledTask):
 
         details = super().get_details()
 
-        details[1]['event'] = self.factory.event
+        details[1]['milestone'] = self.factory.milestone
 
         return details

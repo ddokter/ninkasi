@@ -46,11 +46,30 @@ class Recipe:
     @property
     def volume(self):
 
-        """ Return batch volume for this recipe """
+        """ Return volume for this recipe """
 
     def list_phases(self):
 
         """ Return a list of BasePhase objects, ordered """
+
+    @property
+    def final_gravity(self):
+
+        """ Return final gravity in SG """
+
+    @property
+    def original_gravity(self):
+
+        """ Return original gravity in SG """
+
+    @property
+    def ibu(self):
+
+        """ Return bitterness in IBU """
+
+    def get_value_for(self, event):
+
+        """ Return projected value for event, if possible """
 
 
 class Batch:

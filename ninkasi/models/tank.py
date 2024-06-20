@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from .container import Container
-from ..events import EventProviderModel
+from ..milestones import MilestoneProviderModel
 
 
 TTYPE_VOCAB = [
@@ -68,16 +68,16 @@ class BBT(Tank):
         verbose_name_plural = _("BBTs")
 
 
-class CCT(Tank, EventProviderModel):
+class CCT(Tank, MilestoneProviderModel):
 
     """ Conical-cylindrical tank """
 
     cone_loss = models.SmallIntegerField(_("Amount lost in cone."))
 
     @classmethod
-    def list_events(cls):
+    def list_milestones(cls):
 
-        """The metaphase is an event provider, but per instance"""
+        """The metaphase is an milestone provider, but per instance"""
 
         return ["ninkasi.cct.fill", "ninkasi.cct.empty"]
 

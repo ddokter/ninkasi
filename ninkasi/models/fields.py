@@ -289,9 +289,9 @@ class URNListField(URNMixin, models.JSONField):
         return self.__to_python(value)
 
 
-class EventField(models.CharField):
+class MilestoneField(models.CharField):
 
-    """ Skip check choices given that events is a dynamic list """
+    """ Skip check choices given that milestones is a dynamic list """
 
     def _check_choices(self):
 

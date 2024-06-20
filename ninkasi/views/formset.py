@@ -59,7 +59,9 @@ class FormSetMixin:
 
     def form_valid(self, form):
 
-        """ Save formsets as well """
+        """ Save formsets as well
+        TODO: add error handling to ui
+        """
 
         self.object = form.save()
 

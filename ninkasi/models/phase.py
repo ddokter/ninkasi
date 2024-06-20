@@ -9,7 +9,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
 from ninkasi.api import Phase as BasePhase
 from ninkasi.duration import Duration
-from .task import TaskFactory, EventScheduledTask
+from .task import TaskFactory, MilestoneScheduledTask
 
 
 class Phase(BasePhase, models.Model, TaskFactory):
@@ -24,7 +24,7 @@ class Phase(BasePhase, models.Model, TaskFactory):
     recipe.
 
     A phase is a task factory, that is there may be tasks attached to
-    the phase defined by it's 'events': start and end.
+    the phase defined by it's 'milestones': start and end.
 
     """
 
@@ -34,7 +34,7 @@ class Phase(BasePhase, models.Model, TaskFactory):
     order = models.PositiveIntegerField()
     metaphase = models.CharField(max_length=100, editable=False)
 
-    tasks = GenericRelation("EventTaskSub")
+    tasks = GenericRelation("MilestoneTaskSub")
 
     def __str__(self):
 
@@ -125,15 +125,18 @@ class Phase(BasePhase, models.Model, TaskFactory):
 
     def generate_tasks(self, **kwargs):
 
-        """ Generate any defined tasks if need be for the phase's events """
+        """Generate any defined tasks if need be for the phase's
+        milestones"""
 
-        events = [f"ninkasi.{ self.name }.start", f"ninkasi.{ self.name }.end"]
+        milestones = [f"ninkasi.{ self.name }.start",
+                      f"ninkasi.{ self.name }.end"]
 
         self.tasks.all().delete()
 
         if self.parent._meta.model_name == "batch":
 
-            for task in EventScheduledTask.objects.filter(event=events[0]):
+            for task in MilestoneScheduledTask.objects.filter(
+                    milestone=milestones[0]):
 
                 start = self.parent.get_phase_start(self.id)
                 kwargs['name'] = f"{ task.name } - { self.parent }"

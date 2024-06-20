@@ -4,7 +4,6 @@
 
 {% block content %}
 
-
 <dl class="row">
   <dt class="col-sm-3">{% trans 'Name' %}</dt>
   <dd class="col-sm-9">{{ object.name }}</dd>
@@ -34,14 +33,16 @@
   <thead>
     <tr>
       <th>{% trans 'Quantity' %}</th>
-      <th>{% trans 'Time' %}</th>
+      <th>{% trans 'Event' %}</th>
+      <th>{% trans 'Offset' %}</th>      
     </tr>
   </thead>
   <tbody>
   {% for qc in object.list_qualitychecks %}
   <tr>
     <td>{{ qc.quantity }}</td>
-    <td>{{ qc.time }}</td>
+    <td>{{ qc.event }}</td>
+    <td>{{ qc.offset }}</td>    
   </tr>
   {% endfor %}
   </tbody>

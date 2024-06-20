@@ -12,14 +12,14 @@ from ..ordered import OrderedContainer
 from .tank import Tank
 from .material import Material, ParentedMaterial
 from .fields import Duration, ColorField
-from ..events import EventProviderModel
-from .task import EventScheduledTask
+from ..milestones import MilestoneProviderModel
+from .task import MilestoneScheduledTask
 
 
 DATE_MODE_VOCAB = [(0, _("Start")), (1, _("Delivery"))]
 
 
-class Batch(models.Model, OrderedContainer, EventProviderModel):
+class Batch(models.Model, OrderedContainer, MilestoneProviderModel):
 
     """A batch is a volume of beer that can be treated as a separate
     unit. This boils down to a volume that is brewed in one or more
@@ -62,7 +62,7 @@ class Batch(models.Model, OrderedContainer, EventProviderModel):
 
     color = ColorField(_("Color"), max_length=7, null=True, blank=True)
 
-    task = GenericRelation("EventTaskSub")
+    task = GenericRelation("MilestoneTaskSub")
 
     def __str__(self):
 
@@ -254,7 +254,7 @@ class Batch(models.Model, OrderedContainer, EventProviderModel):
     def generate_tasks(self, **kwargs):
 
         """Create tasks associated with this batch, if at all
-        possible.  Batch tasks are event based, and the start_time of
+        possible.  Batch tasks are milestone based, and the start_time of
         the batch must be set to be able to determine this.
 
         """
@@ -262,14 +262,15 @@ class Batch(models.Model, OrderedContainer, EventProviderModel):
         if not self.start_time:
             return False
 
-        for event in self.list_events():
+        for milestone in self.list_milestones():
 
-            if event == "ninkasi.batch.start":
+            if milestone == "ninkasi.batch.start":
                 date = self.start_time
-            elif event == "ninkasi.batch.end":
+            elif milestone == "ninkasi.batch.end":
                 date = self.end_time
 
-            for task in EventScheduledTask.objects.filter(event=event):
+            for task in MilestoneScheduledTask.objects.filter(
+                    milestone=milestone):
 
                 task.generate_tasks(date=date, **kwargs)
 

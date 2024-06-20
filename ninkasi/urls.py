@@ -11,7 +11,7 @@ from .views.style import StyleListingView
 from .views.sample import SampleCreateView, SampleUpdateView
 # from .views.measurement import MeasurementCreateView
 from .views.brew import (BrewDetailView, BrewCreateView, BrewUpdateView,
-                         BrewImportPhasesView, BrewMeasurements)
+                         BrewImportPhasesView, BrewChecks)
 from .views.phase import (PhaseMoveStepView, PhaseView, AddPhaseView,
                           MovePhaseView)
 from .views.beer import BeerCreateView, BeerUpdateView
@@ -126,9 +126,9 @@ urlpatterns = [
          BrewImportPhasesView.as_view(),
          name="brew_import_phases"),
 
-    path('brew/<int:pk>/measurements',
-         BrewMeasurements.as_view(),
-         name="brew_measurements"),
+    path('brew/<int:pk>/checks',
+         BrewChecks.as_view(),
+         name="brew_qualitychecks"),
 
     path('beer/add/',
          BeerCreateView.as_view(),

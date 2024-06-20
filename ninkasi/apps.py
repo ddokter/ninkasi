@@ -3,7 +3,8 @@
 from django.apps import AppConfig, apps
 from django.forms import widgets
 from .resource import ResourceRegistry
-from .events import EventRegistry, EventProvider, EventProviderModel
+from .milestones import (MilestoneRegistry, MilestoneProvider,
+                         MilestoneProviderModel)
 from .resource import ModelResource
 from .utils import class_implements
 
@@ -37,14 +38,14 @@ class NinkasiConfig(AppConfig):
         ResourceRegistry.register("recipe", "django",
                                   ModelResource(recipe_model))
 
-        # register event providers
+        # register milestone providers
         #
         for model_name, model in self.models.items():
 
-            if class_implements(model, EventProviderModel):
+            if class_implements(model, MilestoneProviderModel):
 
-                EventRegistry.register_model(model_name, model)
+                MilestoneRegistry.register_model(model_name, model)
 
-            elif class_implements(model, EventProvider):
+            elif class_implements(model, MilestoneProvider):
 
-                EventRegistry.register(model_name, model)
+                MilestoneRegistry.register(model_name, model)

@@ -2,11 +2,11 @@
 
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from ..events import EventProvider
-from .fields import DurationField
+from ..milestones import MilestoneProvider
+from .qualitycheck import QualityCheck
 
 
-class MetaPhase(models.Model, EventProvider):
+class MetaPhase(models.Model, MilestoneProvider):
 
     """MetaPhases are used to define what phases may occur in the
     brewing process. Typically this would be stuff like 'mash',
@@ -34,10 +34,6 @@ class MetaPhase(models.Model, EventProvider):
         limit_choices_to=models.Q(app_label="ninkasi",
                                   model__in=["batch", "brew", "recipe"])
     )
-    qualitychecks = models.ManyToManyField(
-        "Quantity", through="MetaPhaseQualityCheck",
-        blank=True, null=True
-    )
 
     def __str__(self):
 
@@ -62,7 +58,7 @@ class MetaPhase(models.Model, EventProvider):
 
         return self.default_step.model_class()
 
-    def list_events(self):
+    def list_milestones(self):
 
         """The metaphase is an event provider, but per instance"""
 
@@ -72,23 +68,10 @@ class MetaPhase(models.Model, EventProvider):
 
         """ List all measurements that should be taken in this phase. """
 
-        return self.metaphasequalitycheck_set.all()
+        return QualityCheck.objects.filter(event__in=self.list_milestones())
 
     class Meta:
 
         app_label = "ninkasi"
         ordering = ["name"]
         verbose_name_plural = _("MetaPhases")
-
-
-TIME_HELP_TEXT = _("Specify timing from start of phase, or from end"
-                   "using negative durations")
-
-
-class MetaPhaseQualityCheck(models.Model):
-
-    """ Define measurements to take during this phase """
-
-    metaphase = models.ForeignKey("MetaPhase", on_delete=models.CASCADE)
-    quantity = models.ForeignKey("Quantity", on_delete=models.CASCADE)
-    time = DurationField(null=True, blank=True, help_text=TIME_HELP_TEXT)

@@ -6,11 +6,12 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.contenttypes.fields import GenericRelation
 from ..ordered import OrderedContainer
 from .material import Material, ParentedMaterial
-from ..events import EventProviderModel
+from ..milestones import MilestoneProviderModel
 from ..duration import Duration
+from .fields import DurationField
 
 
-class Brew(models.Model, OrderedContainer, EventProviderModel):
+class Brew(models.Model, OrderedContainer, MilestoneProviderModel):
 
     """One brew. This boils down to one full brewing cycle on the
     brewhouse. One or more brews make up a batch. The Brew consists of
@@ -23,10 +24,11 @@ class Brew(models.Model, OrderedContainer, EventProviderModel):
     brewhouse = models.ForeignKey("Brewhouse", on_delete=models.CASCADE)
     date = models.DateTimeField(_("Time"))
     material = models.ManyToManyField(Material, through="BrewMaterial")
-    volume_projected = models.FloatField()
 
     phase = GenericRelation("Phase")
     measurement = GenericRelation("Measurement")
+
+    checks = models.ManyToManyField("QualityCheck", through="BrewQualityCheck")
 
     # sample = GenericRelation("Sample")
 
@@ -61,6 +63,12 @@ class Brew(models.Model, OrderedContainer, EventProviderModel):
         """Return list of all related measurments."""
 
         return self.measurement.all()
+
+    def list_qualitychecks(self):
+
+        """ Return a list of all qualitychecks for the brew."""
+
+        return self.brewqualitycheck_set.all()
 
     def add_phase(self, metaphase):
 
@@ -97,6 +105,18 @@ class Brew(models.Model, OrderedContainer, EventProviderModel):
         return total
 
     @property
+    def volume_projected(self):
+
+        """ Check quality checks for final volume """
+
+        if self.list_qualitychecks().filter(
+                qc__milestone="ninkasi.brew.end").exists():
+            return self.list_qualitychecks().filter(
+                qc__milestone="ninkasi.brew.end").first().projected
+
+        return 0
+
+    @property
     def volume(self):
 
         """The brew volume is the volume of the last measurement
@@ -121,11 +141,26 @@ class Brew(models.Model, OrderedContainer, EventProviderModel):
 
         self.list_phases().delete()
 
-        for phase in self.batch.beer.get_recipe(recipe_id).list_phases():
+        recipe = self.batch.beer.get_recipe(recipe_id)
+
+        for phase in recipe.list_phases():
 
             if phase.get_metaphase().parents.filter(model='brew').exists():
 
                 phase.copy(self)
+
+                # Also create quality checks
+                #
+                for check in phase.get_metaphase().list_qualitychecks():
+
+                    kwargs = {'qc': check}
+
+                    value = recipe.get_value_for(check.milestone)
+
+                    if value:
+                        kwargs['value'] = value
+
+                    self.brewqualitycheck_set.create(**kwargs)
 
     class Meta:
 
@@ -138,3 +173,32 @@ class BrewMaterial(ParentedMaterial):
     """ M2M definition for a brew to materials. """
 
     brew = models.ForeignKey(Brew, on_delete=models.CASCADE)
+
+
+class BrewQualityCheck(models.Model):
+
+    """ Define measurements to take during this phase """
+
+    brew = models.ForeignKey(Brew, on_delete=models.CASCADE)
+    qc = models.ForeignKey("QualityCheck", on_delete=models.CASCADE)
+    projected = models.FloatField(blank=True, null=True)
+    margin = models.FloatField(default=0)
+    time = models.DateTimeField(blank=True, null=True)
+    actual = models.FloatField(blank=True, null=True)
+    notes = models.TextField(_("Notes"), null=True, blank=True)
+
+    def __str__(self):
+
+        """ Return readable quality check """
+
+        return f"{ self.qc }"
+
+    def is_ok(self):
+
+        """ See whether the values are ok."""
+
+        if not self.projected and self.actual:
+            return False
+
+        return (self.actual <= self.projected + self.margin and
+                self.actual >= self.projected - self.margin)

@@ -99,13 +99,17 @@
 	    {% trans 'Repeat scheduled' %}
 	  </a>	  
         </div>	
-      </li>
-      
+      </li>      
       <li class="nav-item {% if view.view_name.0 == 'beer' %}active{% endif %}">
 	<a class="nav-link" href="{% url 'list' model='beer' %}">
 	  {% trans 'Beers' %}
 	</a>
       </li>
+      <li class="nav-item {% if view.view_name.0 == 'qualitycheck' %}active{% endif %}">
+	<a class="nav-link" href="{% url 'list' model='qualitycheck' %}">
+	  {% trans 'Quality checks' %}
+	</a>
+      </li>      
       <li class="nav-item {% if view.view_name.0 == 'recipe' %}active{% endif %}">
 	<a class="nav-link" href="{% url 'list' model='recipe' %}">
 	  {% trans 'Recipes' %}
