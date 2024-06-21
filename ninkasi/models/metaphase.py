@@ -60,7 +60,7 @@ class MetaPhase(models.Model, MilestoneProvider):
 
     def list_milestones(self):
 
-        """The metaphase is an event provider, but per instance"""
+        """The metaphase is a milestone provider, but per instance"""
 
         return [f"ninkasi.{ self.name }.start", f"ninkasi.{ self.name }.end"]
 
@@ -68,7 +68,8 @@ class MetaPhase(models.Model, MilestoneProvider):
 
         """ List all measurements that should be taken in this phase. """
 
-        return QualityCheck.objects.filter(event__in=self.list_milestones())
+        return QualityCheck.objects.filter(
+            milestone__in=self.list_milestones())
 
     class Meta:
 

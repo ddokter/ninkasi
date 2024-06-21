@@ -80,14 +80,14 @@ class Recipe(models.Model, BaseRecipe, OrderedContainer):
 
         return sum(phase.get_duration() for phase in self.list_phases())
 
-    def get_value_for(self, event, quantity):
+    def get_milestone_value(self, milestone, quantity):
 
         evt_map = {
             ('ninkasi.brew.end', 'volume'): self.volume,
             ('ninkasi.brew.end', 'gravity'): self.original_gravity
         }
 
-        return evt_map.get((event, quantity), None)
+        return evt_map.get((milestone, quantity), None)
 
     class Meta:
 

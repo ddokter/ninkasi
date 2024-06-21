@@ -67,9 +67,9 @@ class Recipe:
 
         """ Return bitterness in IBU """
 
-    def get_value_for(self, event):
+    def get_milestone_value(self, milestone, quantity):
 
-        """ Return projected value for event, if possible """
+        """ Arguments must be milestone and Quantity object """
 
 
 class Batch:

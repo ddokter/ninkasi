@@ -10,7 +10,7 @@ from ninkasi.models.brew import Brew
 from ninkasi.models.brewhouse import Brewhouse
 from ninkasi.models.metaphase import MetaPhase
 from ninkasi.models.beer import Beer
-from ninkasi.models.task import EventScheduledTask
+from ninkasi.models.task import MilestoneScheduledTask
 
 
 class TestPhase(TestCase):
@@ -134,11 +134,11 @@ class TestPhase(TestCase):
             order=0,
             metaphase="fermentation")
 
-        EventScheduledTask.objects.create(
+        MilestoneScheduledTask.objects.create(
             name="Doe dingen",
             description="Wat ik zeg",
             precision="5m",
-            event="ninkasi.fermentation.start"
+            milestone="ninkasi.fermentation.start"
         )
 
         phase0.generate_tasks(parent=batch)

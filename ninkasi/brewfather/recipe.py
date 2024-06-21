@@ -173,3 +173,11 @@ class Recipe(BaseRecipe):
             return reverse('brewfather_view_recipe', kwargs={'pk': self.id})
 
         return "#"
+
+    def get_milestone_value(self, milestone, quantity):
+
+        if milestone == "ninkasi.brew.end":
+            if quantity.name == "volume":
+                return self.volume
+
+        return None

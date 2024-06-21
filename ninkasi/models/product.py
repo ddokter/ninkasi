@@ -10,7 +10,7 @@ class Product(models.Model):
     """
 
     name = models.CharField(max_length=50)
-    volume = models.SmallIntegerField()
+    volume = models.FloatField()
     unit = models.ForeignKey("Unit", on_delete=models.CASCADE)
 
     def __str__(self):

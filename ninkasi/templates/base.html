@@ -89,13 +89,16 @@
 	  {% trans 'Tasks' %}	  
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-	  <a class="dropdown-item" href="{% url 'list' model='scheduledtask' %}">
+	  <a class="dropdown-item"
+	     href="{% url 'list' model='scheduledtask' %}">
 	    {% trans 'Scheduled' %}
 	  </a>
-	  <a class="dropdown-item" href="{% url 'list' model='eventscheduledtask' %}">
-	    {% trans 'Event scheduled' %}
+	  <a class="dropdown-item"
+	     href="{% url 'list' model='milestonescheduledtask' %}">
+	    {% trans 'Milestone scheduled' %}
 	  </a>
-	  <a class="dropdown-item" href="{% url 'list' model='repeatedscheduledtask' %}">
+	  <a class="dropdown-item"
+	     href="{% url 'list' model='repeatedscheduledtask' %}">
 	    {% trans 'Repeat scheduled' %}
 	  </a>	  
         </div>	

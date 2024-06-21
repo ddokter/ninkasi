@@ -1,0 +1,29 @@
+{% extends 'brew_detail.html' %}
+
+{% load i18n bootstrap4 ninkasi_tags %}
+
+{% block content %}
+
+{% bootstrap_messages %}
+
+{% with active_tab='targets' %}
+{% include 'snippets/brew_tabs.html' %}
+{% endwith %}
+
+<h2>{% trans 'Targets' %}
+
+  {% if user|push:'brewqualitycheck'|has_model_perm:'add' %}
+  <a class="btn btn-outline-success btn-sm"
+     href="{% url 'inline_create' 'brew' object.id 'brewqualitycheck' %}"
+     data-toggle="tooltip" data-placement="right"
+     title="{% trans 'Add measurement' %}">
+    <span class="fas fa-plus" />
+    <span class="fas fa-scale-balanced" />
+  </a>
+  {% endif %}
+
+</h2>
+
+{% listing '' view.list_qcs %}
+
+{% endblock content %}

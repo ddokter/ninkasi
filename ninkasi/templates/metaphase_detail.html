@@ -33,7 +33,7 @@
   <thead>
     <tr>
       <th>{% trans 'Quantity' %}</th>
-      <th>{% trans 'Event' %}</th>
+      <th>{% trans 'Milestone' %}</th>
       <th>{% trans 'Offset' %}</th>      
     </tr>
   </thead>
@@ -41,7 +41,7 @@
   {% for qc in object.list_qualitychecks %}
   <tr>
     <td>{{ qc.quantity }}</td>
-    <td>{{ qc.event }}</td>
+    <td>{{ qc.milestone }}</td>
     <td>{{ qc.offset }}</td>    
   </tr>
   {% endfor %}
