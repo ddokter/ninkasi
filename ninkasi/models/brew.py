@@ -8,7 +8,6 @@ from ..ordered import OrderedContainer
 from .material import Material, ParentedMaterial
 from ..milestones import MilestoneProviderModel
 from ..duration import Duration
-from .fields import DurationField
 
 
 class Brew(models.Model, OrderedContainer, MilestoneProviderModel):
@@ -31,6 +30,10 @@ class Brew(models.Model, OrderedContainer, MilestoneProviderModel):
     checks = models.ManyToManyField("QualityCheck", through="BrewQualityCheck")
 
     # sample = GenericRelation("Sample")
+
+    def get_parent(self):
+
+        return self.batch
 
     def __str__(self):
 
@@ -193,6 +196,12 @@ class BrewQualityCheck(models.Model):
     time = models.DateTimeField(blank=True, null=True)
     actual = models.FloatField(blank=True, null=True)
     notes = models.TextField(_("Notes"), null=True, blank=True)
+
+    def get_parent(self):
+
+        """ Return parent brew """
+
+        return self.brew
 
     def __str__(self):
 

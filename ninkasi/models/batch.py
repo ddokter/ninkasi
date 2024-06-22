@@ -68,6 +68,10 @@ class Batch(models.Model, OrderedContainer, MilestoneProviderModel):
 
         return f"{self.beer.name} - #{self.nr}"
 
+    def get_parent(self):
+
+        return None
+
     @property
     def start_date_projected(self):
 

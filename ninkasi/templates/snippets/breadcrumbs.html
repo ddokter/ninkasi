@@ -1,0 +1,24 @@
+{% load i18n ninkasi_tags %}
+
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <a href="{% url 'home' %}">{% trans "Home" %}</a>
+    </li>
+
+    {% for item in path %}
+    {% if forloop.last %}
+    <li class="breadcrumb-item active">
+      <a href="{{ item|detail_url }}">
+	{{ item }}
+      </a>
+    {% else %}
+    <li class="breadcrumb-item">
+      <a href="{{ item|listing_url }}">
+	{{ item }}
+      </a>
+    </li>
+    {% endif %}
+    {% endfor %}
+  </ol>
+</nav>

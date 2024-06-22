@@ -1,6 +1,6 @@
 {% extends 'bootstrap4/bootstrap4.html' %}
 
-{% load i18n bootstrap4 static %}
+{% load i18n bootstrap4 static ninkasi_tags %}
 
 {% block bootstrap4_title %}Ninkasi - Beer QA{% endblock %}
 
@@ -166,7 +166,7 @@
 <div class="container">
   {% autoescape off %}{% bootstrap_messages %}{% endautoescape %}
 
-  {% block breadcrumbs %}{% endblock %}
+  {% breadcrumbs %}
 
   <h1>
     {% block title %}{% endblock %}

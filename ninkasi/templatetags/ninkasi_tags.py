@@ -163,6 +163,15 @@ def detail_url(obj):
 
 
 @register.filter
+def listing_url(obj):
+
+    try:
+        return reverse('list', kwargs={'model': get_model_name(obj)})
+    except NoReverseMatch:
+        return "."
+
+
+@register.filter
 def doc(model):
 
     """ Return object class docstring """
@@ -338,3 +347,26 @@ def task(_task):
     """ Render snippet for task """
 
     return {'task': _task}
+
+
+@register.inclusion_tag("snippets/breadcrumbs.html", takes_context=True)
+def breadcrumbs(context):
+
+    """ Render snippet for breadcrumb trail """
+
+    path = []
+
+    if context['object']:
+
+        obj = context['object']
+
+        path.append(obj)
+
+        while getattr(obj, "get_parent", None):
+
+            obj = obj.get_parent()
+
+            if obj:
+                path.insert(0, obj)
+
+    return {'path': path}
