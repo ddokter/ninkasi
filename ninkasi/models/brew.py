@@ -155,10 +155,17 @@ class Brew(models.Model, OrderedContainer, MilestoneProviderModel):
 
                     kwargs = {'qc': check}
 
-                    value = recipe.get_value_for(check.milestone)
+                    if check.constant:
+                        value = check.constant
+                    else:
+                        value = recipe.get_milestone_value(check.milestone,
+                                                           check.quantity)
 
                     if value:
-                        kwargs['value'] = value
+                        kwargs['projected'] = value
+
+                    if check.margin:
+                        kwargs['margin'] = check.margin
 
                     self.brewqualitycheck_set.create(**kwargs)
 

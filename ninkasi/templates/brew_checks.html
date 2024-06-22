@@ -6,11 +6,11 @@
 
 {% bootstrap_messages %}
 
-{% with active_tab='targets' %}
+{% with active_tab='checks' %}
 {% include 'snippets/brew_tabs.html' %}
 {% endwith %}
 
-<h2>{% trans 'Targets' %}
+<h2>{% trans 'Check targets' %}
 
   {% if user|push:'brewqualitycheck'|has_model_perm:'add' %}
   <a class="btn btn-outline-success btn-sm"
@@ -18,7 +18,7 @@
      data-toggle="tooltip" data-placement="right"
      title="{% trans 'Add measurement' %}">
     <span class="fas fa-plus" />
-    <span class="fas fa-scale-balanced" />
+    <span class="fas fa-check-square" />
   </a>
   {% endif %}
 
