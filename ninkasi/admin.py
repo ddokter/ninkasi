@@ -1,3 +1,5 @@
+""" Admin registrations """
+
 from django.contrib import admin
 from .models.tank import CCT
 

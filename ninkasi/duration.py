@@ -1,7 +1,4 @@
-""" All duration stuff
-
-TODO: remove Django stuff and move upwards
-"""
+""" All duration stuff """
 
 import re
 from datetime import timedelta
@@ -12,6 +9,10 @@ from django.utils.translation import gettext_lazy as _
 # Duration field regexp
 #
 DURATION_RE = re.compile(r"^(\-?[0-9]+\.?[0-9]*)\s*([smhd])$")
+
+# All valid durations
+#
+DURATION_UNITS = ["s", "m", "h", "d"]
 
 # Map duration to minutes
 #
@@ -79,6 +80,15 @@ class Duration:
 
         return timedelta(days=self.days)
 
+    def get_sign(self):
+
+        """ Get whether the duration is negatove or positive """
+
+        if self.amount < 0:
+            return "-"
+
+        return "+"
+
     def __len__(self):
 
         return len(str(self))
@@ -88,6 +98,14 @@ class Duration:
         """ Add another duration. Convert to same unit. """
 
         self.amount += convert_duration(str(value), unit=self.unit)
+
+        return self
+
+    def __sub__(self, value):
+
+        """ Subtract another duration. Convert to same unit. """
+
+        self.amount -= convert_duration(str(value), unit=self.unit)
 
         return self
 
@@ -102,7 +120,7 @@ class Duration:
 
     def __eq__(self, thing):
 
-        if not thing:
+        if not isinstance(thing, self.__class__):
             return False
 
         return (self.amount == thing.amount and self.unit == thing.unit)
@@ -111,3 +129,20 @@ class Duration:
         """ Return abs for amount """
 
         return f"{abs(self.amount):.2f}{ self.unit }"
+
+    def h10n(self):
+
+        """ Provide a humanized version of the duration """
+
+        amount = self.amount
+        idx = DURATION_UNITS.index(self.unit)
+
+        while amount < 1 and idx > 0:
+            amount = self.convert(DURATION_UNITS[idx - 1])
+            idx -= 1
+
+        while amount > 100 and idx < len(DURATION_UNITS):
+            amount = self.convert(DURATION_UNITS[idx + 1])
+            idx += 1
+
+        return Duration(f"{ amount }{ DURATION_UNITS[idx] }")

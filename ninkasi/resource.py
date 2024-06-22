@@ -89,5 +89,16 @@ class ModelResource(Resource):
 
         return self.model.objects.all()
 
+    def get(self, _id):
+
+        """Get the instance specified by _id. Throw
+        NotFoundInResource if the instance can nog be found.
+        """
+
+        try:
+            return self.model.objects.get(pk=_id)
+        except self.model.DoesNotExist as exc:
+            raise NotFoundInResource from exc
+
 
 registry = ResourceRegistry()

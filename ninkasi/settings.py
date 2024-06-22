@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-8f2ujnq$t78r@hipcg8scfme6ctb=q0ps-#c(wiob^x#%&zw39'
+SECRET_KEY = 'eeG6ru7hoom3oC5aethoob8d'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -40,8 +40,8 @@ INSTALLED_APPS = [
     'django_extensions',
     'bootstrap4',
     'ninkasi',
-    'ninkasi.brewfather', 
-    'ninkasi.bjcp'   
+    'ninkasi.brewfather',
+    'ninkasi.bjcp'
 ]
 
 
@@ -98,18 +98,20 @@ CACHES = {
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
+APV_NS = 'django.contrib.auth.password_validation'
+
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'NAME': f"{ APV_NS }.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'NAME': f"{ APV_NS }.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        'NAME': f"{ APV_NS }..CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        'NAME': f"{ APV_NS }..NumericPasswordValidator",
     },
 ]
 
@@ -159,6 +161,8 @@ BOOTSTRAP4 = {
 #
 DEFAULT_PROCESSING_TIME = "30d"
 
+DEFAULT_BREW_TIME = "8h"
+
 #
 # END Ninkasi variables
 
@@ -169,6 +173,10 @@ DEFAULT_PROCESSING_TIME = "30d"
 # Bf doesn't account for startup, filter, whilrpool and transfer
 #
 BF_PROCESSING_TIME_OFFSET = 30 + 150 + 15 + 30
+
+BF_FILTER_TIME = "90m"
+
+BF_SPARGE_TIME = "60m"
 
 BF_USER_ID = ""
 
@@ -187,5 +195,5 @@ BJCP_API_URL = "https://www.api-bjcp.com/graphql"
 
 try:
     from .local_settings import *
-except:
+except ModuleNotFoundError:
     pass

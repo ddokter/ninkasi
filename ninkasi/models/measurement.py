@@ -1,22 +1,9 @@
+""" Measurement model definition """
+
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from .sample import Sample
-
-
-Q_VOCAB = [
-    (0, _("Acidity")),
-    (1, _("DO")),
-    (2, _("Gravity")),
-    (3, _("CO2")),
-    (4, _("FAN"))
-]
-
-
-U_VOCAB = [
-    (0, "Ph"),
-    (1, "PPM"),
-    (2, "SG")
-]
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 
 
 class Measurement(models.Model):
@@ -24,25 +11,22 @@ class Measurement(models.Model):
     """ Measurement of any kind
     """
 
-    sample = models.ForeignKey(Sample, on_delete=models.CASCADE)
-    quantity = models.SmallIntegerField(
-        _("Quantity"),
-        help_text=_("What are we measuring"),
-        choices=Q_VOCAB)
-    unit = models.SmallIntegerField(_("Unit"),
-                                    choices=U_VOCAB)
-    value = models.FloatField(_("Value"))
+    parent = GenericForeignKey("content_type", "object_id")
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+
+    time = models.DateTimeField(_("Time"))
+    quantity = models.ForeignKey("Quantity", on_delete=models.CASCADE)
+    value = models.FloatField()
+    unit = models.ForeignKey("Unit", on_delete=models.CASCADE)
+    notes = models.TextField(_("Notes"), max_length=200, null=True,
+                             blank=True)
 
     def __str__(self):
 
-        return (f"{self.sample} {self.get_quantity_display()}"
-                f" {self.get_unit_display()} {self.value}")
-
-    @property
-    def label(self):
-
-        return _("Measurements")
+        return f"{self.quantity}: {self.value} { self.unit }"
 
     class Meta:
 
         app_label = "ninkasi"
+        ordering = ['time']

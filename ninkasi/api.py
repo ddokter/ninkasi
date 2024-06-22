@@ -46,11 +46,30 @@ class Recipe:
     @property
     def volume(self):
 
-        """ Return batch volume for this recipe """
+        """ Return volume for this recipe """
 
     def list_phases(self):
 
         """ Return a list of BasePhase objects, ordered """
+
+    @property
+    def final_gravity(self):
+
+        """ Return final gravity in SG """
+
+    @property
+    def original_gravity(self):
+
+        """ Return original gravity in SG """
+
+    @property
+    def ibu(self):
+
+        """ Return bitterness in IBU """
+
+    def get_milestone_value(self, milestone, quantity):
+
+        """ Arguments must be milestone and Quantity object """
 
 
 class Batch:
@@ -90,6 +109,10 @@ class Phase(OrderedContainer):
         step may have different implementations.
 
         """
+
+    def get_duration(self):
+
+        """ How lon is this step? Should return a Duration object. """
 
     def has_steps(self):
 

@@ -7,7 +7,8 @@
 {% if user|push:'sample'|has_obj_perm:'add' %}
 <a class="btn btn-outline-success btn-sm"
    href="{% url 'create_sample' %}{{ object.pk }}"
-   data-toggle="tooltip" data-placement="right" title="{% trans 'Add sample' %}">
+   data-toggle="tooltip" data-placement="right"
+   title="{% trans 'Add sample' %}">
   <span class="fas fa-plus" />
   <span class="fas fa-vial" />
 </a>
@@ -37,12 +38,24 @@
 
 {% block content %}
 
+{% with active_tab='details' %}
+{% include 'snippets/brew_tabs.html' %}
+{% endwith %}
 
 <dl class="row">
   <dt class="col-sm-3">{% trans 'Date' %}</dt>
   <dd class="col-sm-9">{{ object.date }}</dd>
-  <dt class="col-sm-3">{% trans 'Volume' %}</dt>
-  <dd class="col-sm-9">{{ object.volume }}</dd>
+
+  <dt class="col-sm-3">Volume (planned/actual)</dt>
+  <dd class="col-sm-9">{{ object.volume_projected }} / {{ object.volume }}
+    {% if object.volume_projected > object.volume %}
+    <i class="text-warning" data-toggle="tooltip" data-placement="top"
+	     title="{% trans 'Brew volume too low' %}">
+      <span class="fas fa-exclamation-triangle">
+      </span>
+    </i>
+    {% endif %}
+  </dd>
   <dt class="col-sm-3">{% trans 'Brewhouse' %}</dt>
   <dd class="col-sm-9">
     <a href="object.brewhouse|detail_url">{{ object.brewhouse }}</a>

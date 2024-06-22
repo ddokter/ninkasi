@@ -13,23 +13,6 @@ from .ingredient import Ingredient
 from ..ordered import OrderedContainer
 
 
-class RecipeResource(Resource):
-
-    def list(self):
-
-        return Recipe.objects.all()
-
-    def get(self, _id):
-
-        try:
-            return Recipe.objects.get(pk=_id)
-        except Recipe.objects.DoesNotExist as exc:
-            raise NotFoundInResource from exc
-
-
-ResourceRegistry.register("recipe", "django", RecipeResource())
-
-
 class Recipe(models.Model, BaseRecipe, OrderedContainer):
 
     """Brew recipe for a given beer, including ingredients,
@@ -96,6 +79,15 @@ class Recipe(models.Model, BaseRecipe, OrderedContainer):
         """ TODO: use days or no """
 
         return sum(phase.get_duration() for phase in self.list_phases())
+
+    def get_milestone_value(self, milestone, quantity):
+
+        evt_map = {
+            ('ninkasi.brew.end', 'volume'): self.volume,
+            ('ninkasi.brew.end', 'gravity'): self.original_gravity
+        }
+
+        return evt_map.get((milestone, quantity), None)
 
     class Meta:
 

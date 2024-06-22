@@ -3,6 +3,7 @@ from django.http import HttpResponseRedirect
 from django.forms import inlineformset_factory, HiddenInput
 from django.forms.models import ModelChoiceIterator
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes.forms import generic_inlineformset_factory
 from .base import CreateView, UpdateView
 from ..models.sample import Sample
 from ..models.batch import Batch
@@ -16,7 +17,7 @@ class FormSetMixin:
 
         form = super().get_form(form_class=form_class)
 
-        # form.fields.pop('measurement')
+        # form.fields.pop('measurements')
 
         return form
 
@@ -28,11 +29,9 @@ class FormSetMixin:
     @property
     def formsets(self):
 
-        factory = inlineformset_factory(
-            Sample, Measurement, exclude=[],
-            # widgets={'date_from': DateTimeInput(),
-            #         'date_to': DateTimeInput()}
-            )
+        factory = generic_inlineformset_factory(
+            Measurement, exclude=[]
+        )
 
         kwargs = {}
 
@@ -91,7 +90,7 @@ class SampleCreateView(FormSetMixin, CreateView):
 
             for phase in batch.list_phases():
                 for step in phase.list_steps():
-                    steps.append((step.id, step))
+                    steps.append((step.id, f"{ phase } -> { step }"))
 
             form.fields['step'].widget.choices = steps
 

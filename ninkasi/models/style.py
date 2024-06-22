@@ -1,29 +1,9 @@
+from django.apps import apps
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
-from ninkasi.resource import Resource
 from ninkasi.api import Style as BaseStyle
 from .fields import IntRangeField
-
-
-class StyleResource(Resource):
-
-    """ Wrapper for Django model manager """
-
-    def list(self):
-
-        """ Call Style manager for all objects """
-
-        return Style.objects.all()
-
-    def get(self, _id):
-
-        """Get unique style, given by id. The id usually comes in as
-        str, so convert
-
-        """
-
-        return Style.objects.get(pk=int(_id))
 
 
 class Style(models.Model, BaseStyle):
@@ -56,6 +36,14 @@ class Style(models.Model, BaseStyle):
     def urn(self):
 
         return f"urn:django:{ self.id }"
+
+    def list_beers(self):
+
+        """ List beers in the system using this style """
+
+        beer_model = apps.get_model("ninkasi", "Beer")
+
+        return beer_model.objects.filter(style=self.urn)
 
     class Meta:
 

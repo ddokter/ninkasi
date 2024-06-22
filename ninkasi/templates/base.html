@@ -49,6 +49,9 @@
 	  <a class="dropdown-item" href="{% url 'list' model='unit' %}">
 	    {% trans 'Units' %}
 	  </a>
+	  <a class="dropdown-item" href="{% url 'list' model='quantity' %}">
+	    {% trans 'Quantities' %}
+	  </a>	  
 	  <a class="dropdown-item" href="{% url 'list' model='metaphase' %}">
 	    {% trans 'Phases' %}
 	  </a>
@@ -73,6 +76,9 @@
 	  <a class="dropdown-item" href="{% url 'list' model='ingredient' %}">
 	    {% trans 'Ingredients' %}
 	  </a>
+	  <a class="dropdown-item" href="{% url 'list' model='product' %}">
+	    {% trans 'Products' %}
+	  </a>	  
         </div>
       </li>
 
@@ -83,42 +89,39 @@
 	  {% trans 'Tasks' %}	  
         </a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-	  <a class="dropdown-item" href="{% url 'list' model='scheduledtask' %}">
+	  <a class="dropdown-item"
+	     href="{% url 'list' model='scheduledtask' %}">
 	    {% trans 'Scheduled' %}
 	  </a>
-	  <a class="dropdown-item" href="{% url 'list' model='eventscheduledtask' %}">
-	    {% trans 'Event scheduled' %}
+	  <a class="dropdown-item"
+	     href="{% url 'list' model='milestonescheduledtask' %}">
+	    {% trans 'Milestone scheduled' %}
 	  </a>
-	  <a class="dropdown-item" href="{% url 'list' model='repeatedscheduledtask' %}">
+	  <a class="dropdown-item"
+	     href="{% url 'list' model='repeatedscheduledtask' %}">
 	    {% trans 'Repeat scheduled' %}
 	  </a>	  
         </div>	
-      </li>
-      
+      </li>      
       <li class="nav-item {% if view.view_name.0 == 'beer' %}active{% endif %}">
 	<a class="nav-link" href="{% url 'list' model='beer' %}">
 	  {% trans 'Beers' %}
 	</a>
       </li>
+      <li class="nav-item {% if view.view_name.0 == 'qualitycheck' %}active{% endif %}">
+	<a class="nav-link" href="{% url 'list' model='qualitycheck' %}">
+	  {% trans 'Quality checks' %}
+	</a>
+      </li>      
       <li class="nav-item {% if view.view_name.0 == 'recipe' %}active{% endif %}">
 	<a class="nav-link" href="{% url 'list' model='recipe' %}">
-	  {% trans 'Recipe' %}
+	  {% trans 'Recipes' %}
 	</a>
       </li>      
       
       <li class="nav-item {% if view.view_name.0 == 'batch' %}active{% endif %}">
 	<a class="nav-link" href="{% url 'list' model='batch' %}">
 	  {% trans 'Batches' %}
-	</a>
-      </li>
-      <!--li class="nav-item {% if view.view_name.0 == 'phase' %}active{% endif %}">
-	<a class="nav-link" href="{% url 'list' model='phase' %}">
-	  {% trans 'Phases' %}
-	</a>
-      </li-->
-      <li class="nav-item {% if view.view_name.0 == 'sample' %}active{% endif %}">
-	<a class="nav-link" href="{% url 'list' model='sample' %}">
-	  {% trans 'Samples' %}
 	</a>
       </li>
     </ul>

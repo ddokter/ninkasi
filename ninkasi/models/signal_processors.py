@@ -1,46 +1,12 @@
-from datetime import timedelta
-from django.db.models.signals import post_save, pre_save
+""" Register event handlers for Django's signals """
+
+from django.db.models.signals import post_save, pre_save, post_delete
 from django.dispatch import receiver
-from django.utils import timezone
-from .batch import Batch, BatchContainer
-from .transfer import Transfer
+from .batch import BatchContainer
 from .step import Step, MashStep
 from .brew import Brew
-from .task import EventScheduledTask
-
-
-def recalc_end_dates(batch, transfer=None):
-
-    """Set end date to either delivery date of batch, or to date of
-    next transfer. Use 'update' to prevent further signals
-
-    """
-
-    transfers = batch.list_transfers()
-
-    for i, transfer in enumerate(transfers):
-        try:
-            Transfer.objects.filter(id=transfer.id).update(
-                end_date=transfers[i + 1].date)
-        except IndexError:
-            Transfer.objects.filter(id=transfer.id).update(
-                end_date=batch.end_date_projected)
-
-
-@receiver(post_save, sender=Transfer)
-def transfer_post_save(sender, instance, **kwargs):
-
-    """ Handle Transfer post save """
-
-    recalc_end_dates(instance.parent, transfer=instance)
-
-
-@receiver(post_save, sender=Batch)
-def batch_post_save(sender, instance, **kwargs):
-
-    """ Handle signal for batch, where end date may be involved """
-
-    # recalc_end_dates(instance)
+from .task import MilestoneScheduledTask
+from .phase import Phase
 
 
 @receiver(post_save, sender=Brew)
@@ -78,20 +44,33 @@ def batchcontainer_post_save(sender, instance, **kwargs):
 
     if instance.from_date:
 
-        for event in EventScheduledTask.objects.filter(event=1):
+        for milestone in MilestoneScheduledTask.objects.filter(milestone=1):
 
-            event.generate_tasks(parent=instance.batch,
-                                 date=instance.from_date.date(),
-                                 time=instance.from_date.time(),
-                                 name=f"{ event.name } { instance.tank }"
-                                 )
+            milestone.generate_tasks(
+                parent=instance.batch,
+                date=instance.from_date.date(),
+                time=instance.from_date.time(),
+                name=f"{ milestone.name } { instance.tank }"
+            )
 
     if instance.to_date:
 
-        for event in EventScheduledTask.objects.filter(event=0):
+        for milestone in MilestoneScheduledTask.objects.filter(milestone=0):
 
-            event.generate_tasks(parent=instance.batch,
-                                 date=instance.to_date.date(),
-                                 time=instance.to_date.time(),
-                                 name=f"{ event.name } { instance.tank }"
-                                 )
+            milestone.generate_tasks(
+                parent=instance.batch,
+                date=instance.to_date.date(),
+                time=instance.to_date.time(),
+                name=f"{ milestone.name } { instance.tank }"
+            )
+
+
+@receiver(post_save, sender=Phase)
+def phase_post_save(sender, instance, **kwargs):
+
+    """Whenever a phase changes, recreate any tasks associated with
+    it to make sure timings are correct
+
+    """
+
+    instance.generate_tasks()

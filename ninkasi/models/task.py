@@ -3,10 +3,12 @@
 from datetime import datetime, date
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from .fields import DurationField
+from .fields import DurationField, MilestoneField
 from .base import BaseModel
+from ..milestones import MilestoneRegistry
 
 
 PRIO_VOCAB = [(1, _("High")),
@@ -43,9 +45,8 @@ class ScheduledTaskManager(models.Manager):
 class TaskFactory:
 
     """Generates tasks that stay linked to the factory, so the same
-    factory can generate those tasks again (and again). This is needed
-    to be able to produce tasks based on parent parameters and
-    recreate those tasks if any parameter of the parent changes.
+    factory can generate those tasks again (and again). The factory is
+    responsible for preventing inadvert copies.
 
     """
 
@@ -58,8 +59,8 @@ class TaskFactory:
 
 class Task(BaseModel):
 
-    """Base class for tasks. A task may be related to the apparatus of
-    the brewery, or may be stand-alone.
+    """Base class for tasks. Any actual task should be a subclass, so
+    the get_real method may be used to get the actual task.
 
     """
 
@@ -70,6 +71,7 @@ class Task(BaseModel):
     status = models.SmallIntegerField(default=0,
                                       editable=False,
                                       choices=STATUS_VOCAB)
+    estimated_time = DurationField()
 
     @property
     def is_done(self):
@@ -87,6 +89,13 @@ class Task(BaseModel):
 
         return f"{ str(real) } [{ real.get_status_display() }]"
 
+    def get_details(self):
+
+        """ Return a more detailed description of the task. This should
+        be a tuple of (str, dict) """
+
+        return (self.description, {})
+
     class Meta:
         app_label = "ninkasi"
 
@@ -103,7 +112,7 @@ class ScheduledTask(Task):
 
     date = models.DateField()
     time = models.TimeField(blank=True, null=True)
-    precision = DurationField(max_length=5)
+    precision = DurationField()
 
     def get_deadline(self):
 
@@ -119,7 +128,7 @@ class ScheduledTask(Task):
     def is_due(self):
 
         """Is the task due yet? This is the deadline compared to the
-        current time.
+        current time or date.
 
         """
 
@@ -134,40 +143,66 @@ class ScheduledTask(Task):
         app_label = "ninkasi"
 
 
-EVENT_VOCAB = [(0, _("Container empty")),
-               (1, _("Container fill")),
-               (2, _("Brew start")),
-               (3, _("Brew finish"))]
+PRECISION_HELP = _("How much slack is allowed around the specified time?")
 
 
-PRECISION_HELP = _("Use negative durations to specify before.")
+OFFSET_HELP = _("Offset from time of milestone. Use negative durations"
+                " to specify before the milestone"
+                )
 
 
-class EventScheduledTask(Task, TaskFactory):
+def milestone_vocab():
 
-    """Task that is created based on an event. The precision field
+    """ Provide vocabulary for milestones """
+
+    return [(evt, evt) for evt in MilestoneRegistry.list_milestones()]
+
+
+class MilestoneScheduledTask(Task, TaskFactory):
+
+    """Task that is created based on an milestone. The precision field
     specifies how much slack there is around the scheduled time.
-    Events are specified by Ninkasi and are in terms of 'tank empty',
-    etc.
-
-    TODO: somehow list events, maybe in a registry?
+    Milestones are specified by Ninkasi and are in terms of 'tank empty',
+    'batch start', etc.
 
     """
 
-    precision = DurationField(max_length=5)
-    event = models.SmallIntegerField(choices=EVENT_VOCAB)
+    precision = DurationField(help_text=PRECISION_HELP)
+    milestone = MilestoneField(max_length=100, choices=milestone_vocab)
+    offset = DurationField(help_text=OFFSET_HELP, null=True, blank=True)
 
     def generate_tasks(self, **kwargs):
 
-        self.eventtasksub_set.filter(
+        """ Generate tasks based on the given milestone. The kwargs must
+        contain a date and may contain a time. """
+
+        if 'date' not in kwargs:
+            raise KeyError("'date' must be specified in kwargs")
+
+        self.milestonetasksub_set.filter(
             name=kwargs['name'],
             object_id=kwargs['parent'].id,
             content_type=ContentType.objects.get_for_model(kwargs['parent']).id
         ).delete()
 
-        kwargs.update(priority=self.priority, precision=self.precision)
+        kwargs.update(priority=self.priority,
+                      precision=self.precision,
+                      description=self.description
+                      )
 
-        return self.eventtasksub_set.create(**kwargs)
+        return self.milestonetasksub_set.create(**kwargs)
+
+    def h10nized(self):
+
+        """ Provide a human readable version"""
+
+        sign = self.offset.get_sign()
+
+        if sign == "-":
+            sign = ""
+
+        return _(f"{ self.name } within { self.precision } of "
+                 f"{ self.milestone } { sign }{ self.offset }")
 
     class Meta:
         app_label = "ninkasi"
@@ -248,12 +283,20 @@ class RepeatedTaskSub(ScheduledTask):
         return str(self.parent)
 
 
-class EventTaskSub(ScheduledTask):
+class MilestoneTaskSub(ScheduledTask):
 
-    """ Parented task created through planned event """
+    """ Parented task created through planned milestone """
 
-    factory = models.ForeignKey(EventScheduledTask, on_delete=models.CASCADE)
-
+    factory = models.ForeignKey(MilestoneScheduledTask,
+                                on_delete=models.CASCADE)
     parent = GenericForeignKey("content_type", "object_id")
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
+
+    def get_details(self):
+
+        details = super().get_details()
+
+        details[1]['milestone'] = self.factory.milestone
+
+        return details

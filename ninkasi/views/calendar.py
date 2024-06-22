@@ -49,6 +49,7 @@ class Calendar:
         return {
             'title': now.strftime("%B %Y"),
             'days': days,
+            'today': now,
             'weeks': weeks,
             'next': _next.strftime("%Y-%m"),
             'prev': _prev.strftime("%Y-%m"),

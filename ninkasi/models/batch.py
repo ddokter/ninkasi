@@ -1,6 +1,6 @@
 """ Hold batch model """
 
-from datetime import timedelta
+from datetime import datetime
 from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
@@ -11,13 +11,15 @@ from django.core.exceptions import ValidationError
 from ..ordered import OrderedContainer
 from .tank import Tank
 from .material import Material, ParentedMaterial
-from .fields import Duration
+from .fields import Duration, ColorField
+from ..milestones import MilestoneProviderModel
+from .task import MilestoneScheduledTask
 
 
 DATE_MODE_VOCAB = [(0, _("Start")), (1, _("Delivery"))]
 
 
-class Batch(models.Model, OrderedContainer):
+class Batch(models.Model, OrderedContainer, MilestoneProviderModel):
 
     """A batch is a volume of beer that can be treated as a separate
     unit. This boils down to a volume that is brewed in one or more
@@ -52,9 +54,15 @@ class Batch(models.Model, OrderedContainer):
 
     material = models.ManyToManyField(Material, through="BatchMaterial")
     tank = models.ManyToManyField(Tank, through="BatchContainer")
+    product = models.ManyToManyField("Product", through="Deliverable")
 
     phase = GenericRelation("Phase")
     sample = GenericRelation("Sample")
+    measurement = GenericRelation("Measurement")
+
+    color = ColorField(_("Color"), max_length=7, null=True, blank=True)
+
+    task = GenericRelation("MilestoneTaskSub")
 
     def __str__(self):
 
@@ -83,6 +91,16 @@ class Batch(models.Model, OrderedContainer):
             return self.list_brews().first().date.date()
 
         return self.start_date_projected
+
+    @property
+    def start_time(self):
+
+        """ Return the start time, if set at all. """
+
+        if self.list_brews().exists():
+            return self.list_brews().first().date
+
+        return None
 
     @property
     def delivery_date_projected(self):
@@ -122,6 +140,17 @@ class Batch(models.Model, OrderedContainer):
 
         return self.phase.all()
 
+    def list_deliverables(self):
+
+        """ Get all products defined for this batch """
+
+        return self.deliverable_set.all()
+
+    def total_product_volume(self):
+
+        return sum(product.total_volume() for product in
+                   self.list_deliverables())
+
     def get_phase(self, _id):
 
         return self.phase.get(_id)
@@ -131,6 +160,27 @@ class Batch(models.Model, OrderedContainer):
         """ Add phase of the metpahase given """
 
         self.phase.create(metaphase=metaphase, order=self.phase.count())
+
+    def get_phase_start(self, _id):
+
+        """ Retrieve the time this phase starts. This is based on the
+        batch start, with all phases in between added. """
+
+        start = self.start_time
+
+        if not isinstance(start, datetime):
+
+            return None
+
+        for phase in self.list_phases():
+
+            if phase.id == _id:
+
+                break
+
+            start += phase.get_duration().as_timedelta()
+
+        return start
 
     def list_materials(self):
 
@@ -159,17 +209,22 @@ class Batch(models.Model, OrderedContainer):
 
         """ Get duration based on phases """
 
-        return sum(phase.get_duration() for phase in self.list_phases())
+        if self.list_phases().exists():
+            total = sum(phase.get_duration() for phase in self.list_phases())
+
+            for brew in self.list_brews():
+                total += brew.get_total_duration()
+        else:
+            total = Duration(settings.DEFAULT_PROCESSING_TIME)
+
+        return total
 
     def get_processing_time(self):
 
         """ Get the time needed to process this batch.
         """
 
-        try:
-            return self.get_total_duration()
-        except AttributeError:
-            return Duration(settings.DEFAULT_PROCESSING_TIME)
+        return self.get_total_duration()
 
     def import_phases(self, recipe_id):
 
@@ -177,6 +232,8 @@ class Batch(models.Model, OrderedContainer):
         the recipe of the beer for this batch. In the future, this
         could be a choice of many.
         """
+
+        self.list_phases().delete()
 
         for phase in self.beer.get_recipe(recipe_id).list_phases():
 
@@ -187,6 +244,35 @@ class Batch(models.Model, OrderedContainer):
     def get_recipe(self):
 
         """ Get the recipe set for this batch """
+
+    def list_measurements(self):
+
+        """ Return all related measurements """
+
+        return self.measurement.all()
+
+    def generate_tasks(self, **kwargs):
+
+        """Create tasks associated with this batch, if at all
+        possible.  Batch tasks are milestone based, and the start_time of
+        the batch must be set to be able to determine this.
+
+        """
+
+        if not self.start_time:
+            return False
+
+        for milestone in self.list_milestones():
+
+            if milestone == "ninkasi.batch.start":
+                date = self.start_time
+            elif milestone == "ninkasi.batch.end":
+                date = self.end_time
+
+            for task in MilestoneScheduledTask.objects.filter(
+                    milestone=milestone):
+
+                task.generate_tasks(date=date, **kwargs)
 
     class Meta:
 
@@ -228,3 +314,18 @@ class BatchContainer(models.Model):
 
     # TODO: make validator for checking on whether the tank is already
     # filled on these dates.
+
+
+class Deliverable(models.Model):
+
+    """ Relate batch to proucts """
+
+    batch = models.ForeignKey(Batch, on_delete=models.CASCADE)
+    product = models.ForeignKey("Product", on_delete=models.CASCADE)
+    amount = models.SmallIntegerField()
+
+    def total_volume(self):
+
+        """ Return the total volume of the batchproduct """
+
+        return self.amount * self.product.get_liter_volume()

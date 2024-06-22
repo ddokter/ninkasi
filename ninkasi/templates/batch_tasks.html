@@ -1,0 +1,22 @@
+{% extends 'batch_detail.html' %}
+
+{% load i18n ninkasi_tags %}
+
+{% block content %}
+
+{% with active_tab='tasks' %}
+{% include 'snippets/batch_tabs.html' %}
+{% endwith %}
+
+<section class="tasks">
+
+  <ul class="list-group">
+    {% for task in view.list_tasks %}
+    <li class="list-group-item">
+      {% task task %}
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+
+{% endblock %}

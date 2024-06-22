@@ -6,30 +6,32 @@
 
 <h1>Ninkasi - Beer QA</h1>
 
-<section class="tasks">
-  <h2>{% trans "Today's tasks" %}</h2>
+<section class="tasks card">
+  <h2 class="card-title">{% trans "Today's tasks" %}</h2>
 
-  <ul class="list-group">
-    {% for task in view.tasks_today %}
-    <li class="list-group-item">
-      {% task task %}
-    </li>
-    {% endfor %}
-  </ul>
-  
+  <div class="card-body">
+    <ul class="list-group">
+      {% for task in view.tasks_today %}
+      <li class="list-group-item">
+	{% task task %}
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
 </section>
   
-<section class="tasks">
-  <h2>{% trans "Open tasks" %}</h2>
+<section class="tasks card">
+  <h2 class="card-title">{% trans "Open tasks" %}</h2>
 
-  <ul class="list-group">
-    {% for task in view.tasks_open %}
-    <li class="list-group-item">
-      {% task task %}      
-    <li>
-    {% endfor %}
-  </ul>
-  
+  <div class="card-body">
+    <ul class="list-group list-group-flush">
+      {% for task in view.tasks_open %}
+      <li class="list-group-item">
+	{% task task %}      
+      <li>
+	{% endfor %}
+    </ul>
+  </div>
 </section>
 
 {% endblock %}

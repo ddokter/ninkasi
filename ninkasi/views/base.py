@@ -12,6 +12,8 @@ from django.apps import apps
 from django.conf import settings
 from ..utils import get_model_name
 from ..forms.dtinput import DateTimeInput
+from ..forms.colorpicker import ColorInput
+from .formset import FormSetMixin
 
 
 class SearchForm(forms.Form):
@@ -91,12 +93,13 @@ class GenericMixin:
 
             if mdl._meta.swappable:
 
-                module, model = getattr(settings, mdl._meta.swappable).split(".")
+                module, model = getattr(settings,
+                                        mdl._meta.swappable).split(".")
 
                 return apps.get_model(module, model)
 
             return mdl
-            
+
         else:
             return self._model
 
@@ -129,7 +132,15 @@ class InlineActionMixin:
 
     def get_initial(self):
 
-        return {self.fk_field: self.parent}
+        """May also be parented by contenttypes, so set those values
+        as well
+
+        """
+
+        return {
+            self.fk_field: self.parent,
+            'content_type': ContentType.objects.get_for_model(self.parent).id,
+            'object_id': self.parent.id}
 
     @property
     def fk_field(self):
@@ -154,7 +165,7 @@ class InlineActionMixin:
             for field in field_defs.keys():
                 form.fields[field].queryset = field_defs[field]
 
-        except:
+        except (KeyError, AttributeError):
             pass
 
         # Always use DateTimeWidget...
@@ -163,17 +174,24 @@ class InlineActionMixin:
             if form.fields[field].__class__.__name__ == 'DateTimeField':
                 form.fields[field].widget = DateTimeInput()
 
+        # Patch Textarea
+        #
+        for field in form.fields:
+            if form.fields[field].widget.__class__.__name__ == "Textarea":
+                form.fields[field].widget.attrs['rows'] = 3
+
         # Hide parent, if possible
         #
-        try:
-            form.fields[self.fk_field].widget = forms.HiddenInput()
-        except KeyError:
-            pass
-            
+        for fname in [self.fk_field, "object_id", "content_type"]:
+            try:
+                form.fields[fname].widget = forms.HiddenInput()
+            except KeyError:
+                pass
+
         return form
 
 
-class CreateView(GenericMixin, BaseCreateView, CTypeMixin):
+class CreateView(GenericMixin, FormSetMixin, BaseCreateView, CTypeMixin):
 
     """ Base create view that enables creation within a parent """
 
@@ -189,10 +207,10 @@ class CreateView(GenericMixin, BaseCreateView, CTypeMixin):
 
         try:
             obj = self.get_object()
-        except:
+        except BaseException:
             try:
                 obj = self.get_parent()
-            except:
+            except BaseException:
                 obj = None
 
         return request.user.has_perm(permission, obj=obj)
@@ -206,7 +224,7 @@ class CreateView(GenericMixin, BaseCreateView, CTypeMixin):
 
         if self.template_name:
             return [self.template_name]
-        
+
         return ["%s_create.html" % self.ctype, "base_create.html"]
 
     @property
@@ -231,7 +249,7 @@ class CreateView(GenericMixin, BaseCreateView, CTypeMixin):
         return action_url
 
 
-class UpdateView(GenericMixin, BaseUpdateView, CTypeMixin):
+class UpdateView(GenericMixin, FormSetMixin, BaseUpdateView, CTypeMixin):
 
     view_type = "edit"
 
@@ -287,7 +305,7 @@ class DetailView(GenericMixin, BaseDetailView, CTypeMixin):
 
         """ provide content type specific permission """
 
-        return "ninkasi.view_%s" % self.ctype
+        return f"ninkasi.view_{ self.ctype }"
 
     def get_template_names(self):
 
@@ -311,13 +329,22 @@ class DetailView(GenericMixin, BaseDetailView, CTypeMixin):
                 continue
 
             try:
-                _props.append((field.verbose_name,
-                               getattr(self.object,
-                                       f"get_{ field.name }_display" )()))
+                value = getattr(self.object, f"get_{ field.name }_display")()
             except AttributeError:
+                value = getattr(self.object, field.name)
 
-                _props.append((field.verbose_name,
-                               getattr(self.object, field.name)))
+            if isinstance(value, list):
+                value = ", ".join([str(part) for part in value])
+
+            _props.append((field.verbose_name, value))
+
+        for field in self.object._meta.many_to_many:
+
+            qs = getattr(self.object, field.name)
+
+            values = [str(val) for val in list(qs.all())]
+
+            _props.append((field.verbose_name, ", ".join(values)))
 
         return _props
 

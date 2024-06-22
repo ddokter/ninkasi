@@ -1,14 +1,18 @@
+""" All phase definitions """
+
+from datetime import datetime
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
 from ninkasi.api import Phase as BasePhase
 from ninkasi.duration import Duration
-from .metaphase import MetaPhase
+from .task import TaskFactory, MilestoneScheduledTask
 
 
-class Phase(BasePhase, models.Model):
+class Phase(BasePhase, models.Model, TaskFactory):
 
     """Phases in the production process, relevant to the lifecycle of
     a batch or brew. This could be anything, from 'boil' to
@@ -19,6 +23,9 @@ class Phase(BasePhase, models.Model):
     brew but also recipe. Batch and brew import phases from the
     recipe.
 
+    A phase is a task factory, that is there may be tasks attached to
+    the phase defined by it's 'milestones': start and end.
+
     """
 
     parent = GenericForeignKey("content_type", "object_id")
@@ -26,6 +33,8 @@ class Phase(BasePhase, models.Model):
     object_id = models.PositiveIntegerField()
     order = models.PositiveIntegerField()
     metaphase = models.CharField(max_length=100, editable=False)
+
+    tasks = GenericRelation("MilestoneTaskSub")
 
     def __str__(self):
 
@@ -105,15 +114,40 @@ class Phase(BasePhase, models.Model):
         if self.step_set.count() != thing.list_steps(raw=True).count():
             return False
 
-        steps_old = list(self.list_steps())
         steps_new = list(thing.list_steps())
 
-        for i in range(len(steps_old)):
+        for idx, val in enumerate(self.list_steps()):
 
-            if steps_old[i] != steps_new[i]:
+            if val != steps_new[idx]:
                 return False
 
         return True
+
+    def generate_tasks(self, **kwargs):
+
+        """Generate any defined tasks if need be for the phase's
+        milestones"""
+
+        milestones = [f"ninkasi.{ self.name }.start",
+                      f"ninkasi.{ self.name }.end"]
+
+        self.tasks.all().delete()
+
+        if self.parent._meta.model_name == "batch":
+
+            for task in MilestoneScheduledTask.objects.filter(
+                    milestone=milestones[0]):
+
+                start = self.parent.get_phase_start(self.id)
+                kwargs['name'] = f"{ task.name } - { self.parent }"
+                kwargs['parent'] = self.parent
+
+                if start:
+
+                    if isinstance(start, datetime):
+                        kwargs['time'] = start.time()
+
+                    task.generate_tasks(date=start, **kwargs)
 
     class Meta:
 

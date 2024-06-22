@@ -1,28 +1,61 @@
 {% load i18n ninkasi_tags %}
 
-<div class="alert
-	    {% if task.is_done %}
-	    alert-success
-	    {% elif task.is_due %}
-	    alert-danger
-	    {% else %}
-	    alert-info
-	    {% endif %}
-	    ">
-  {% priority task %} {{ task }}
-  <div class="float-right">
-    {{ task.get_deadline }}
-    {% if task.is_due %}
-    <i class="fas fa-exclamation-triangle"></i>
-    {% endif %}
+{% with details=task.get_details %}
+<div class="card">
+  <div class="card-body">
+    <div class="card-title">
+      <div class="alert
+		  {% if task.is_done %}
+		  alert-success
+		  {% elif task.is_due %}
+		  alert-danger
+		  {% else %}
+		  alert-info
+		  {% endif %}
+		  ">
+	{% priority task %} {{ task }}
 
-    {% if not task.is_done %}
-    <a class="btn btn-outline-default btn-sm rounded-circle"
-       href="{% url 'fixtask' task.id %}"
-       data-toggle="tooltip" data-placement="right"
-       title="{% trans 'Set task status to done' %}">
-      <span class="fas fa-check" />
-    </a>
-    {% endif %}
+	{% if details %}
+	<a data-toggle="collapse" class="collapsed"
+	   href="#task_details_{{ task.id }}" role="button" aria-expanded="false"
+	   aria-controls="task_details_{{ task.id }}">
+	  <i class="show" data-toggle="tooltip" data-placement="right"
+	     title="{% trans 'Show details' %}">
+	    <span class="fas fa-caret-down"></span>
+	  </i>
+	  <i class="hide" data-toggle="tooltip" data-placement="right"
+	     title="{% trans 'Hide details' %}">
+	    <span class="fas fa-caret-up"></span>
+	  </i>
+	</a>
+	{% endif %}
+
+	<div class="float-right">
+	  {{ task.get_deadline }}
+	  {% if task.is_due %}
+	  <i class="fas fa-exclamation-triangle"></i>
+	  {% endif %}
+
+	  {% if not task.is_done %}
+	  <a class="btn btn-outline-default btn-sm rounded-circle"
+	     href="{% url 'fixtask' task.id %}"
+	     data-toggle="tooltip" data-placement="right"
+	     title="{% trans 'Set task status to done' %}">
+	    <span class="fas fa-check" />
+	  </a>
+	  {% endif %}
+	</div>
+      </div>
+    </div>
+    <div class="card-text collapse" id="task_details_{{ task.id }}">
+      <dl class="row">
+	{% for k, v in details.1.items %}
+	<dt class="col-sm-3">{{ k }}</dt>
+	<dd class="col-sm-9">{{ v }}</dd>
+	{% endfor %}
+      </dl>
+      {{ details.0 }}
+    </div>
   </div>
 </div>
+{% endwith %}

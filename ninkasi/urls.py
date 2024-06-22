@@ -4,14 +4,14 @@ from .views.auth import LoginView, LogoutView
 from .views.base import (DeleteView, ListingView, DetailView, CreateView,
                          UpdateView, InlineCreateView, InlineUpdateView,
                          InlineDeleteView)
-from .views.batch import (BatchCreateView, BatchUpdateView, BatchDetailView,
-                          BatchImportPhasesView)
-from .views.recipe import (RecipeCreateView, RecipeUpdateView,
-                           RecipeDetailView, RecipeListingView)
+from .views.batch import (BatchCreateView, BatchDetailView, BatchTasks,
+                          BatchImportPhasesView, BatchMeasurements)
+from .views.recipe import RecipeDetailView, RecipeListingView
 from .views.style import StyleListingView
 from .views.sample import SampleCreateView, SampleUpdateView
+# from .views.measurement import MeasurementCreateView
 from .views.brew import (BrewDetailView, BrewCreateView, BrewUpdateView,
-                         BrewImportPhasesView)
+                         BrewImportPhasesView, BrewChecks)
 from .views.phase import (PhaseMoveStepView, PhaseView, AddPhaseView,
                           MovePhaseView)
 from .views.beer import BeerCreateView, BeerUpdateView
@@ -66,29 +66,25 @@ urlpatterns = [
          BatchCreateView.as_view(),
          name="create_batch"),
 
-    path('batch/<int:pk>/edit',
-         BatchUpdateView.as_view(),
-         name="edit_batch"),
-
     path('batch/<int:pk>',
          BatchDetailView.as_view(),
          name="view"),
+
+    path('batch/<int:pk>/measurements',
+         BatchMeasurements.as_view(),
+         name="batch_measurements"),
+
+    path('batch/<int:pk>/tasks',
+         BatchTasks.as_view(),
+         name="batch_tasks"),
 
     path('batch/<int:pk>/importphases',
          BatchImportPhasesView.as_view(),
          name="batch_import_phases"),
 
-    path('recipe/add/',
-         RecipeCreateView.as_view(),
-         name="create_recipe"),
-
     path('recipe/<int:pk>',
          RecipeDetailView.as_view(),
          name="view"),
-
-    path('recipe/<int:pk>/edit',
-         RecipeUpdateView.as_view(),
-         name="edit_recipe"),
 
     path('recipe/list',
          RecipeListingView.as_view(),
@@ -129,6 +125,10 @@ urlpatterns = [
     path('brew/<int:pk>/importphases',
          BrewImportPhasesView.as_view(),
          name="brew_import_phases"),
+
+    path('brew/<int:pk>/checks',
+         BrewChecks.as_view(),
+         name="brew_qualitychecks"),
 
     path('beer/add/',
          BeerCreateView.as_view(),

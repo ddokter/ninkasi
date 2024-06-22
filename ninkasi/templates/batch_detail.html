@@ -2,6 +2,7 @@
 
 {% load i18n ninkasi_tags %}
 
+
 {% block extra_actions %}
 
 {% if user|push:object|has_obj_perm:'change' %}
@@ -23,7 +24,6 @@
   </div>
 </span>
 {% endif %}
-
 
 <!--a class="btn btn-outline-success btn-sm"
    href="{% url 'transfer' view.ct_id object.id %}"
@@ -49,10 +49,13 @@
 
 {% block content %}
 
+{% with active_tab='details' %}
+{% include 'snippets/batch_tabs.html' %}
+{% endwith %}
 
 <dl class="row">
   <dt class="col-sm-3">Volume (planned/actual)</dt>
-  <dd class="col-sm-9">{{ object.volume_projected }}/{{ object.volume }}
+  <dd class="col-sm-9">{{ object.volume_projected }} / {{ object.volume }}
     {% if object.volume_projected > object.volume %}
     <i class="text-warning" data-toggle="tooltip" data-placement="top"
 	     title="{% trans 'Brew volume too low' %}">
@@ -69,21 +72,10 @@
   <dd class="col-sm-9">
     {{ object.get_processing_time.days|floatformat:2 }} days
   </dd>
-  <dt class="col-sm-3">{% trans 'Delivery date (planned/actual)' %}</dt>
-  <dd class="col-sm-9">
-    {{ object.delivery_date_projected|date:"d-m-Y" }}/
-    {{ object.delivery_date|date:"d-m-Y" }}
-    {% if object.delivery_date_projected < object.delivery_date %}
-    <i class="text-warning" data-toggle="tooltip" data-placement="top"
-	     title="{% trans 'Delivery too late' %}">
-      <span class="fas fa-exclamation-triangle">
-      </span>
-    </i>
-    {% endif %}
-  </dd>
   <dt class="col-sm-3">{% trans 'Start date (planned/actual)' %}</dt>
   <dd class="col-sm-9">
-    {{ object.start_date_projected|date:"d-m-Y" }}/{{ object.start_date|date:"d-m-Y" }}
+    {{ object.start_date_projected|date:"d-m-Y" }} /
+    {{ object.start_date|date:"d-m-Y" }}
     {% if object.start_date_projected < object.start_date %}
     <i class="text-warning" data-toggle="tooltip" data-placement="top"
 	     title="{% trans 'Start date too late' %}">
@@ -92,7 +84,58 @@
     </i>
     {% endif %}
   </dd>
+  <dt class="col-sm-3">{% trans 'Delivery date (planned/actual)' %}</dt>
+  <dd class="col-sm-9">
+    {{ object.delivery_date_projected|date:"d-m-Y" }} /
+    {{ object.delivery_date|date:"d-m-Y" }}
+    {% if object.delivery_date_projected < object.delivery_date %}
+    <i class="text-warning" data-toggle="tooltip" data-placement="top"
+	     title="{% trans 'Delivery too late' %}">
+      <span class="fas fa-exclamation-triangle">
+      </span>
+    </i>
+    {% endif %}
+  </dd>  
+  <dt class="col-sm-3">{% trans 'Color' %}</dt>
+  <dd class="col-sm-9">
+    <div class="rounded-circle batch-marker"
+	 style="background-color: {{ view.get_color }}">
+    </div>
+  </dd>
 </dl>
+
+
+<section>
+  <h2>{% icon 'product' %} {% trans 'Deliverables' %}</h2>
+
+  <table class="table table-striped">
+    <thead>
+      <tr>
+	<th>Product</th>
+	<th>Amount</th>
+	<th>Volume</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for product in object.list_deliverables %}
+      <tr>
+	<td>
+	  <a href="{{ product.product|detail_url }}">{{ product.product }}</a>
+	</td>
+	<td>{{ product.amount }}</td>
+	<td>{{ product.total_volume }}</td>
+      </tr>
+      {% endfor %}
+      <tr>
+	<th>{% trans 'Total' %}</th>
+	<th />
+	<th>
+	  {{ object.total_product_volume }}
+	</th>
+      </tr>
+    </tbody>
+  </table>
+</section>
 
 
 <section>
@@ -114,6 +157,7 @@
 	<th>Brew</th>
 	<th>Date</th>
 	<th>Volume</th>
+	<th></th>
       </tr>
     </thead>
     <tbody>
@@ -124,6 +168,16 @@
 	</td>
 	<td>{{ brew.date|date:"d-m-Y H:i " }}</td>
 	<td>{{ brew.volume }}</td>
+	<td>
+	  <div class="float-right">
+            {% if user|push:brew|has_obj_perm:'change' %}
+            {% edit_action brew %}
+            {% endif %}
+            {% if user|push:brew|has_obj_perm:'delete' %}
+            {% delete_action brew %}
+            {% endif %}
+	  </div>	 
+	</td>
       </tr>
       {% endfor %}
     </tbody>
@@ -158,7 +212,7 @@
 
   {% with dates=view.get_calendar %}
   {% if dates %}
-  <h2>Planning</h2>
+  <h2>Tank planning</h2>
 
   <table class="table table-bordered table-sm">
     <thead>
