@@ -5,6 +5,7 @@ from django.forms import widgets
 from .resource import ResourceRegistry
 from .milestones import (MilestoneRegistry, MilestoneProvider,
                          MilestoneProviderModel)
+from .tanks import TankRegistry, Tank
 from .resource import ModelResource
 from .utils import class_implements
 
@@ -49,3 +50,12 @@ class NinkasiConfig(AppConfig):
             elif class_implements(model, MilestoneProvider):
 
                 MilestoneRegistry.register(model_name, model)
+
+        # register tanks. Could be done in loop above, but the gain is
+        # zilch and this is more clear.
+        #
+        for model_name, model in self.models.items():
+
+            if class_implements(model, Tank):
+
+                TankRegistry.register_model(model_name, model)

@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% load i18n bootstrap4 ninkasi_tags %}
+{% load i18n django_bootstrap5 ninkasi_tags %}
 
 {% block title %}
 <h1>{% blocktrans with label=view.ct_label %}Add {{label}}{% endblocktrans %} </h1>
@@ -39,14 +39,14 @@
       {{ formset|fslabel }}
 
       <button class="btn btn-primary btn-sm" type="button"
-              data-toggle="collapse"
-	      data-target="#formset_collapse_{{ forloop.counter0 }}"
+              data-bs-toggle="collapse"
+	      href="#formset_collapse_{{ forloop.counter0 }}"
 	      {% if formset.expanded %}
               aria-expanded="true"
 	      {% else %}
               aria-expanded="false"	      
 	      {% endif %}
-	      aria-controls="formset_collapse"
+	      aria-controls="formset_collapse_{{ forloop.counter0 }}"
               title="{% trans 'Show subformset' %}">
 	{% if formset.expanded %}
 	<span class="fas fa-angle-up" />
@@ -60,16 +60,15 @@
       {% bootstrap_formset formset layout='horizontal' %}
     </section>
     {% endfor %}
-        
-    {% buttons %}
-    <button type="submit" class="btn btn-primary">
-      {% trans 'Save' %}
-    </button>
-    <a href="{{ view.cancel_url }}" class="btn btn-default">
-      {% trans 'Cancel' %}
-    </a>
-    
-    {% endbuttons %}
+
+    <div class="btn-group" role="group" aria-label="Form controls">
+      <button type="submit" class="btn btn-primary">
+	{% trans 'Save' %}
+      </button>
+      <a href="{{ view.cancel_url }}" role="button" class="btn btn-secondaryf">
+	{% trans 'Cancel' %}
+      </a>
+    </div>
 </form>
 {% endblock form %}
 

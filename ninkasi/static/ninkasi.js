@@ -91,4 +91,34 @@ $(document).ready(function() {
 	    $(elt).addClass("required");
 	}
     });
+
+    $(function () {
+        // Create table dragging functionality
+        var isMouseDown = false;
+        var highlighted;
+	$("table.schedule td")
+            .mousedown(function () {
+		isMouseDown = true;
+		highlighted = $(this).hasClass('highlighted');
+		
+		if ( highlighted ) {
+                    $(this).removeClass('highlighted');
+		} else {
+                    $(this).addClass('highlighted');
+		}
+		return false; // prevent text selection
+            })
+            .mouseover(function () {
+		if (isMouseDown) {
+                    if ( highlighted ) {
+			$(this).removeClass('highlighted');
+                    } else {
+			$(this).addClass('highlighted');
+                    }
+		}
+            })
+            .bind("selectstart", function () {
+		return false; // prevent text selection in IE
+            });
+    });
 });

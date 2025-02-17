@@ -9,13 +9,13 @@
     {% for item in path %}
     {% if forloop.last %}
     <li class="breadcrumb-item active">
-      <a href="{{ item|detail_url }}">
-	{{ item }}
+      <a href="{{ item.1 }}">
+	{{ item.0 }}
       </a>
     {% else %}
     <li class="breadcrumb-item">
-      <a href="{{ item|listing_url }}">
-	{{ item }}
+      <a href="{{ item.1 }}">
+	{{ item.0 }}
       </a>
     </li>
     {% endif %}

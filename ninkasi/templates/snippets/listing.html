@@ -28,7 +28,7 @@
       
       {% status item %}
 
-      <div class="float-right">
+      <div class="float-end">
         {% if user|push:item|has_obj_perm:'change' %}
         {% edit_action item %}
         {% endif %}

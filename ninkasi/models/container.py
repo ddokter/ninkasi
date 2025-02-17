@@ -1,8 +1,9 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from .base import BaseModel
 
 
-class Container(models.Model):
+class Container(BaseModel):
 
     """ Anything that can hold a batch of beer. May be a brewhouse,
     but also a tank, like CCT or BBT. The container is used to define
@@ -10,8 +11,6 @@ class Container(models.Model):
 
     name = models.CharField(_("Name"), max_length=100)
     volume = models.FloatField()
-
-    maintenance_schema = models.ManyToManyField("Task", null=True, blank=True)
 
     def __str__(self):
 

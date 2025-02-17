@@ -6,6 +6,9 @@ from ninkasi.api import Style as BaseStyle
 from .fields import IntRangeField
 
 
+COLOR_HELP = _("Give EBC color as range <int>, <int>")
+
+
 class Style(models.Model, BaseStyle):
 
     """The (beer) style defines the ranges in terms of color, gravity,
@@ -17,7 +20,7 @@ class Style(models.Model, BaseStyle):
 
     name = models.CharField(_("Name"), null=True, blank=True, max_length=100)
     description = models.TextField()
-    color = IntRangeField(_("Color"), max_length=10)
+    color = IntRangeField(_("Color"), max_length=10, help_text=COLOR_HELP)
     source = models.CharField(_("Source"), max_length=50)
 
     def __str__(self):

@@ -111,6 +111,48 @@
   </tbody>
 </table-->
 
-{% include 'snippets/schema.html' %}
+<section>
+  <h2>{% icon 'phase' %} {% trans 'Phases' %}
+
+    {% if object.mode != 'ro' %}
+    <span class="dropdown show">
+      <a class="btn btn-sm btn-outline-success dropdown-toggle" href="#"
+	 role="button" id="phase-dropdown" data-bs-toggle="dropdown"
+	 aria-haspopup="true" aria-expanded="false"
+	 title="{% trans 'Add phase' %}">
+	<span class="fas fa-plus" />
+      </a>
+      <div class="dropdown-menu" aria-labelledby="phase-dropdown">
+	{% for phase in view.phase_vocab %}
+	<a class="dropdown-item"
+	   href="{% url 'addphase' view.ctype object.pk phase.name %}">
+	  {{ phase }}</a>
+	{% endfor %}
+      </div>
+    </span>
+    {% endif %}
+    {% if user|push:object|has_obj_perm:'change' %}
+    <span class="dropdown show">
+      <a class="btn btn-sm btn-outline-info dropdown-toggle" href="#"
+	 role="button" id="import-dropdown" data-bs-toggle="dropdown"
+	 aria-haspopup="true" aria-expanded="false"
+	 title="{% trans 'Import recipe' %}">
+	{% trans 'Import from recipe' %}
+      </a>
+      <div class="dropdown-menu" aria-labelledby="phase-dropdown">
+	{% for recipe in object.list_recipes %}
+	<a class="dropdown-item"
+	   href="{% url 'brew_import_phases' object.pk %}?recipe={{ recipe.id }}">
+	  {{ recipe }}
+	</a>
+	{% endfor %}
+      </div>
+    </span>
+    {% endif %}
+  </h2>
+  
+  {% include 'snippets/schema.html' %}
+
+</section>
 
 {% endblock content %}

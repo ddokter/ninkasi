@@ -5,26 +5,6 @@
 
 {% block extra_actions %}
 
-{% if user|push:object|has_obj_perm:'change' %}
-<span class="dropdown show">
-  <a class="btn btn-sm btn-outline-info dropdown-toggle" href="#"
-     role="button" id="import-dropdown" data-toggle="dropdown"
-     aria-haspopup="true" aria-expanded="false"
-     title="{% trans 'Import recipe' %}">
-    <span class="fas fa-arrow-left" />
-    <span class="fas fa-clipboard-list" />
-  </a>
-  <div class="dropdown-menu" aria-labelledby="phase-dropdown">
-    {% for recipe in view.list_recipes %}
-    <a class="dropdown-item"
-       href="{% url 'batch_import_phases' object.pk %}?recipe={{ recipe.id }}">
-      {{ recipe }}
-    </a>
-    {% endfor %}
-  </div>
-</span>
-{% endif %}
-
 <!--a class="btn btn-outline-success btn-sm"
    href="{% url 'transfer' view.ct_id object.id %}"
    data-toggle="tooltip" data-placement="right" title="{% trans 'Transfer' %}">
@@ -47,6 +27,14 @@
 {% endblock %}
 
 
+{% block title %}
+<div class="badge rounded-circle" style="background-color: {{ view.get_color }}">
+  {% icon object %}
+</div>
+{{ object }}
+{% endblock title %}
+
+
 {% block content %}
 
 {% with active_tab='details' %}
@@ -57,7 +45,7 @@
   <dt class="col-sm-3">Volume (planned/actual)</dt>
   <dd class="col-sm-9">{{ object.volume_projected }} / {{ object.volume }}
     {% if object.volume_projected > object.volume %}
-    <i class="text-warning" data-toggle="tooltip" data-placement="top"
+    <i class="text-danger" data-toggle="tooltip" data-placement="top"
 	     title="{% trans 'Brew volume too low' %}">
       <span class="fas fa-exclamation-triangle">
       </span>
@@ -70,14 +58,21 @@
   </dd>
   <dt class="col-sm-3">Processing time</dt>
   <dd class="col-sm-9">
-    {{ object.get_processing_time.days|floatformat:2 }} days
+    {{ object.get_processing_time.days|floatformat:2 }} {% trans 'days' %}
+    {% if not object.list_phases.exists %}
+    <i class="text-danger" data-toggle="tooltip" data-placement="top"
+	     title="{% trans 'No phases are defined, so default is shown' %}">
+      <span class="fas fa-exclamation-triangle">
+      </span>
+    </i>
+    {% endif %}
   </dd>
   <dt class="col-sm-3">{% trans 'Start date (planned/actual)' %}</dt>
   <dd class="col-sm-9">
     {{ object.start_date_projected|date:"d-m-Y" }} /
     {{ object.start_date|date:"d-m-Y" }}
     {% if object.start_date_projected < object.start_date %}
-    <i class="text-warning" data-toggle="tooltip" data-placement="top"
+    <i class="text-danger" data-toggle="tooltip" data-placement="top"
 	     title="{% trans 'Start date too late' %}">
       <span class="fas fa-exclamation-triangle">
       </span>
@@ -96,24 +91,30 @@
     </i>
     {% endif %}
   </dd>  
-  <dt class="col-sm-3">{% trans 'Color' %}</dt>
-  <dd class="col-sm-9">
-    <div class="rounded-circle batch-marker"
-	 style="background-color: {{ view.get_color }}">
-    </div>
-  </dd>
 </dl>
 
 
 <section>
-  <h2>{% icon 'product' %} {% trans 'Deliverables' %}</h2>
+  <h2>{% icon 'product' %} {% trans 'Deliverables' %}
+
+    {% if user|push:'deliverable'|has_model_perm:'add' %}
+    <a class="btn btn-outline-success btn-sm"
+       href="{% url 'inline_create' 'batch' object.pk 'deliverable' %}"
+       data-toggle="tooltip" data-placement="right"
+       title="{% trans 'Add deliverable' %}">
+      <span class="fas fa-plus" />
+    </a>
+    {% endif %}
+
+  </h2>
 
   <table class="table table-striped">
     <thead>
       <tr>
-	<th>Product</th>
-	<th>Amount</th>
-	<th>Volume</th>
+	<th>{% trans 'Product' %}</th>
+	<th>{% trans 'Amount' %}</th>
+	<th>{% trans 'Volume' %}</th>
+	<th>{% trans 'Deadline' %}</th>
       </tr>
     </thead>
     <tbody>
@@ -124,6 +125,7 @@
 	</td>
 	<td>{{ product.amount }}</td>
 	<td>{{ product.total_volume }}</td>
+	<td>{{ product.deadline }}</td>
       </tr>
       {% endfor %}
       <tr>
@@ -132,6 +134,7 @@
 	<th>
 	  {{ object.total_product_volume }}
 	</th>
+	<th />
       </tr>
     </tbody>
   </table>
@@ -214,7 +217,7 @@
   {% if dates %}
   <h2>Tank planning</h2>
 
-  <table class="table table-bordered table-sm">
+  <table class="table table-bordered table-sm schedule">
     <thead>
       <tr>
 	<th scope="col" />
@@ -259,6 +262,49 @@
   {% endif %}
   {% endwith %}
 
-{% include 'snippets/schema.html' %}
 
+<section>
+  <h2>{% icon 'phase' %} {% trans 'Phases' %}
+
+    {% if object.mode != 'ro' %}
+    <span class="dropdown show">
+      <a class="btn btn-sm btn-outline-success dropdown-toggle" href="#"
+	 role="button" id="phase-dropdown" data-bs-toggle="dropdown"
+	 aria-haspopup="true" aria-expanded="false"
+	 title="{% trans 'Add phase' %}">
+	<span class="fas fa-plus" />
+      </a>
+      <div class="dropdown-menu" aria-labelledby="phase-dropdown">
+	{% for phase in view.phase_vocab %}
+	<a class="dropdown-item"
+	   href="{% url 'addphase' view.ctype object.pk phase.name %}">
+	  {{ phase }}</a>
+	{% endfor %}
+      </div>
+    </span>
+    {% endif %}
+    {% if user|push:object|has_obj_perm:'change' %}
+    <span class="dropdown show">
+      <a class="btn btn-sm btn-outline-info dropdown-toggle" href="#"
+	 role="button" id="import-dropdown" data-bs-toggle="dropdown"
+	 aria-haspopup="true" aria-expanded="false"
+	 title="{% trans 'Import recipe' %}">
+	{% trans 'Import from recipe' %}
+      </a>
+      <div class="dropdown-menu" aria-labelledby="phase-dropdown">
+	{% for recipe in view.list_recipes %}
+	<a class="dropdown-item"
+	   href="{% url 'batch_import_phases' object.pk %}?recipe={{ recipe.id }}">
+	  {{ recipe }}
+	</a>
+	{% endfor %}
+      </div>
+    </span>
+    {% endif %}
+  </h2>
+  
+  {% include 'snippets/schema.html' %}
+
+</section>
+  
 {% endblock content %}

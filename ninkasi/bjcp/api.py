@@ -8,7 +8,7 @@ from ninkasi.utils import cache
 
 
 LIST_STYLES_QRY = """query getAllBeerStyles {
-    beerStyles(%PARAMS) {
+    beerStyles(%PARAMS, pagination: { pageSize: 200 }) {
     data {
     id
       attributes {

@@ -1,24 +1,24 @@
-{% extends 'bootstrap4/bootstrap4.html' %}
+{% extends 'django_bootstrap5/bootstrap5.html' %}
 
-{% load i18n bootstrap4 static ninkasi_tags %}
+{% load i18n django_bootstrap5 static ninkasi_tags %}
 
-{% block bootstrap4_title %}Ninkasi - Beer QA{% endblock %}
+{% block bootstrap5_title %}Ninkasi - Beer QA{% endblock %}
 
-{% block bootstrap4_extra_head %}
+{% block bootstrap5_extra_head %}
 <link rel="stylesheet"
       xxhref="https://use.fontawesome.com/releases/v5.6.3/css/all.css"
-      href="/static/fontawesome/css/all.css"
+      href="/static/fontawesome-free/css/all.css"
       xxintegrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/"
       crossorigin="anonymous">
 <link rel="stylesheet"
       href="{% static 'ninkasi.css' %}" type="text/css">
 {% endblock %}
 
-{% block bootstrap4_extra_script %}
-<script type="text/javascript" src="{% static 'ninkasi.js' %}"></script>
+{% block bootstrap5_extra_script %}
+<!--script type="text/javascript" src="{% static 'ninkasi.js' %}"></script-->
 {% endblock %}
 
-{% block bootstrap4_content %}
+{% block bootstrap5_content %}
 <nav class="navbar navbar-dark bg-dark navbar-expand-lg">
   <a class="navbar-brand" href="{% url 'home' %}">
     <i class="fas fa-beer-mug-empty"></i>
@@ -35,73 +35,99 @@
 
       <li class="nav-item dropdown {% if view.view_name.0 == 'system' %}active{% endif %}">
         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
-	   role="button" data-toggle="dropdown" aria-haspopup="true"
+	   role="button" data-bs-toggle="dropdown" aria-haspopup="true"
 	   aria-expanded="false">
 	  {% trans 'System' %}	  
         </a>
-        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-	  <a class="dropdown-item" href="{% url 'list' model='tank' %}">
-	    {% trans 'Tanks' %}
-	  </a>
-	  <a class="dropdown-item" href="{% url 'list' model='brewhouse' %}">
-	    {% trans 'Brewhouses' %}
-	  </a>	  	  
-	  <a class="dropdown-item" href="{% url 'list' model='unit' %}">
-	    {% trans 'Units' %}
-	  </a>
-	  <a class="dropdown-item" href="{% url 'list' model='quantity' %}">
-	    {% trans 'Quantities' %}
-	  </a>	  
-	  <a class="dropdown-item" href="{% url 'list' model='metaphase' %}">
-	    {% trans 'Phases' %}
-	  </a>
-	  <a class="dropdown-item" href="{% url 'list' model='category' %}">
-	    {% trans 'Categories' %}
-	  </a>
-	  <a class="dropdown-item" href="{% url 'list' model='style' %}">
-	    {% trans 'Styles' %}
-	  </a>	  
-        </div>
+        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+	  <li>
+	    <a class="dropdown-item" href="{% url 'list' model='tank' %}">
+	      {% trans 'Tanks' %}
+	    </a>
+	  </li>
+	  <li>
+	    <a class="dropdown-item" href="{% url 'list' model='brewhouse' %}">
+	      {% trans 'Brewhouses' %}
+	    </a>
+	  </li>
+	  <li>
+	    <a class="dropdown-item" href="{% url 'list' model='unit' %}">
+	      {% trans 'Units' %}
+	    </a>
+	  </li>
+	  <li>
+	    <a class="dropdown-item" href="{% url 'list' model='quantity' %}">
+	      {% trans 'Quantities' %}
+	    </a>
+	  </li>
+	  <li>
+	    <a class="dropdown-item" href="{% url 'list' model='metaphase' %}">
+	      {% trans 'Phases' %}
+	    </a>
+	  </li>
+	  <li>	    
+	    <a class="dropdown-item" href="{% url 'list' model='category' %}">
+	      {% trans 'Categories' %}
+	    </a>
+	  </li>
+	  <li>
+	    <a class="dropdown-item" href="{% url 'list' model='style' %}">
+	      {% trans 'Styles' %}
+	    </a>
+	  </li>
+        </ul>
       </li>
 
       <li class="nav-item dropdown {% if view.view_name.0 == 'material' %}active{% endif %}">
         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
-	   role="button" data-toggle="dropdown" aria-haspopup="true"
+	   role="button" data-bs-toggle="dropdown" aria-haspopup="true"
 	  aria-expanded="false"> {% trans 'Materials' %}
         </a>
-        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-	  <a class="dropdown-item" href="{% url 'list' model='material' %}">
-	    {% trans 'General' %}
-	  </a>
-	  <a class="dropdown-item" href="{% url 'list' model='ingredient' %}">
-	    {% trans 'Ingredients' %}
-	  </a>
-	  <a class="dropdown-item" href="{% url 'list' model='product' %}">
-	    {% trans 'Products' %}
-	  </a>	  
-        </div>
+        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+	  <li>
+	    <a class="dropdown-item" href="{% url 'list' model='material' %}">
+	      {% trans 'General' %}
+	    </a>
+	  </li>
+	  <li>	 
+	    <a class="dropdown-item" href="{% url 'list' model='ingredient' %}">
+	      {% trans 'Ingredients' %}
+	    </a>
+	  </li>
+	  <li>
+	    <a class="dropdown-item" href="{% url 'list' model='product' %}">
+	      {% trans 'Products' %}
+	    </a>
+	  </li>
+        </ul>
       </li>
 
       <li class="nav-item dropdown {% if view.view_name.0 == 'tasks' %}active{% endif %}">
         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
-	   role="button" data-toggle="dropdown" aria-haspopup="true"
+	   role="button" data-bs-toggle="dropdown" aria-haspopup="true"
 	   aria-expanded="false">
 	  {% trans 'Tasks' %}	  
         </a>
-        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-	  <a class="dropdown-item"
-	     href="{% url 'list' model='scheduledtask' %}">
-	    {% trans 'Scheduled' %}
-	  </a>
-	  <a class="dropdown-item"
-	     href="{% url 'list' model='milestonescheduledtask' %}">
-	    {% trans 'Milestone scheduled' %}
-	  </a>
-	  <a class="dropdown-item"
-	     href="{% url 'list' model='repeatedscheduledtask' %}">
-	    {% trans 'Repeat scheduled' %}
-	  </a>	  
-        </div>	
+        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+	  <li>
+	    <a class="dropdown-item"
+	       href="{% url 'list' model='scheduledtask' %}">
+	      {% trans 'Scheduled' %}
+	    </a>
+	  </li>
+	  <li>
+	    <a class="dropdown-item"
+	       href="{% url 'list' model='milestonescheduledtask' %}">
+	      {% trans 'Milestone scheduled' %}
+	    </a>
+	  </li>
+	  <li>
+	    <a class="dropdown-item"
+	       href="{% url 'list' model='repeatedscheduledtask' %}">
+	      {% trans 'Repeat scheduled' %}
+	    </a>
+	  </li>
+        </ul>	
       </li>      
       <li class="nav-item {% if view.view_name.0 == 'beer' %}active{% endif %}">
 	<a class="nav-link" href="{% url 'list' model='beer' %}">

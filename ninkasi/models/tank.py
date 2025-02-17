@@ -2,30 +2,29 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from .container import Container
 from ..milestones import MilestoneProviderModel
+from ..tanks import Tank as BaseTank
 
 
-TTYPE_VOCAB = [
-    (0, "Fermentation"),
-    (1, "BBT"),
-    (2, "Lagering")
-]
-
-
-class Tank(Container):
+class Tank(Container, MilestoneProviderModel, BaseTank):
 
     """Container for brew. May be any type of tank that holds beer in
-    any stage of the process, i.e. CCT, BBT, lagertank.
+    any stage of the process, i.e. CCT, BBT, lagertank. Subclass
+    nikasi,Tank and your model should show up in 'Add' lists.
 
     """
 
-    ttype = models.SmallIntegerField(_("Type"),
-                                     default=0,
-                                     choices=TTYPE_VOCAB,
-                                     )
-
     def __str__(self):
 
-        return self.name
+        return f"{ self.get_real().__class__.__name__ } { self.name }"
+
+    @classmethod
+    def list_milestones(cls):
+
+        """Tanks provide milestones in the scheme of things: fill and
+        empty"""
+
+        return [f"ninkasi.{ cls._meta.model_name }.fill",
+                f"ninkasi.{ cls._meta.model_name }.empty"]
 
     def content(self, date):
 
@@ -47,7 +46,7 @@ class Tank(Container):
         """ List all tasks for this tank. This is the list of tasks in the
         maintenance schema. """
 
-        return self.maintenance_schema.all()
+        return []
 
     class Meta:
 
@@ -68,18 +67,11 @@ class BBT(Tank):
         verbose_name_plural = _("BBTs")
 
 
-class CCT(Tank, MilestoneProviderModel):
+class CCT(Tank):
 
     """ Conical-cylindrical tank """
 
     cone_loss = models.SmallIntegerField(_("Amount lost in cone."))
-
-    @classmethod
-    def list_milestones(cls):
-
-        """The metaphase is an milestone provider, but per instance"""
-
-        return ["ninkasi.cct.fill", "ninkasi.cct.empty"]
 
     class Meta:
 

@@ -250,3 +250,27 @@ class BatchTasks(BatchDetailView):
         """ List all tasks for the batch """
 
         return self.object.task.all()
+
+
+class BatchMaterials(BatchDetailView):
+
+    """ View on all tasks associated with this batch """
+
+    template_name = "batch_materials.html"
+
+    def list_materials(self):
+
+        """List all needed materials, not just the ones specified on
+        the batch through BatchMaterials.
+
+        """
+
+        materials = []
+
+        for deliverable in self.object.list_deliverables():
+
+            for pmaterial in deliverable.product.list_productmaterials():
+
+                materials.append(pmaterial.material)
+
+        return materials

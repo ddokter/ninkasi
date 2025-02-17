@@ -30,7 +30,7 @@
       </span>
       {% endif %}
 
-      <div class="float-right">
+      <div class="float-end">
         {% if user|push:item|has_obj_perm:'change' %}
         {% inline_edit_action item object %}
         {% endif %}

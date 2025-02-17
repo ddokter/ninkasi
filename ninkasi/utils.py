@@ -2,6 +2,7 @@
 
 import hashlib
 from django.core.cache import cache as base_cache
+from django.utils.text import camel_case_to_spaces
 
 
 def class_implements(clazz, superclazz, check_self=True):
@@ -84,3 +85,13 @@ def obj_cache(time=None):
             return result
         return wrapper
     return decorator
+
+
+def get_listing_label(obj):
+
+    """ Get the name to be shown for listings """
+
+    try:
+        return f"{ obj._meta.verbose_name }s"
+    except AttributeError:
+        return f"{ camel_case_to_spaces(obj.__class__.__name__) }s"

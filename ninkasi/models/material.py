@@ -36,7 +36,8 @@ class ParentedMaterial(models.Model):
     unit = models.ForeignKey("Unit", on_delete=models.CASCADE)
     material = models.ForeignKey(Material, on_delete=models.CASCADE)
     brand = models.CharField(null=True, blank=True, max_length=100)
-    batchnr = models.CharField(_("Batch Nr"), max_length=100)
+    batchnr = models.CharField(_("Batch Nr"), max_length=100,
+                               null=True, blank=True)
 
     def __str__(self):
 

@@ -5,7 +5,8 @@ from .views.base import (DeleteView, ListingView, DetailView, CreateView,
                          UpdateView, InlineCreateView, InlineUpdateView,
                          InlineDeleteView)
 from .views.batch import (BatchCreateView, BatchDetailView, BatchTasks,
-                          BatchImportPhasesView, BatchMeasurements)
+                          BatchImportPhasesView, BatchMeasurements,
+                          BatchMaterials)
 from .views.recipe import RecipeDetailView, RecipeListingView
 from .views.style import StyleListingView
 from .views.sample import SampleCreateView, SampleUpdateView
@@ -15,6 +16,7 @@ from .views.brew import (BrewDetailView, BrewCreateView, BrewUpdateView,
 from .views.phase import (PhaseMoveStepView, PhaseView, AddPhaseView,
                           MovePhaseView)
 from .views.beer import BeerCreateView, BeerUpdateView
+from .views.tank import TankListingView
 from .views.home import Home, FixTask
 from .views.planner import PlannerView
 from .views.agenda import AgendaView
@@ -77,6 +79,10 @@ urlpatterns = [
     path('batch/<int:pk>/tasks',
          BatchTasks.as_view(),
          name="batch_tasks"),
+
+    path('batch/<int:pk>/materials',
+         BatchMaterials.as_view(),
+         name="batch_materials"),
 
     path('batch/<int:pk>/importphases',
          BatchImportPhasesView.as_view(),
@@ -167,6 +173,10 @@ urlpatterns = [
     # path('tank/<int:pk>/edit',
     #     TankUpdateView.as_view(),
     #     name="edit_tank"),
+
+    path('tank/list',
+         TankListingView.as_view(),
+         name="list_tanks"),
 
 
     # Generic delete view

@@ -1,4 +1,4 @@
-{% load i18n bootstrap4 %}
+{% load i18n django_bootstrap5 %}
 
 <form action="
 	      {% if step.steplog %}
@@ -13,12 +13,10 @@
   {% csrf_token %}
   {% bootstrap_form form %}
 
-  {% buttons %}
   <button type="submit" class="btn btn-primary">
     {% trans 'Save' %}
   </button>
   <button type="button" class="btn btn-secondary"
 	  data-dismiss="modal">{% trans 'Close' %}</button>  
-  {% endbuttons %}
   
 </form>

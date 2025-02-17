@@ -11,7 +11,7 @@ from django.utils.safestring import mark_safe
 from django.utils import timezone
 from django.forms import models as model_forms
 from markdown import markdown
-from ninkasi.utils import get_model_name
+from ninkasi.utils import get_model_name, get_listing_label
 from ninkasi.models.task import ScheduledTask
 from ninkasi.models.step import StepLog
 from ninkasi.views.base import InlineCreateView
@@ -352,21 +352,31 @@ def task(_task):
 @register.inclusion_tag("snippets/breadcrumbs.html", takes_context=True)
 def breadcrumbs(context):
 
-    """ Render snippet for breadcrumb trail """
+    """Render snippet for breadcrumb trail. If the view is an object
+    view, add parents to the path, of the listing if no parents
+    exist.
+
+    """
 
     path = []
 
-    if context['object']:
+    if 'object' in context:
 
         obj = context['object']
 
-        path.append(obj)
+        path.append((obj, detail_url(obj)))
+
+        if not hasattr(obj, "get_parent"):
+
+            path.append((get_listing_label(obj), listing_url(obj)))
 
         while getattr(obj, "get_parent", None):
 
             obj = obj.get_parent()
 
             if obj:
-                path.insert(0, obj)
+                path.append((obj, detail_url(obj)))
+
+    path.reverse()
 
     return {'path': path}

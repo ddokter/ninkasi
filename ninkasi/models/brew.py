@@ -45,7 +45,7 @@ class Brew(models.Model, OrderedContainer, MilestoneProviderModel):
 
         return self.batch.beer.recipes
 
-    def list_materials(self):
+    def list_brewmaterials(self):
 
         return self.brewmaterial_set.all()
 
@@ -128,10 +128,11 @@ class Brew(models.Model, OrderedContainer, MilestoneProviderModel):
         TODO: how to make volume configurable?
         """
 
-        if self.list_measurements().filter(quantity__name="Volume").exists():
-            return self.list_measurements().filter(
-                quantity__name="Volume"
-            ).last().value
+        if self.list_qualitychecks().filter(
+                qc__quantity__name="Volume").exists():
+            return self.list_qualitychecks().filter(
+                qc__quantity__name="Volume"
+            ).last().actual
 
         return self.volume_projected
 

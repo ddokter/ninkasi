@@ -7,6 +7,7 @@ from .step import Step, MashStep
 from .brew import Brew
 from .task import MilestoneScheduledTask
 from .phase import Phase
+from .qualitycheck import QualityCheck
 
 
 @receiver(post_save, sender=Brew)
@@ -18,6 +19,19 @@ def brew_post_save(sender, instance, **kwargs):
             date__lt=instance.date).exists():
         instance.batch.date = instance.date
         instance.batch.save()
+
+    for check in QualityCheck.objects.filter(
+            milestone__in=instance.list_milestones()):
+
+        kwargs = {'qc': check}
+
+        if check.constant:
+            kwargs['projected'] = check.constant
+
+        if check.margin:
+            kwargs['margin'] = check.margin
+
+        instance.brewqualitycheck_set.create(**kwargs)
 
 
 @receiver(pre_save, sender=Step)

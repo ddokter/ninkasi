@@ -382,13 +382,22 @@ class DeleteView(GenericMixin, BaseDeleteView):
 class ListingView(GenericMixin, FormView, CTypeMixin):
 
     permission = "ninkasi.manage_products"
-    template_name = "base_listing.html"
     form_class = SearchForm
     query = None
     view_type = "list"
 
+    def get_template_names(self):
+
+        """ Override for returning a specific or the default template """
+
+        if self.template_name:
+            return [self.template_name]
+
+        return [f"{ self.ctype }_listing.html", "base_listing.html"]
+
     def list_items(self):
 
+        """ Return the items to be shown in the actual list """
         items = self.model.objects.all()
 
         if getattr(self.model, "_prefetch_related", None):

@@ -68,10 +68,6 @@ class Batch(models.Model, OrderedContainer, MilestoneProviderModel):
 
         return f"{self.beer.name} - #{self.nr}"
 
-    def get_parent(self):
-
-        return None
-
     @property
     def start_date_projected(self):
 
@@ -186,14 +182,14 @@ class Batch(models.Model, OrderedContainer, MilestoneProviderModel):
 
         return start
 
-    def list_materials(self):
+    def list_batchmaterials(self):
 
         """ List all materials, also of sub brews """
 
         batch_materials = self.batchmaterial_set.all()
 
         for brew in self.list_brews():
-            batch_materials = batch_materials.union(brew.list_materials())
+            batch_materials = batch_materials.union(brew.list_brewmaterials())
 
         return batch_materials
 
@@ -322,14 +318,19 @@ class BatchContainer(models.Model):
 
 class Deliverable(models.Model):
 
-    """ Relate batch to proucts """
+    """Relate batch to product to be delivered."""
 
     batch = models.ForeignKey(Batch, on_delete=models.CASCADE)
     product = models.ForeignKey("Product", on_delete=models.CASCADE)
     amount = models.SmallIntegerField()
+    deadline = models.DateTimeField(null=True, blank=True)
 
     def total_volume(self):
 
         """ Return the total volume of the batchproduct """
 
         return self.amount * self.product.get_liter_volume()
+
+    def __str__(self):
+
+        return f"{ self.product } * { self.amount }"

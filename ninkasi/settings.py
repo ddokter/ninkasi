@@ -15,7 +15,6 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
@@ -38,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
-    'bootstrap4',
+    'django_bootstrap5',
     'ninkasi',
     'ninkasi.brewfather',
     'ninkasi.bjcp'
@@ -138,17 +137,13 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-BOOTSTRAP4 = {
+BOOTSTRAP5 = {
     "css_url": {
-        "href": "/static/bootstrap4/css/bootstrap.css"
+        "url": "/static/bootstrap/dist/css/bootstrap.css"
     },
-    'include_jquery': True,
     "javascript_url": {
-        "url": "/static/bootstrap4/js/bootstrap.bundle.js"
+        "url": "/static/bootstrap/dist/js/bootstrap.bundle.js"
     },
-    "jquery_url": {
-        "url": "/static/bootstrap4/js/jquery-3.2.1.js"
-    }
 }
 
 

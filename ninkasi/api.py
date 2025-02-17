@@ -1,6 +1,7 @@
 """ API definitions for Ninkasi """
 
 from django.apps import apps
+from django.utils.text import camel_case_to_spaces
 from .ordered import OrderedContainer
 
 
@@ -9,7 +10,13 @@ class APIConnectionException(Exception):
     """ Whenever an API cannot be reached, this exception should be raised """
 
 
-class Style:
+class Base:
+
+    """ Base class. Empty for now.
+    """
+
+
+class Style(Base):
 
     """Base style class, defining what Ninkasi expects of a
     beerstyle. All models must implement the methods described here.
@@ -32,7 +39,7 @@ class Style:
         """ Style identifier """
 
 
-class Recipe:
+class Recipe(Base):
 
     """ Base recipe class, defining what Ninkasi expects of a recipe. All
     recipe models must implement the methods described here.
@@ -72,7 +79,7 @@ class Recipe:
         """ Arguments must be milestone and Quantity object """
 
 
-class Batch:
+class Batch(Base):
 
     """ Base batch class
     """

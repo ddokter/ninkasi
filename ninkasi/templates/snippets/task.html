@@ -16,14 +16,15 @@
 	{% priority task %} {{ task }}
 
 	{% if details %}
-	<a data-toggle="collapse" class="collapsed"
-	   href="#task_details_{{ task.id }}" role="button" aria-expanded="false"
+	<a data-bs-toggle="collapse" class="collapsed"
+	   href="#task_details_{{ task.id }}" role="button"
+	   aria-expanded="false"
 	   aria-controls="task_details_{{ task.id }}">
-	  <i class="show" data-toggle="tooltip" data-placement="right"
+	  <i class="show" data-bs-toggle="tooltip" data-placement="right"
 	     title="{% trans 'Show details' %}">
 	    <span class="fas fa-caret-down"></span>
 	  </i>
-	  <i class="hide" data-toggle="tooltip" data-placement="right"
+	  <i class="hide" data-bs-toggle="tooltip" data-placement="right"
 	     title="{% trans 'Hide details' %}">
 	    <span class="fas fa-caret-up"></span>
 	  </i>

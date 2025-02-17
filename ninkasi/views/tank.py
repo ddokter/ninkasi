@@ -1,16 +1,20 @@
-from django.utils.translation import gettext_lazy as _
-from django.http import HttpResponseRedirect
-from django.forms import inlineformset_factory
-from .base import CreateView, UpdateView
+from ninkasi.tanks import TankRegistry
 from ..models.tank import Tank
-from ..models.task import Task
+from .base import ListingView
 
 
-class TankCreateView(CreateView):
+class TankListingView(ListingView):
+
+    """ Override base listing to add tank vocab
+
+    """
 
     model = Tank
 
+    def tank_vocab(self):
 
-class TankUpdateView(UpdateView):
+        """ Fetch all possible tank types """
 
-    model = Tank
+        for tank in TankRegistry.list_tanks():
+
+            yield tank

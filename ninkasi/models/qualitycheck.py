@@ -7,10 +7,10 @@ from ..milestones import MilestoneRegistry
 
 
 OFFSET_HELP = _("Offset to milestone. Use negative amounts to "
-                "specify before")
+                "specify time before")
 
-CONSTANT_HELP = _("If the quantity can be specifed across recipes, "
-                  "define the projected value here.")
+CONSTANT_HELP = _("If the quantity can be specified as constant across"
+                  "recipes, define the projected value here.")
 
 
 def milestone_vocab():
@@ -24,8 +24,8 @@ class QualityCheck(models.Model):
 
     """Define quantities that should be measured at the given
     milestone. Ninkasi does not make any assumptions on what checks to
-    do, the brewery itself should decide what quantities are defining
-    their beer.
+    do, the brewery itself should decide what measurements are
+    defining the quality of their beer.
 
     """
 
@@ -41,4 +41,10 @@ class QualityCheck(models.Model):
 
         """ Return readable quality check """
 
-        return f"{ self.quantity } @ { self.milestone } { self.offset }"
+        _str = f"{ self.quantity } @ { self.milestone }"
+
+        if self.offset.amount:
+
+            _str += f" { self.offset.get_sign() } { self.offset }"
+
+        return _str

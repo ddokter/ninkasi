@@ -11,8 +11,17 @@
 * add warning when inventory not sufficient for planned brews
 
 * use batch projected volume and subtract losses to calculate brew
-  volumes
+  volumes. If the produced volume is less than the start volume minus
+  all losses in transfers, warn.
 
 * calculate timings of brewhouse based on measurements
 
 * Make metaphase measurements into targets for brew/batch
+
+* Tanks should go into a registry for listing types, for example when
+  one needs to add a tank of a certain type.
+
+* Should we introduce 'Deliverables'? So something with a deadline for
+  a given customer that consists of Products?
+
+* Batch materials should follow from deliverables and ingredients.

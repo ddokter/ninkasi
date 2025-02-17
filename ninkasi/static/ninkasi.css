@@ -9,19 +9,19 @@ td.brewhouse.full {
 td.empty {
 }
 
-a[data-toggle=collapse] i.show {
+a[data-bs-toggle=collapse] i.show {
     display: none;
 }
 
-a[data-toggle=collapse].collapsed i.show {
+a[data-bs-toggle=collapse].collapsed i.show {
     display: inherit;
 }
 
-a[data-toggle=collapse] i.hide {
+a[data-bs-toggle=collapse] i.hide {
     display: inherit;
 }
 
-a[data-toggle=collapse].collapsed i.hide {
+a[data-bs-toggle=collapse].collapsed i.hide {
     display: none;
 }
 
@@ -73,4 +73,8 @@ table.calendar {
 .form-group.required label:after {
   content:" *";
   color:red;
+}
+
+table.schedule td.highlighted {
+    background-color:#FF6961;
 }
