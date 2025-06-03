@@ -1,6 +1,7 @@
 """ BJCP style implementation """
 
 from django.conf import settings
+from django.urls import reverse
 from ninkasi.api import Style as BaseStyle
 from ninkasi.bjcp import api
 
@@ -16,6 +17,14 @@ class Style(BaseStyle):
     _data = {}
     mode = "ro"
 
+    def get_url(self, mode):
+
+        if mode == 'view':
+
+            return reverse('bjcp_view_style', kwargs={'pk': self.id})
+
+        return "#"
+    
     def __init__(self, data):
 
         self._data = data
@@ -32,7 +41,7 @@ class Style(BaseStyle):
     @property
     def id(self):
 
-        return self.data['id']
+        return self.data['number']
 
     @property
     def name(self):
@@ -42,7 +51,7 @@ class Style(BaseStyle):
     @property
     def color(self):
 
-        return f"{ self.data['srmMin'] },{ self.data['srmMax'] }"
+        return f"{ self.data['srmmin'] },{ self.data['srmmax'] }"
 
     @property
     def data(self):

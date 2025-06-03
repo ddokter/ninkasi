@@ -1,71 +1,18 @@
-from gql import gql, Client
-from gql.transport.aiohttp import AIOHTTPTransport
-from aiohttp.client_exceptions import ClientConnectorError
-from gql.transport.exceptions import TransportServerError
+from pathlib import Path
+import json
 from django.conf import settings
 from ninkasi.api import APIConnectionException
 from ninkasi.utils import cache
 
 
-LIST_STYLES_QRY = """query getAllBeerStyles {
-    beerStyles(%PARAMS, pagination: { pageSize: 200 }) {
-    data {
-    id
-      attributes {
-        reference
-        name,
-        overallImpression,
-        aroma,
-        appearance,
-        flavor,
-        mouthfeel,
-        comments,
-        entryInstructions,
-        history,
-        characteristicIngredients,
-        styleComparison,
-        vitalStatistics
-        shortDescription
-        ibuMin
-        ibuMax
-        fgMin
-        fgMax
-        ogMin
-        ogMax
-        srmMin
-        srmMax
-        abvMin
-        abvMax
-        style_tag_references {
-         data {
-           id
-           attributes {
-            tag
-            description
-           }
-          }
-        }
-    }
-  }
-}
-}
-"""
-
-
-def _call(qry):
+def _call():
 
     """ Call API with the given query and return the JSON result """
 
-    # Select your transport with a defined url endpoint
-    transport = AIOHTTPTransport(url=settings.BJCP_API_URL)
+    path = Path(__file__).with_name('styles.json')
 
-    # Create a GraphQL client using the defined transport
-    client = Client(transport=transport, fetch_schema_from_transport=False)
-
-    query = gql(qry)
-
-    # Execute the query on the transport
-    return client.execute(query)
+    with path.open('r') as f:
+        return json.load(f)
 
 
 @cache(time=3600)
@@ -74,18 +21,21 @@ def list_styles():
     """ Return listing of style definitions """
 
     try:
-        return _call(LIST_STYLES_QRY.replace('%PARAMS', 'sort: "id"'))
-    except (ClientConnectorError, TransportServerError) as exc:
-        raise APIConnectionException from exc
+        return _call()
+    except:
+        raise APIConnectionException
 
 
 @cache(time=3600)
 def get_style(_id):
 
-    """ Show one style """
+    """ Show one style
+    TODO: this is a tad dumbass.
+    """
 
     try:
-        return _call(LIST_STYLES_QRY.replace(
-            '%PARAMS', f'filters: {{ id: {{ eq: { _id } }} }}'))
-    except (ClientConnectorError, TransportServerError) as exc:
-        raise APIConnectionException from exc
+        for style in _call():
+            if style['number'] == _id:
+                return style
+    except:
+        raise APIConnectionException

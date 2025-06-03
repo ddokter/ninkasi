@@ -8,10 +8,9 @@ CHANGES = open(os.path.join(here, 'CHANGES.txt')).read()
 
 requires = [
     'Django',
-    'django-bootstrap4',
+    'django-bootstrap5',
     'requests',
     'django_extensions',
-    'gql',
     'markdown'
     ]
 

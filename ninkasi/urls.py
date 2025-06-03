@@ -29,6 +29,8 @@ urlpatterns = [
 
     path('brewfather/', include('ninkasi.brewfather.urls')),
 
+    path('bjcp/', include('ninkasi.bjcp.urls')),
+    
     path('login/',
          LoginView.as_view(),
          name="login"),

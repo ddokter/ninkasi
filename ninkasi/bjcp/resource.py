@@ -19,17 +19,14 @@ class StyleResource(Resource):
 
     def list(self):
 
-        """ List styles from BJCP api as bjcp.Style objects """
+        """ List styles from BJCP resource as bjcp.Style objects """
 
         styles = []
 
         try:
-            for style in list_styles()['beerStyles']['data']:
+            for style in list_styles():
 
-                data = style['attributes']
-                data['id'] = style['id']
-
-                styles.append(Style(data))
+                styles.append(Style(style))
         except APIConnectionException:
             LOGGER.exception("Couldn't get styles from BJCP API")
 
@@ -40,12 +37,9 @@ class StyleResource(Resource):
         """ return one single  style by the given BJCP id """
 
         try:
-            style = get_style(_id)['beerStyles']['data'][0]
+            style = get_style(_id)
 
-            data = style['attributes']
-            data['id'] = style['id']
-
-            return Style(data)
+            return Style(style)
         except APIConnectionException:
             LOGGER.exception("Couldn't get style from BJCP API")
             return None

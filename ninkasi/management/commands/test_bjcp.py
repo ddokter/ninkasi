@@ -21,7 +21,7 @@ class Command(BaseCommand):
         if options['verbosity'] > 1:
             self.stdout.write("Calling BJCP API")
 
-        res = api.get_style(16)
+        res = api.list_styles()  #api.get_style(16)
 
         if options['verbosity'] > 2:
             self.stdout.write(str(res))
