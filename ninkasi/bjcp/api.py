@@ -1,5 +1,5 @@
-from pathlib import Path
 import json
+import importlib
 from django.conf import settings
 from ninkasi.api import APIConnectionException
 from ninkasi.utils import cache
@@ -9,10 +9,8 @@ def _call():
 
     """ Call API with the given query and return the JSON result """
 
-    path = Path(__file__).with_name('styles.json')
-
-    with path.open('r') as f:
-        return json.load(f)
+    with importlib.resources.open_text("ninkasi.bjcp", "styles.json") as file:
+        return json.load(file) 
 
 
 @cache(time=3600)
