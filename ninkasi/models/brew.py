@@ -8,6 +8,7 @@ from ..ordered import OrderedContainer
 from .material import Material, ParentedMaterial
 from ..milestones import MilestoneProviderModel
 from ..duration import Duration
+from .task import MilestoneScheduledTask
 
 
 class Brew(models.Model, OrderedContainer, MilestoneProviderModel):
@@ -110,31 +111,39 @@ class Brew(models.Model, OrderedContainer, MilestoneProviderModel):
     @property
     def volume_projected(self):
 
-        """ Check quality checks for final volume """
+        """Check quality checks projected volume. If none exists,
+        take the brewhouse volume.
+
+        """
 
         if self.list_qualitychecks().filter(
-                qc__milestone="ninkasi.brew.end").exists():
+                actual__isnull=False,
+                qc__milestone="ninkasi.brew.end",
+                qc__quantity__name="Volume").exists():
             return self.list_qualitychecks().filter(
-                qc__milestone="ninkasi.brew.end").first().projected
+                actual__isnull=False,
+                qc__milestone="ninkasi.brew.end",
+                qc__quantity__name="Volume"
+            ).first().projected or 0
 
-        return 0
+        return self.brewhouse.volume
 
     @property
     def volume(self):
 
         """The brew volume is the volume of the last measurement
-        taken.
-
-        TODO: how to make volume configurable?
+        taken, if there is one. Otherwise 0 will be returned. 
         """
 
         if self.list_qualitychecks().filter(
+                actual__isnull=False,
                 qc__quantity__name="Volume").exists():
             return self.list_qualitychecks().filter(
+                actual__isnull=False,
                 qc__quantity__name="Volume"
             ).last().actual
 
-        return self.volume_projected
+        return 0
 
     def import_phases(self, recipe_id):
 
@@ -172,6 +181,24 @@ class Brew(models.Model, OrderedContainer, MilestoneProviderModel):
                         kwargs['margin'] = check.margin
 
                     self.brewqualitycheck_set.create(**kwargs)
+
+    def generate_tasks(self, **kwargs):
+
+        """Create tasks associated with this brew, if at all possible.
+
+        """
+
+        if not self.date:
+            return False
+
+        kwargs.update({'parent': self, 'date': self.date})
+
+        for milestone in self.list_milestones():
+
+            for task in MilestoneScheduledTask.objects.filter(
+                    milestone=milestone):
+
+                task.generate_tasks(**kwargs)
 
     class Meta:
 

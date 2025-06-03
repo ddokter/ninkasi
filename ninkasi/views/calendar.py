@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 import calendar
 
 
@@ -56,3 +56,21 @@ class Calendar:
             'month': now.month,
             'year': now.year
             }
+
+    @property
+    def week(self):
+
+        """ Get the current week """
+
+        now = date.today()
+        dates = [now + timedelta(days=i)
+                 for i in range(0 - now.weekday(), 7 - now.weekday())]
+        
+        return {
+            'title': now.isocalendar()[1],
+            'days': dates,
+            'today': now,
+            'month': now.month,
+            'year': now.year
+            }
+        

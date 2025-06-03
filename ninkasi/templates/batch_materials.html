@@ -1,0 +1,31 @@
+{% extends 'batch_detail.html' %}
+
+{% load i18n ninkasi_tags %}
+
+{% block content %}
+
+{% with active_tab='materials' %}
+{% include 'snippets/batch_tabs.html' %}
+{% endwith %}
+
+<section class="materials">
+
+  <ul class="list-group">
+    {% for material in view.list_materials %}
+    <li class="list-group-item">
+      {{ material }}
+    </li>
+    {% endfor %}
+  </ul>
+
+  <ul class="list-group">
+    {% for material in object.list_batchmaterials %}
+    <li class="list-group-item">
+      {{ material }}
+    </li>
+    {% endfor %}
+  </ul>
+
+</section>
+
+{% endblock %}

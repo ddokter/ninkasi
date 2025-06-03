@@ -12,6 +12,9 @@
       crossorigin="anonymous">
 <link rel="stylesheet"
       href="{% static 'ninkasi.css' %}" type="text/css">
+
+{% block extra_css %}
+{% endblock %}
 {% endblock %}
 
 {% block bootstrap5_extra_script %}
@@ -192,7 +195,9 @@
 <div class="container">
   {% autoescape off %}{% bootstrap_messages %}{% endautoescape %}
 
+  {% block breadcrumbs %}
   {% breadcrumbs %}
+  {% endblock %}
 
   <h1>
     {% block title %}{% endblock %}

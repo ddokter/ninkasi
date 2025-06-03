@@ -1,0 +1,28 @@
+{% extends 'base_listing.html' %}
+
+{% load i18n ninkasi_tags %}
+
+{% block actions %}
+{% if user|push:view.ctype|has_model_perm:'add' %}
+
+<a type="button"
+   class="btn btn-outline-secondary btn-sm dropdown-bs-toggle"
+   href="#"
+   role="button"
+   id="tankDropdown"
+   data-bs-toggle="dropdown"
+   aria-haspopup="true"
+   aria-expanded="false">
+  <span class="fas fa-plus" />
+</a>
+<div class="dropdown-menu" aria-labelledby="tankDropdown">
+  {% for tank in view.tank_vocab %}
+  <a class="dropdown-item" href="{% url 'create' model=tank %}">
+    {% trans tank %}
+  </a>
+  {% endfor %}
+</div>
+
+{% endif %}
+
+{% endblock %}

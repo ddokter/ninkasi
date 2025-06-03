@@ -1,0 +1,34 @@
+{% extends 'base_detail.html' %}
+
+{% load i18n ninkasi_tags %}
+
+{% block extra_actions %}
+
+{% if user|push:'sample'|has_obj_perm:'change' %}
+{% if not task.is_done %}
+<a class="btn btn-outline-default btn-sm rounded-circle"
+   href="{% url 'fixtask' object.id %}"
+   data-toggle="tooltip" data-placement="right"
+   title="{% trans 'Set task status to done' %}">
+  <span class="fas fa-check" />
+</a>
+{% endif %}
+{% endif %}
+
+{% endblock %}
+
+
+{% block content %}
+
+<dl class="row">
+  <dt class="col-sm-3">{% trans 'Description' %}</dt>
+  <dd class="col-sm-9">{{ object.description }}</dd>
+  <dt class="col-sm-3">{% trans 'Priority' %}</dt>
+  <dd class="col-sm-9">{{ object.priority }}</dd>
+  <dt class="col-sm-3">{% trans 'Status' %}</dt>
+  <dd class="col-sm-9">{{ object.status }}</dd>
+  <dt class="col-sm-3">{% trans 'Estimated time needed' %}</dt>
+  <dd class="col-sm-9">{{ object.estimated_time }}</dd>
+</dl>
+
+{% endblock %}

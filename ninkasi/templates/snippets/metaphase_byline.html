@@ -1,0 +1,10 @@
+{% extends 'snippets/byline.html' %}
+
+{% load i18n %}
+
+{% block content %}
+{% trans 'Applies to' %}:
+{% for model in obj.list_parent_models %}
+{{ model.name }}
+{% endfor %}
+{% endblock %}

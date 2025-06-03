@@ -182,6 +182,8 @@ def doc(model):
 @register.filter
 def get(iterable, idx):
 
+    """ Get indexed value from iterable """
+
     return iterable.get(idx, None)
 
 

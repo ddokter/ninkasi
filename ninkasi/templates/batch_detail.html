@@ -133,6 +133,15 @@
 	<th />
 	<th>
 	  {{ object.total_product_volume }}
+
+	  {% if object.total_product_volume > object.volume %}
+          <i class="text-danger" data-toggle="tooltip" data-placement="top"
+	     title="{% trans 'Batch volume too low' %}">
+	    <span class="fas fa-exclamation-triangle">
+	    </span>
+	  </i>
+	  {% endif %}
+
 	</th>
 	<th />
       </tr>

@@ -2,9 +2,11 @@ from datetime import datetime
 from django.views.generic import TemplateView
 from ..models.task import (ScheduledTask, RepeatedScheduledTask, Task,
                            TaskFactory)
+from ..models.brew import Brew
+from .calendar import Calendar
 
 
-class Home(TemplateView):
+class Home(TemplateView, Calendar):
 
     """ Dashboard """
 
@@ -34,17 +36,31 @@ class Home(TemplateView):
 
         return tasks
 
+    def get_data(self):
 
-class FixTask(Home):
+        """ Generate data for calendar. Loop over tanks and brewhouses,
+        and display the calendar. """
 
-    """ Set task to done. TODO: this should be done Ajax style """
+        data = {}
 
-    def get(self, request, *args, **kwargs):
+        for day in self.get_current_week()['days']:
 
-        """ Shortcut to moving of phases """
+            data[day] = list(ScheduledTask.objects.for_date(day))
 
-        if kwargs.get('task'):
+            for task in RepeatedScheduledTask.objects.filter(date__lt=day):
+                if task.is_due_date(day):
+                    data[day].append(task)
 
-            Task.objects.filter(pk=kwargs['task']).update(status=1)
+        return data
 
-        return super().get(request, *args, **kwargs)
+    def get_current_week(self):
+
+        return self.week
+
+    def planned_brews(self):
+
+        """ List all brews that are scheduled """\
+
+        today = datetime.now()
+
+        return Brew.objects.filter(date__gt=today)

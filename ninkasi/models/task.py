@@ -173,20 +173,20 @@ class MilestoneScheduledTask(Task, TaskFactory):
 
     def generate_tasks(self, **kwargs):
 
-        """ Generate tasks based on the given milestone. The kwargs must
+        """ Generate tasks based on the given (meta) milestone. The kwargs must
         contain a date and may contain a time. """
 
         if 'date' not in kwargs:
             raise KeyError("'date' must be specified in kwargs")
 
         self.milestonetasksub_set.filter(
-            name=kwargs['name'],
             object_id=kwargs['parent'].id,
             content_type=ContentType.objects.get_for_model(kwargs['parent']).id
         ).delete()
 
         kwargs.update(priority=self.priority,
                       precision=self.precision,
+                      name=self.name,
                       description=self.description
                       )
 

@@ -23,8 +23,14 @@ def brew_post_save(sender, instance, **kwargs):
     for check in QualityCheck.objects.filter(
             milestone__in=instance.list_milestones()):
 
+        # recreate qcs
+        #
         kwargs = {'qc': check}
 
+        instance.brewqualitycheck_set.filter(
+            **kwargs,
+            actual__isnull=True).delete()
+        
         if check.constant:
             kwargs['projected'] = check.constant
 
@@ -32,6 +38,8 @@ def brew_post_save(sender, instance, **kwargs):
             kwargs['margin'] = check.margin
 
         instance.brewqualitycheck_set.create(**kwargs)
+
+        instance.generate_tasks()
 
 
 @receiver(pre_save, sender=Step)

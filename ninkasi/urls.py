@@ -17,7 +17,8 @@ from .views.phase import (PhaseMoveStepView, PhaseView, AddPhaseView,
                           MovePhaseView)
 from .views.beer import BeerCreateView, BeerUpdateView
 from .views.tank import TankListingView
-from .views.home import Home, FixTask
+from .views.home import Home
+from .views.task import FixTask
 from .views.planner import PlannerView
 from .views.agenda import AgendaView
 from .views.transfer import TransferView
@@ -56,7 +57,7 @@ urlpatterns = [
 
     path('', Home.as_view(), name="home"),
 
-    path('task/fix/<int:task>/',
+    path('task/fix/<int:pk>/',
          FixTask.as_view(),
          name="fixtask"),
 

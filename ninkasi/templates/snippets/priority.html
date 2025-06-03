@@ -1,7 +1,7 @@
 {% if task.priority == 1 %}
-<span class="badge text-bs-danger">{{ task.get_priority_display }}</span>
+<span class="badge text-bg-danger">{{ task.get_priority_display }}</span>
 {% elif task.priority == 3 %}
-<span class="badge text-bs-warning">{{ task.get_priority_display }}</span>
+<span class="badge text-bg-warning">{{ task.get_priority_display }}</span>
 {% else %}
-<span class="badge text-bs-info">{{ task.get_priority_display }}</span>
+<span class="badge text-bg-info">{{ task.get_priority_display }}</span>
 {% endif %}

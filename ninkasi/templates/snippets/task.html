@@ -1,62 +1,22 @@
 {% load i18n ninkasi_tags %}
 
 {% with details=task.get_details %}
-<div class="card">
-  <div class="card-body">
-    <div class="card-title">
-      <div class="alert
-		  {% if task.is_done %}
-		  alert-success
-		  {% elif task.is_due %}
-		  alert-danger
-		  {% else %}
-		  alert-info
-		  {% endif %}
-		  ">
-	{% priority task %} {{ task }}
-
-	{% if details %}
-	<a data-bs-toggle="collapse" class="collapsed"
-	   href="#task_details_{{ task.id }}" role="button"
-	   aria-expanded="false"
-	   aria-controls="task_details_{{ task.id }}">
-	  <i class="show" data-bs-toggle="tooltip" data-placement="right"
-	     title="{% trans 'Show details' %}">
-	    <span class="fas fa-caret-down"></span>
-	  </i>
-	  <i class="hide" data-bs-toggle="tooltip" data-placement="right"
-	     title="{% trans 'Hide details' %}">
-	    <span class="fas fa-caret-up"></span>
-	  </i>
-	</a>
-	{% endif %}
-
-	<div class="float-right">
-	  {{ task.get_deadline }}
-	  {% if task.is_due %}
-	  <i class="fas fa-exclamation-triangle"></i>
-	  {% endif %}
-
-	  {% if not task.is_done %}
-	  <a class="btn btn-outline-default btn-sm rounded-circle"
-	     href="{% url 'fixtask' task.id %}"
-	     data-toggle="tooltip" data-placement="right"
-	     title="{% trans 'Set task status to done' %}">
-	    <span class="fas fa-check" />
-	  </a>
-	  {% endif %}
-	</div>
-      </div>
-    </div>
-    <div class="card-text collapse" id="task_details_{{ task.id }}">
-      <dl class="row">
-	{% for k, v in details.1.items %}
-	<dt class="col-sm-3">{{ k }}</dt>
-	<dd class="col-sm-9">{{ v }}</dd>
-	{% endfor %}
-      </dl>
-      {{ details.0 }}
-    </div>
+<div class="alert
+	    {% if task.is_done %}
+	    alert-success
+	    {% elif task.is_due %}
+	    alert-danger
+	    {% else %}
+	    alert-info
+	    {% endif %}
+	    ">
+  {% priority task %} <a href="{{ task|detail_url }}">{{ task }}</a>
+  
+  <div class="float-end">
+    {{ task.get_deadline }}
+    {% if task.is_due %}
+    <i class="fas fa-exclamation-triangle"></i>
+    {% endif %}
   </div>
 </div>
 {% endwith %}
