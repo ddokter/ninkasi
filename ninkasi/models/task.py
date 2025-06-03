@@ -245,7 +245,7 @@ class RepeatedScheduledTask(ScheduledTask, TaskFactory):
 
         if self.frequency == 1:
             if (
-                    abs((self.date - _date.date()).days) %
+                    abs((self.date - _date).days) %
                     (7 * self.frequency_modifier) == 0):
                 return True
 
