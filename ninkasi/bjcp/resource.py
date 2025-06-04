@@ -34,7 +34,7 @@ class StyleResource(Resource):
 
     def get(self, _id):
 
-        """ return one single  style by the given BJCP id """
+        """ return one single style by the given BJCP id """
 
         try:
             style = get_style(_id)

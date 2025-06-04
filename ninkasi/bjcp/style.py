@@ -27,7 +27,7 @@ class Style(BaseStyle):
     
     def __init__(self, data):
 
-        self._data = data
+        self.data = data
 
     def __str__(self):
 
@@ -51,17 +51,7 @@ class Style(BaseStyle):
     @property
     def color(self):
 
-        return f"{ self.data['srmmin'] },{ self.data['srmmax'] }"
-
-    @property
-    def data(self):
-
-        """ Get data from BrewFather and store in memory.
-        TODO: cache in a better way
-        """
-
-        if not getattr(self, "_data", None):
-
-            self._data = api.get_style(self.id)
-
-        return self._data
+        if 'srmmin' in self.data and 'srmmax' in self.data:
+            return f"{ self.data['srmmin'] },{ self.data['srmmax'] }"
+        else:
+            return "Unknown"
