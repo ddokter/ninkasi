@@ -9,11 +9,10 @@ class FixTask(DetailView):
     """ Set task to done. TODO: this should be done Ajax style """
 
     def get(self, request, *args, **kwargs):
+        """ Set the task to done """
 
-        """ Shortcut to moving of phases """
+        if kwargs.get('pk'):
 
-        if kwargs.get('task'):
-
-            Task.objects.filter(pk=kwargs['task']).update(status=1)
+            Task.objects.filter(pk=kwargs['pk']).update(status=1)
 
         return super().get(request, *args, **kwargs)
