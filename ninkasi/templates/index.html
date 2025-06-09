@@ -85,16 +85,9 @@
 	  <tr>
 	    {% for day in week.days %}
 	    <td {% if day == week.today %}class="today"{% endif %}>
-	      <ul class="list-group">
-		{% for task in data|get:day %}
-		<li class="list-group-item"
-		  data-bs-toggle="tooltip"
-		    data-bs-placement="bottom"
-		    title="{{ task.get_details.0 }}">
-		  {% task task %}
-		</li>
-		{% endfor %}
-	      </ul>
+	      {% for task in data|get:day %}
+	      {% task task %}
+	      {% endfor %}
 	    </td>
 	    {% endfor %}
 	  </tr>
