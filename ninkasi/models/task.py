@@ -293,6 +293,12 @@ class MilestoneTaskSub(ScheduledTask):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
 
+    def get_deadline(self):
+
+        """ Add (or subtract) offset from deadline """
+
+        return super().get_deadline() + self.factory.offset.as_timedelta()
+    
     def get_details(self):
 
         details = super().get_details()

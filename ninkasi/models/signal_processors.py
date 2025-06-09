@@ -39,7 +39,7 @@ def brew_post_save(sender, instance, **kwargs):
 
         instance.brewqualitycheck_set.create(**kwargs)
 
-        instance.generate_tasks()
+    instance.generate_tasks()
 
 
 @receiver(pre_save, sender=Step)

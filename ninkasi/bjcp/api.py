@@ -32,8 +32,8 @@ def get_style(_id):
     """
 
     try:
-        for style in _call():
-            if style['number'] == _id:
-                return style
+        for rec in _call():
+            if rec['number'] == _id:
+                return rec
     except:
         raise APIConnectionException

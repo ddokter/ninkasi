@@ -191,7 +191,8 @@ class Brew(models.Model, OrderedContainer, MilestoneProviderModel):
         if not self.date:
             return False
 
-        kwargs.update({'parent': self, 'date': self.date})
+        kwargs.update({'parent': self, 'date': self.date.date(),
+                       'time': self.date.time()})
 
         for milestone in self.list_milestones():
 

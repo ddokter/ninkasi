@@ -19,12 +19,12 @@
 
 
 {% block content %}
-
+{% with obj=object.get_real %}
 <dl class="row">
   <dt class="col-sm-3">{% trans 'Description' %}</dt>
-  <dd class="col-sm-9">{{ object.description }}</dd>
+  <dd class="col-sm-9">{{ obj.description }}</dd>
   <dt class="col-sm-3">{% trans 'Priority' %}</dt>
-  <dd class="col-sm-9">{% priority object %}</dd>
+  <dd class="col-sm-9">{% priority obj %}</dd>
   <dt class="col-sm-3">{% trans 'Status' %}</dt>
   <dd class="col-sm-9">
     <div class="badge
@@ -36,12 +36,14 @@
 	    text-bg-primary
 	    {% endif %}
 	    ">
-      {{ object.get_status_display }}
+      {{ obj.get_status_display }}
     </div>
 
   </dd>
   <dt class="col-sm-3">{% trans 'Estimated time needed' %}</dt>
-  <dd class="col-sm-9">{{ object.estimated_time }}</dd>
+  <dd class="col-sm-9">{{ obj.estimated_time }}</dd>
+  <dt class="col-sm-3">{% trans 'Deadline' %}</dt>
+  <dd class="col-sm-9">{{ obj.get_deadline }}</dd>  
 </dl>
-
+{% endwith %}
 {% endblock %}
