@@ -22,7 +22,7 @@ class Brewhouse(Container):
 
     """
 
-    warmup = models.SmallIntegerField(_("Warmup time per degree C"),
+    warmup = models.FloatField(_("Warmup time per degree C"),
                                       help_text=WARMUP_HELP)
     next_brew_delay = DurationField(_("Minimal brewtime before next brew"),
                                     help_text=NEXT_HELP)
