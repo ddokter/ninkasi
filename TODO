@@ -28,3 +28,5 @@
 
 * When a task is defined, it should also generate tasks based on what
   is already there, like brews, etc.
+
+* when a brew is in a batch (stacked), no tank task needs to be created.

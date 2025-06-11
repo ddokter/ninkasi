@@ -18,3 +18,9 @@ class TankListingView(ListingView):
         for tank in TankRegistry.list_tanks():
 
             yield tank
+
+    def list_items(self):
+
+        for tank in super().list_items():
+
+            yield tank.get_real()
