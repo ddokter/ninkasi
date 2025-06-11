@@ -14,14 +14,14 @@
 
     {% csrf_token %}
 
-    {% buttons %}
-    <button type="submit" class="btn btn-primary">
-      {% trans 'Yes' %}
-    </button>
-    <a href="{{ view.cancel_url }}" class="btn btn-default">
-      {% trans 'Cancel' %}
-    </a>
-    {% endbuttons %}
+    <div class="btn-group" role="group" aria-label="Form controls">    
+      <button type="submit" class="btn btn-primary">
+	{% trans 'Yes' %}
+      </button>
+      <a href="{{ view.cancel_url }}" class="btn btn-default">
+	{% trans 'Cancel' %}
+      </a>
+    </div>
 
 </form>
 

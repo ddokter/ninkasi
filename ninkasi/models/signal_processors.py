@@ -27,17 +27,16 @@ def brew_post_save(sender, instance, **kwargs):
         #
         kwargs = {'qc': check}
 
-        instance.brewqualitycheck_set.filter(
-            **kwargs,
-            actual__isnull=True).delete()
-        
         if check.constant:
             kwargs['projected'] = check.constant
 
         if check.margin:
             kwargs['margin'] = check.margin
 
-        instance.brewqualitycheck_set.create(**kwargs)
+        if not instance.brewqualitycheck_set.filter(qc=check).exists():
+            instance.brewqualitycheck_set.create(**kwargs)
+        else:
+            instance.brewqualitycheck_set.update(**kwargs)
 
     instance.generate_tasks()
 
