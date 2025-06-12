@@ -38,7 +38,16 @@ class Brew(models.Model, OrderedContainer, MilestoneProviderModel):
 
     def __str__(self):
 
-        return f"{self.batch.nr} - {self.batch.beer}"
+        return (f"#{self.batch.nr} brew nr.{self.order_in_batch}"
+                f"- {self.batch.beer}")
+
+    @property
+    def order_in_batch(self):
+
+        """ return the order in the batch, starting from 1 """
+
+        return [id for id in self.batch.list_brews().values_list(
+            "id", flat=True).order_by("date")].index(self.id) + 1
 
     def list_recipes(self):
 
@@ -132,7 +141,7 @@ class Brew(models.Model, OrderedContainer, MilestoneProviderModel):
     def volume(self):
 
         """The brew volume is the volume of the last measurement
-        taken, if there is one. Otherwise 0 will be returned. 
+        taken, if there is one. Otherwise 0 will be returned.
         """
 
         if self.list_qualitychecks().filter(
@@ -236,7 +245,7 @@ class BrewQualityCheck(models.Model):
 
         """ Return readable quality check """
 
-        return f"{ self.qc }"
+        return f"{self.qc}"
 
     def is_ok(self):
 

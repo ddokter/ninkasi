@@ -64,3 +64,9 @@ class Home(TemplateView, Calendar):
         today = datetime.now()
 
         return Brew.objects.filter(date__gt=today)
+
+    def get_current_brews(self):
+
+        today = datetime.now()
+
+        return Brew.objects.filter(date__date=today)

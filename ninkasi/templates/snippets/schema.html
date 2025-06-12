@@ -90,7 +90,7 @@
 		{% else %}
 		title="{% trans 'Add log' %}"
 		{% endif %}
-		data-toggle="modal" data-target="#{{ phase.id }}_log">
+		data-bs-toggle="modal" data-bs-target="#{{ phase.id }}_log">
 	  {% if step.steplog %}
 	  <span class="fas fa-pencil" />
 	  {% else %}
@@ -106,7 +106,8 @@
 	    <div class="modal-content">
 	      <div class="modal-header">
 		<h5 class="modal-title" id="{{ phase.id }}_log_label">Log</h5>
-		<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+		<button type="button" class="close" data-bs-dismiss="modal"
+			aria-label="Close">
 		  <span aria-hidden="true">&times;</span>
 		</button>
 	      </div>

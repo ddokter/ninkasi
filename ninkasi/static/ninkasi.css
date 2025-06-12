@@ -43,10 +43,6 @@ table.calendar td {
     height: 80px;
 }
 
-table.calendar td.today, th.today {
-    background-color: #bae2e4;
-}
-
 table.calendar td, th {
     width: 14%;
 }

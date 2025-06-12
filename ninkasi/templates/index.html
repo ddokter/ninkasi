@@ -15,6 +15,28 @@
 
 {% block content %}
 
+{% with brews=view.get_current_brews %}
+{% if brews %}
+<section class="card brew">
+  <div class="card-header">{% trans "Now brewing" %}</div>
+  <div class="card-body">
+  
+    <ul class="list-group list-group-flush">
+      {% for brew in brews %}
+      <li class="list-group-item list-group-item-success">
+	<a href="{{ brew|detail_url }}">{{ brew }}</a>
+	
+	<div class="float-end">
+	  {{ brew.date|date:"l j b" }}
+	</div>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+{% endif %}
+{% endwith %}
+
 <div class="row">
   <div class="col-sm-4 mb-3 mb-sm-0">
 
@@ -33,7 +55,7 @@
   </div>
 
   <div class="col-sm-4">
-    <section class="tasks card border-warning">
+    <section class="tasks card border-danger">
       <div class="card-header">{% trans "Open tasks" %}</div>
       <div class="card-body">
 	<ul class="list-group list-group-flush">
@@ -74,7 +96,7 @@
 	<thead>
 	  <tr>
 	    {% for day in week.days %}
-	    <th {% if day == week.today %}class="today"{% endif %}>
+	    <th {% if day == week.today %}class="table-primary"{% endif %}>
 	      {{ day|date:"l j b" }}
 	    </th>
 	    {% endfor %}
@@ -84,7 +106,7 @@
 	  {% with data=view.get_data %}
 	  <tr>
 	    {% for day in week.days %}
-	    <td {% if day == week.today %}class="today"{% endif %}>
+	    <td {% if day == week.today %}class="table-primary"{% endif %}>
 	      {% for task in data|get:day %}
 	      {% task task %}
 	      {% endfor %}
