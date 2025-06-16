@@ -238,7 +238,7 @@ class RepeatedScheduledTask(ScheduledTask, TaskFactory):
         """ Check whether the task should be done on this date """
 
         if isinstance(_date, datetime):
-            _date = _date.date
+            _date = _date.date()
 
         if self.date == _date:
             return True
