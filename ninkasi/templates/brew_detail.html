@@ -67,7 +67,16 @@
 </dl>
 
 
-<h2>Materials</h2>
+<h2>Materials
+  {% if user|push:'brewmaterial'|has_model_perm:'add' %}
+  <a class="btn btn-outline-success btn-sm"
+     href="{% url 'inline_create' 'brew' object.pk 'brewmaterial' %}"
+     data-toggle="tooltip" data-placement="right"
+     title="{% trans 'Add material' %}">
+    <span class="fas fa-plus" />
+  </a>
+  {% endif %}
+</h2>
 
 <table class="table table-striped">
   <thead>

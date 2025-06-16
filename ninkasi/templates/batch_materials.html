@@ -10,21 +10,26 @@
 
 <section class="materials">
 
-  <ul class="list-group">
-    {% for material in view.list_materials %}
-    <li class="list-group-item">
-      {{ material }}
-    </li>
-    {% endfor %}
-  </ul>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>{% trans 'Material' %}</th>
+      <th>{% trans 'Amount' %}</th>
+      <th>{% trans 'Unit' %}</th>
+      <th>{% trans 'Brand' %}</th>
+      <th>{% trans 'Batch nr' %}</th>      
+    </tr>
+  </thead>
 
-  <ul class="list-group">
-    {% for material in object.list_batchmaterials %}
-    <li class="list-group-item">
-      {{ material }}
-    </li>
-    {% endfor %}
-  </ul>
+  {% for material in view.list_materials %}
+  <tr>
+    <td>{{ material }}</td>
+    <td>{{ material.amount }}</td>
+    <td>{{ material.unit }}</td>
+    <td>{{ material.brand }}</td>
+    <td>{{ material.batchnr }}</td>
+  </tr>
+  {% endfor %}
 
 </section>
 

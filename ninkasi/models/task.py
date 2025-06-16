@@ -87,7 +87,7 @@ class Task(BaseModel):
         if self == real:
             return self.name
 
-        return f"{ str(real) } [{ real.get_status_display() }]"
+        return f"{str(real)}"
 
     def get_details(self):
 
@@ -201,8 +201,8 @@ class MilestoneScheduledTask(Task, TaskFactory):
         if sign == "-":
             sign = ""
 
-        return _(f"{ self.name } within { self.precision } of "
-                 f"{ self.milestone } { sign }{ self.offset }")
+        return _(f"{self.name} within {self.precision} of "
+                 f"{self.milestone} {sign}{self.offset}")
 
     class Meta:
         app_label = "ninkasi"
@@ -236,6 +236,9 @@ class RepeatedScheduledTask(ScheduledTask, TaskFactory):
     def is_due_date(self, _date):
 
         """ Check whether the task should be done on this date """
+
+        if isinstance(_date, datetime):
+            _date = _date.date
 
         if self.date == _date:
             return True
@@ -298,7 +301,7 @@ class MilestoneTaskSub(ScheduledTask):
         """ Add (or subtract) offset from deadline """
 
         return super().get_deadline() + self.factory.offset.as_timedelta()
-    
+
     def get_details(self):
 
         details = super().get_details()

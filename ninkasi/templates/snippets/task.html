@@ -10,8 +10,15 @@
 	    alert-info
 	    {% endif %}
 	    ">
-  {% priority task %} <a href="{{ task|detail_url }}">{{ task }}</a>
-  
+  {% priority task %} <a href="{{ task|detail_url }}">
+    {% if task.is_done %}
+    <del>{{ task }}</del>
+    <i class="fas fa-check"></i>
+    {% else %}
+    {{ task }}
+    {% endif %}
+  </a>
+
   <div class="float-end">
     {{ task.get_deadline }}
     {% if task.is_due and not task.is_done %}
