@@ -283,7 +283,7 @@ class RepeatedTaskSub(ScheduledTask):
 
     def __str__(self):
 
-        return str(self.parent)
+        return str(self.factory)
 
 
 class MilestoneTaskSub(ScheduledTask):
