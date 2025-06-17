@@ -39,6 +39,10 @@ a[data-bs-toggle=collapse].collapsed i.hide {
     margin-bottom: 20px;
 }
 
+table.calendar {
+    background-color: #f0f0f0 !important;
+}
+
 table.calendar td {
     height: 80px;
 }

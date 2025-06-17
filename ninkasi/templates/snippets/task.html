@@ -19,6 +19,7 @@
     {% endif %}
   </a>
 
+  {% if not simple %}
   <div class="float-end">
     {{ task.get_deadline }}
     {% if task.is_due and not task.is_done %}
@@ -26,5 +27,6 @@
     {% endif %}
   </div>
   <div class="clearfix"></div>
+  {% endif %}
 </div>
 {% endwith %}

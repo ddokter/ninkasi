@@ -26,7 +26,7 @@
   </a>
 </h2>
 
-<table class="table table-bordered table-sm calendar">
+<table class="table table-bordered table-sm table-light calendar">
   <thead>
     <tr>
       <th>{% trans 'Monday' %}</th>
@@ -44,19 +44,23 @@
     {% for week in month.weeks %}
     <tr>
       {% for day in week %}
-      <td {% if day == month.today.date %}class="today"{% endif %}>
+      <td {% if day == month.today.date %}class="table-primary"{% endif %}>
 	{% if day.month != month.month %}
-	<span class="badge badge-pill badge-secondary">
+	<span class="badge rounded-pill text-bg-secondary">
 	  {{ day.day }}
 	</span>
+	{% elif day == month.today.date %}
+	<span class="badge rounded text-bg-warning">
+	  {{ day.day }}
+	</span>	
 	{% else %}
-	<span class="badge badge-pill badge-primary">
+	<span class="badge rounded text-bg-primary">
 	  {{ day.day }}
 	</span>
 	{% endif %}
-	<ul>
+	<ul class="list-group list-group-flush">
 	{% for task in data|get:day %}
-	<li>{{ task }}</li>
+	<li class="list-group-item">{% task task simple=1 %}</li>
 	{% endfor %}
 	</ul>
       </td>

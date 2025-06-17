@@ -38,18 +38,13 @@ class Home(TemplateView, Calendar):
 
     def get_data(self):
 
-        """ Generate data for calendar. Loop over tanks and brewhouses,
-        and display the calendar. """
+        """ Get scheduled tasks for the week """
 
         data = {}
 
         for day in self.get_current_week()['days']:
 
             data[day] = list(ScheduledTask.objects.for_date(day))
-
-            for task in RepeatedScheduledTask.objects.filter(date__lt=day):
-                if task.is_due_date(day):
-                    data[day].append(task)
 
         return data
 

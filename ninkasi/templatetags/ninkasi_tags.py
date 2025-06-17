@@ -139,7 +139,7 @@ def view_action(obj, extra_args=""):
 
     """ render link to detail view as action button """
 
-    return {'url': f"{ detail_url(obj) }{ extra_args }"}
+    return {'url': f"{detail_url(obj)}{extra_args}"}
 
 
 @register.inclusion_tag('snippets/path_detail.html')
@@ -270,7 +270,7 @@ def icon(obj_or_model):
         model = obj_or_model
 
     try:
-        return render_to_string(f"snippets/icon/{ model }.html", {})
+        return render_to_string(f"snippets/icon/{model}.html", {})
     except TemplateDoesNotExist:
         return ""
 
@@ -344,11 +344,11 @@ def priority(_task):
 
 
 @register.inclusion_tag("snippets/task.html", takes_context=False)
-def task(_task):
+def task(_task, **kwargs):
 
     """ Render snippet for task """
 
-    return {'task': _task}
+    return {'task': _task, 'simple': kwargs.get('simple', 0)}
 
 
 @register.inclusion_tag("snippets/breadcrumbs.html", takes_context=True)
