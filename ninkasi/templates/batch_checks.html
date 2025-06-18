@@ -1,0 +1,29 @@
+{% extends 'batch_detail.html' %}
+
+{% load i18n django_bootstrap5 ninkasi_tags %}
+
+{% block content %}
+
+{% bootstrap_messages %}
+
+{% with active_tab='checks' %}
+{% include 'snippets/batch_tabs.html' %}
+{% endwith %}
+
+<h2>{% trans 'Check targets' %}
+
+  {% if user|push:'batchqualitycheck'|has_model_perm:'add' %}
+  <a class="btn btn-outline-success btn-sm"
+     href="{% url 'inline_create' 'batch' object.id 'batchqualitycheck' %}"
+     data-toggle="tooltip" data-placement="right"
+     title="{% trans 'Add measurement' %}">
+    <span class="fas fa-plus" />
+    <span class="fas fa-check-square" />
+  </a>
+  {% endif %}
+
+</h2>
+
+{% listing '' view.list_qcs %}
+
+{% endblock content %}

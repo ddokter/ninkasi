@@ -348,7 +348,7 @@ def task(_task, **kwargs):
 
     """ Render snippet for task """
 
-    return {'task': _task, 'simple': kwargs.get('simple', 0)}
+    return {'task': _task, 'fmt': kwargs.get('fmt', 'dt')}
 
 
 @register.inclusion_tag("snippets/breadcrumbs.html", takes_context=True)

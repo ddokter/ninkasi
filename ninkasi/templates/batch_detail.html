@@ -255,7 +255,7 @@
 	{% for day in row %}
 	{% if day %}
 	{% if forloop.parentloop.last %}
-	<td style="background-color: #ff0000"></td>
+	<td class="table-danger"></td>
 	{% else %}
 	<td style="background-color: {{ view.get_color }}"></td>
 	{% endif %}

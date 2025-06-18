@@ -19,9 +19,15 @@
     {% endif %}
   </a>
 
-  {% if not simple %}
+  {% if fmt != '' %}
   <div class="float-end">
+    {% if fmt == 't' %}
+    {{ task.get_deadline.time }}    
+    {% elif fmt == 'd' %}
+    {{ task.get_deadline.date }}    
+    {% else %}
     {{ task.get_deadline }}
+    {% endif %}
     {% if task.is_due and not task.is_done %}
     <i class="fas fa-exclamation-triangle"></i>
     {% endif %}

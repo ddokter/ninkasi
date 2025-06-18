@@ -2,7 +2,7 @@
 
 from django.db.models.signals import post_save, pre_save, post_delete
 from django.dispatch import receiver
-from .batch import BatchContainer
+from .batch import Batch, BatchContainer
 from .step import Step, MashStep
 from .brew import Brew
 from .task import MilestoneScheduledTask
@@ -41,6 +41,32 @@ def brew_post_save(sender, instance, **kwargs):
     instance.generate_tasks()
 
 
+@receiver(post_save, sender=Batch)
+def batch_post_save(sender, instance, **kwargs):
+
+    """ Generate any tasks on batch milestones """
+
+    for check in QualityCheck.objects.filter(
+            milestone__in=instance.list_milestones()):
+
+        # recreate qcs
+        #
+        kwargs = {'qc': check}
+
+        if check.constant:
+            kwargs['projected'] = check.constant
+
+        if check.margin:
+            kwargs['margin'] = check.margin
+
+        if not instance.batchqualitycheck_set.filter(qc=check).exists():
+            instance.batchqualitycheck_set.create(**kwargs)
+        else:
+            instance.batchqualitycheck_set.update(**kwargs)
+
+    instance.generate_tasks()
+
+
 @receiver(pre_save, sender=Step)
 def step_pre_save(sender, instance, **kwargs):
 
@@ -71,7 +97,7 @@ def batchcontainer_post_save(sender, instance, **kwargs):
                 parent=instance.batch,
                 date=instance.from_date.date(),
                 time=instance.from_date.time(),
-                name=f"{ milestone.name } { instance.tank }"
+                name=f"{milestone.name} {instance.tank}"
             )
 
     if instance.to_date:
@@ -82,7 +108,7 @@ def batchcontainer_post_save(sender, instance, **kwargs):
                 parent=instance.batch,
                 date=instance.to_date.date(),
                 time=instance.to_date.time(),
-                name=f"{ milestone.name } { instance.tank }"
+                name=f"{milestone.name} {instance.tank}"
             )
 
 

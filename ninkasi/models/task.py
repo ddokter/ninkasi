@@ -296,6 +296,15 @@ class MilestoneTaskSub(ScheduledTask):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
 
+    def __str__(self):
+
+        """ Add parent to task name """
+
+        if self.parent:
+            return f"{self.name} [{self.parent.__abbr__()}]"
+        else:
+            return self.name
+
     def get_deadline(self):
 
         """ Add (or subtract) offset from deadline """

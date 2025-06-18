@@ -37,12 +37,12 @@
     <ul class="navbar-nav mr-auto">
 
       <li class="nav-item dropdown {% if view.view_name.0 == 'system' %}active{% endif %}">
-        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
+	<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
 	   role="button" data-bs-toggle="dropdown" aria-haspopup="true"
 	   aria-expanded="false">
-	  {% trans 'System' %}	  
-        </a>
-        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+	  {% trans 'System' %}
+	</a>
+	<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 	  <li>
 	    <a class="dropdown-item" href="{% url 'list' model='tank' %}">
 	      {% trans 'Tanks' %}
@@ -68,7 +68,7 @@
 	      {% trans 'Phases' %}
 	    </a>
 	  </li>
-	  <li>	    
+	  <li>
 	    <a class="dropdown-item" href="{% url 'list' model='category' %}">
 	      {% trans 'Categories' %}
 	    </a>
@@ -78,21 +78,21 @@
 	      {% trans 'Styles' %}
 	    </a>
 	  </li>
-        </ul>
+	</ul>
       </li>
 
       <li class="nav-item dropdown {% if view.view_name.0 == 'material' %}active{% endif %}">
-        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
+	<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
 	   role="button" data-bs-toggle="dropdown" aria-haspopup="true"
 	  aria-expanded="false"> {% trans 'Materials' %}
-        </a>
-        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+	</a>
+	<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 	  <li>
 	    <a class="dropdown-item" href="{% url 'list' model='material' %}">
 	      {% trans 'General' %}
 	    </a>
 	  </li>
-	  <li>	 
+	  <li>
 	    <a class="dropdown-item" href="{% url 'list' model='ingredient' %}">
 	      {% trans 'Ingredients' %}
 	    </a>
@@ -102,16 +102,26 @@
 	      {% trans 'Products' %}
 	    </a>
 	  </li>
-        </ul>
+	  <li>
+	    <a class="dropdown-item" href="{% url 'list' model='brand' %}">
+	      {% trans 'Brands' %}
+	    </a>
+	  </li>
+	  <li>
+	    <a class="dropdown-item" href="{% url 'list' model='stock' %}">
+	      {% trans 'Stock' %}
+	    </a>
+	  </li>
+	</ul>
       </li>
 
       <li class="nav-item dropdown {% if view.view_name.0 == 'tasks' %}active{% endif %}">
-        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
+	<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
 	   role="button" data-bs-toggle="dropdown" aria-haspopup="true"
 	   aria-expanded="false">
-	  {% trans 'Tasks' %}	  
-        </a>
-        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+	  {% trans 'Tasks' %}
+	</a>
+	<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 	  <li>
 	    <a class="dropdown-item"
 	       href="{% url 'list' model='scheduledtask' %}">
@@ -130,8 +140,8 @@
 	      {% trans 'Repeat scheduled' %}
 	    </a>
 	  </li>
-        </ul>	
-      </li>      
+	</ul>
+      </li>
       <li class="nav-item {% if view.view_name.0 == 'beer' %}active{% endif %}">
 	<a class="nav-link" href="{% url 'list' model='beer' %}">
 	  {% trans 'Beers' %}
@@ -141,13 +151,13 @@
 	<a class="nav-link" href="{% url 'list' model='qualitycheck' %}">
 	  {% trans 'Quality checks' %}
 	</a>
-      </li>      
+      </li>
       <li class="nav-item {% if view.view_name.0 == 'recipe' %}active{% endif %}">
 	<a class="nav-link" href="{% url 'list' model='recipe' %}">
 	  {% trans 'Recipes' %}
 	</a>
-      </li>      
-      
+      </li>
+
       <li class="nav-item {% if view.view_name.0 == 'batch' %}active{% endif %}">
 	<a class="nav-link" href="{% url 'list' model='batch' %}">
 	  {% trans 'Batches' %}
@@ -168,7 +178,7 @@
 	    {% trans 'Planner' %}
 	  </a>
       </li>
-      
+
       {% if request.user.is_authenticated %}
       <li class="nav-item dropdown">
 	<a class="nav-link dropdown-toggle"
@@ -214,7 +224,7 @@
   </p>
 
   {% block warnings %}{% endblock %}
-  
+
   {% block content %}{% endblock %}
 </div>
 

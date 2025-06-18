@@ -68,6 +68,12 @@ class Batch(models.Model, OrderedContainer, MilestoneProviderModel):
 
         return f"{self.beer.name} - #{self.nr}"
 
+    def __abbr__(self):
+
+        """ Return short name """
+
+        return f"#{self.nr:08s}"
+
     @property
     def start_date_projected(self):
 
@@ -262,17 +268,21 @@ class Batch(models.Model, OrderedContainer, MilestoneProviderModel):
         if not self.start_time:
             return False
 
+        kwargs.update({'parent': self})
+
         for milestone in self.list_milestones():
 
             if milestone == "ninkasi.batch.start":
-                date = self.start_time
+                date = self.start_time.date()
+                time = self.start_time.time()
             elif milestone == "ninkasi.batch.end":
-                date = self.end_time
+                date = self.delivery_date_projected
+                time = None
 
             for task in MilestoneScheduledTask.objects.filter(
                     milestone=milestone):
 
-                task.generate_tasks(date=date, **kwargs)
+                task.generate_tasks(date=date, time=time, **kwargs)
 
     class Meta:
 
@@ -333,4 +343,39 @@ class Deliverable(models.Model):
 
     def __str__(self):
 
-        return f"{ self.product } * { self.amount }"
+        return f"{self.product} * {self.amount}"
+
+
+class BatchQualityCheck(models.Model):
+
+    """ Define measurements to take during this phase """
+
+    batch = models.ForeignKey(Batch, on_delete=models.CASCADE)
+    qc = models.ForeignKey("QualityCheck", on_delete=models.CASCADE)
+    projected = models.FloatField(blank=True, null=True)
+    margin = models.FloatField(default=0)
+    time = models.DateTimeField(blank=True, null=True)
+    actual = models.FloatField(blank=True, null=True)
+    notes = models.TextField(_("Notes"), null=True, blank=True)
+
+    def get_parent(self):
+
+        """ Return parent batch """
+
+        return self.batch
+
+    def __str__(self):
+
+        """ Return readable quality check """
+
+        return f"{self.qc}"
+
+    def is_ok(self):
+
+        """ See whether the values are ok."""
+
+        if not self.projected and self.actual:
+            return False
+
+        return (self.actual <= self.projected + self.margin and
+                self.actual >= self.projected - self.margin)

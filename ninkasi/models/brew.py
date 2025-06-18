@@ -36,6 +36,12 @@ class Brew(models.Model, OrderedContainer, MilestoneProviderModel):
 
         return self.batch
 
+    def __abbr__(self):
+
+        """ Return the short name of this brew """
+
+        return f"#{self.batch.nr} brew nr.{self.order_in_batch}"
+
     def __str__(self):
 
         return (f"#{self.batch.nr} brew nr.{self.order_in_batch}"

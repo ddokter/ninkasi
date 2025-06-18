@@ -6,7 +6,7 @@ from .views.base import (DeleteView, ListingView, DetailView, CreateView,
                          InlineDeleteView)
 from .views.batch import (BatchCreateView, BatchDetailView, BatchTasks,
                           BatchImportPhasesView, BatchMeasurements,
-                          BatchMaterials)
+                          BatchMaterials, BatchChecks)
 from .views.recipe import RecipeDetailView, RecipeListingView
 from .views.style import StyleListingView
 from .views.sample import SampleCreateView, SampleUpdateView
@@ -30,7 +30,7 @@ urlpatterns = [
     path('brewfather/', include('ninkasi.brewfather.urls')),
 
     path('bjcp/', include('ninkasi.bjcp.urls')),
-    
+
     path('login/',
          LoginView.as_view(),
          name="login"),
@@ -86,6 +86,10 @@ urlpatterns = [
     path('batch/<int:pk>/materials',
          BatchMaterials.as_view(),
          name="batch_materials"),
+
+    path('batch/<int:pk>/checks',
+         BatchChecks.as_view(),
+         name="batch_qualitychecks"),
 
     path('batch/<int:pk>/importphases',
          BatchImportPhasesView.as_view(),
