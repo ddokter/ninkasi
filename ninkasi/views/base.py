@@ -305,7 +305,7 @@ class DetailView(GenericMixin, BaseDetailView, CTypeMixin):
 
         """ provide content type specific permission """
 
-        return f"ninkasi.view_{ self.ctype }"
+        return f"ninkasi.view_{self.ctype}"
 
     def get_template_names(self):
 
@@ -329,7 +329,7 @@ class DetailView(GenericMixin, BaseDetailView, CTypeMixin):
                 continue
 
             try:
-                value = getattr(self.object, f"get_{ field.name }_display")()
+                value = getattr(self.object, f"get_{field.name}_display")()
             except AttributeError:
                 value = getattr(self.object, field.name)
 
@@ -393,7 +393,7 @@ class ListingView(GenericMixin, FormView, CTypeMixin):
         if self.template_name:
             return [self.template_name]
 
-        return [f"{ self.ctype }_listing.html", "base_listing.html"]
+        return [f"{self.ctype}_listing.html", "base_listing.html"]
 
     def list_items(self):
 
@@ -460,4 +460,7 @@ class InlineUpdateView(InlineActionMixin, UpdateView):
 
 class InlineDeleteView(InlineActionMixin, DeleteView):
 
-    pass
+    @property
+    def success_url(self):
+
+        return self.request.META.get('HTTP_REFERER')

@@ -171,12 +171,23 @@ def listing_url(obj):
         return "."
 
 
-@register.filter
+@register.inclusion_tag("snippets/doc.html", takes_context=False)
 def doc(model):
 
-    """ Return object class docstring """
+    """ Render model documentation """
 
-    return mark_safe(markdown(model.__class__.__doc__))
+    txt = model.__class__.__doc__
+    parts = [[], []]
+    idx = 0
+
+    for line in txt.splitlines():
+        if not idx and not line.strip():
+            idx += 1
+        else:
+            parts[idx].append(line)
+
+    return {'lead': mark_safe(markdown("\n".join(parts[0]))),
+            'doc': mark_safe(markdown("\n".join(parts[1])))}
 
 
 @register.filter

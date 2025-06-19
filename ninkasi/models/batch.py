@@ -192,12 +192,16 @@ class Batch(models.Model, OrderedContainer, MilestoneProviderModel):
 
         """ List all materials, also of sub brews """
 
-        batch_materials = self.batchmaterial_set.all()
+        materials = []
+
+        for material in self.batchmaterial_set.all():
+            materials.append(material)
 
         for brew in self.list_brews():
-            batch_materials = batch_materials.union(brew.list_brewmaterials())
+            for material in brew.list_brewmaterials():
+                materials.append(material)
 
-        return batch_materials
+        return materials
 
     def list_tanks(self):
 

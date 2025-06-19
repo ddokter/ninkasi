@@ -267,11 +267,15 @@ class BatchMaterials(BatchDetailView):
 
         materials = []
 
+        for pmaterial in self.object.list_batchmaterials():
+
+            materials.append(pmaterial)
+
         for deliverable in self.object.list_deliverables():
 
             for pmaterial in deliverable.product.list_productmaterials():
 
-                materials.append(pmaterial.material)
+                materials.append(pmaterial)
 
         return materials
 
