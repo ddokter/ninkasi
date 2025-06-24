@@ -1,0 +1,18 @@
+{% load i18n ninkasi_tags %}
+
+<section class="doc">
+  <p>{{ lead }}</p>
+  {% if doc %}
+  <a data-bs-toggle="collapse"
+     href="#readmore"
+     aria-expanded="false"           
+     aria-controls="readmore"
+     title="{% trans 'Read more' %}">
+    {% trans 'Read more' %}
+  </a>
+  <div class="collapse" id="readmore">
+    {{ doc }}
+  </div>
+  {% endif %}
+
+</section>
