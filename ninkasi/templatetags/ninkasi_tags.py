@@ -347,11 +347,15 @@ def url_is_remote(url):
 
 
 @register.inclusion_tag("snippets/priority.html", takes_context=False)
-def priority(_task):
+def priority(_task, **kwargs):
 
     """ Render snippet for task priority """
 
-    return {'task': _task}
+    STATUS = {1: 'danger', 3: 'warning'}
+
+    return {'task': _task,
+            'status': STATUS.get(_task.priority, 'info'),
+            'fmt': kwargs.get('fmt', 'f')}
 
 
 @register.inclusion_tag("snippets/task.html", takes_context=False)

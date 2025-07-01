@@ -22,6 +22,7 @@ from .views.task import FixTask
 from .views.planner import PlannerView
 from .views.agenda import AgendaView
 from .views.transfer import TransferView
+from .views.shoppinglist import ShoppingListView
 
 
 urlpatterns = [
@@ -54,6 +55,10 @@ urlpatterns = [
     path('transfer/',
          TransferView.as_view(),
          name="transfer"),
+
+    path('shoppinglist',
+         ShoppingListView.as_view(),
+         name='shoppinglist'),
 
     path('admin/', admin.site.urls),
 

@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% load ninkasi_tags i18n %}
+
+{% block content %}
+
+<h1>{% trans 'Shopping list' %}</h1>
+
+
+<form action=""
+      method="GET" 
+      class="form">
+
+  {% csrf_token %}
+
+  <div class="mb-3">
+    <label for="date" class="form-label">{% trans 'date' %}</label>
+    <input type="date" class="form-control" name="date"
+	   id="date" aria-describedby="dateHelp">
+    <div id="dateHelp" class="form-text">
+      {% trans 'Get shopping list untill this date' %}
+    </div>
+  </div>  
+
+  <div class="btn-group" role="group" aria-label="Form controls">    
+    <button type="submit" class="btn btn-primary">
+      {% trans 'Set end date' %}
+    </button>
+  </div>
+
+</form>
+
+{% with data=view.get_list %}
+<table class="table table-bordered table-sm month">
+  <thead>
+    <tr>
+      <th scope="col">{% trans 'Product' %}</th>
+      <th scope="col">{% trans 'Amount' %}</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for rec in data %}
+    <tr>
+      <td scope="row">{{ rec.material }}</td>
+      <td scope="row">{{ rec.amount }}{{ rec.unit }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endwith %}
+
+{% endblock %}

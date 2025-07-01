@@ -108,7 +108,7 @@
 	    {% for day in week.days %}
 	    <td {% if day == week.today %}class="table-primary"{% endif %}>
 	      {% for task in data|get:day %}
-	      {% task task %}
+	      {% task task fmt='t' %}
 	      {% endfor %}
 	    </td>
 	    {% endfor %}

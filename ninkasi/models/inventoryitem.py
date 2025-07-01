@@ -2,12 +2,10 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
-class Stock(models.Model):
+class InventoryItem(models.Model):
 
-    """Final product that the brewery turns out. This is the end
-    product of a batch and may be stuff like kegs, bottles, etc.  It
-    is linked to materials, so a deliverable could be N boxes of
-    bottles, that are linked to both a box and N bottles.
+    """Define inventory for the brewery. An inventory item
+    essentially is an amount of materials that is in store.
 
     """
 

@@ -23,7 +23,7 @@ def list_fermentables():
 
     """ Get all fermentables from BrewFather """
 
-    url = "https://api.brewfather.app/v2/inventory/fermentables"
+    url = "https://api.brewfather.app/v2/inventory/fermentables?limit=50"
 
     return _call(url)
 
@@ -41,7 +41,7 @@ def get_recipe(_id):
 
     """ Get one recipe """
 
-    return _call(f"https://api.brewfather.app/v2/recipes/{ _id }")
+    return _call(f"https://api.brewfather.app/v2/recipes/{_id}")
 
 
 @cache(time=3600)
@@ -57,4 +57,4 @@ def get_batch(_id):
 
     """ Get one batch """
 
-    return _call(f"https://api.brewfather.app/v2/batches/{ _id }")
+    return _call(f"https://api.brewfather.app/v2/batches/{_id}")

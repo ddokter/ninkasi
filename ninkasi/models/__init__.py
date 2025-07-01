@@ -15,7 +15,7 @@ from .metaphase import MetaPhase
 from .quantity import Quantity  # noqa
 from .product import Product  # noqa
 from .unit import Unit, Conversion  # noqa
-from .stock import Stock  # noqa
+from .inventoryitem import InventoryItem  # noqa
 from .brand import Brand  # noqa
 
 from .signal_processors import *  # noqa

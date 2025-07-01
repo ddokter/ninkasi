@@ -65,3 +65,13 @@ class Home(TemplateView, Calendar):
         today = datetime.now()
 
         return Brew.objects.filter(date__date=today)
+
+    def get(self, request, *args, **kwargs):
+
+        """ Set the task to done """
+
+        if 'fixtask' in request.GET:
+
+            Task.objects.filter(pk=request.GET['fixtask']).update(status=1)
+
+        return super().get(request, *args, **kwargs)

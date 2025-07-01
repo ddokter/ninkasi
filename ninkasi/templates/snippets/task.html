@@ -10,12 +10,18 @@
 	    alert-info
 	    {% endif %}
 	    ">
-  {% priority task %} <a href="{{ task|detail_url }}">
+  {% priority task fmt='s' %} <a href="{{ task|detail_url }}">
     {% if task.is_done %}
     <del>{{ task }}</del>
     <i class="fas fa-check"></i>
     {% else %}
     {{ task }}
+    <a class="btn btn-outline-default btn-sm rounded-circle"
+       href=".?fixtask={{ task.id }}"
+       data-toggle="tooltip" data-placement="right"
+       title="{% trans 'Set task status to done' %}">
+      <span class="fas fa-check" />
+    </a>
     {% endif %}
   </a>
 
