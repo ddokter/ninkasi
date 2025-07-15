@@ -19,13 +19,41 @@ def _call(url):
         raise APIConnectionException from exc
 
 
-def list_fermentables():
+def list_fermentables(limit=50):
 
     """ Get all fermentables from BrewFather """
 
-    url = "https://api.brewfather.app/v2/inventory/fermentables?limit=50"
+    if limit == -1:
 
-    return _call(url)
+        fermentables = []
+
+        _id = None
+
+        while True:
+            url = (f"https://api.brewfather.app/v2/inventory/fermentables?"
+                   f"limit=50&complete=True"
+                   )
+
+            if _id:
+                url += f"&start_after={_id}"
+
+            print(url)
+
+            fermentables += _call(url)
+
+            if _id == fermentables[-1]['_id']:
+                break
+
+            _id = fermentables[-1]['_id']
+
+        return fermentables
+
+    else:
+        url = (f"https://api.brewfather.app/v2/inventory/fermentables?"
+               f"limit={limit}&complete=True"
+               )
+
+        return _call(url)
 
 
 @cache(time=3600)

@@ -9,7 +9,7 @@ from django.forms.models import modelform_factory
 from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
 from django.contrib import messages
-from .base import CreateView, DetailView
+from .base import CreateView, DetailView, ListingView
 from ..models.batch import Batch
 from ..models.beer import Beer
 from ..models.metaphase import MetaPhase
@@ -292,3 +292,36 @@ class BatchChecks(BatchDetailView):
         """ Return the list of checks for this batch """
 
         return self.object.batchqualitycheck_set.all()
+
+
+class BatchListingView(ListingView):
+
+    """ Override base listing for status of batch
+    TODO: more efficient handling of listings
+    """
+
+    model = Batch
+
+    def list_brewing(self):
+
+        for batch in super().list_items():
+
+            if batch.get_status() == 2:
+
+                yield batch
+
+    def list_archived(self):
+
+        for batch in super().list_items():
+
+            if batch.get_status() == 3:
+
+                yield batch
+
+    def list_planned(self):
+
+        for batch in super().list_items():
+
+            if batch.get_status() == 1:
+
+                yield batch

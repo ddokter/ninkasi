@@ -1,0 +1,19 @@
+{% extends 'base_detail.html' %}
+
+{% load i18n ninkasi_tags %}
+
+{% block content %}
+
+
+<dl class="row">
+  <dt class="col-sm-3">{% trans 'Color' %}</dt>
+  <dd class="col-sm-9">{{ object.color|range2str }} EBC</dd>
+</dl>
+
+
+<h2>{% trans 'Products' %}</h2>
+
+{% sublisting '' object.list_products '' %}
+
+  
+{% endblock content %}

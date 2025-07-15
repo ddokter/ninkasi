@@ -59,6 +59,10 @@ class Recipe(Base):
 
         """ Return a list of BasePhase objects, ordered """
 
+    def list_materials(self):
+
+        """ Return a list of all ingredients """
+
     @property
     def final_gravity(self):
 

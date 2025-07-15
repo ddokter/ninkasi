@@ -12,13 +12,17 @@ class InventoryItem(models.Model):
     amount = models.FloatField()
     unit = models.ForeignKey("Unit", on_delete=models.CASCADE)
     material = models.ForeignKey("Material", on_delete=models.CASCADE)
-    brand = models.ForeignKey("Brand", on_delete=models.CASCADE)
-    batchnr = models.CharField(_("Batch Nr"), max_length=100,
-                               null=True, blank=True)
+    brand = models.ForeignKey("Brand", on_delete=models.CASCADE,
+                              null=True, blank=True
+                              )
+    batchnr = models.CharField(_("Batch Nr"), max_length=100)
 
     def __str__(self):
 
-        return f"{self.material} ({self.brand}) {self.amount}{self.unit}"
+        if self.brand:
+            return f"{self.material} ({self.brand}) {self.amount}{self.unit}"
+        else:
+            return f"{self.material} {self.amount}{self.unit}"
 
     class Meta:
 

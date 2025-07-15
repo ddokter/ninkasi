@@ -1,0 +1,8 @@
+{% extends 'snippets/byline.html' %}
+
+{% load i18n %}
+
+{% block content %}
+{% trans 'Start date' %}: {{ obj.start_date }}
+{% trans 'Status' %}: {{ obj.get_status }}
+{% endblock %}

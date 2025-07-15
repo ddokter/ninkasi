@@ -397,3 +397,11 @@ def breadcrumbs(context):
     path.reverse()
 
     return {'path': path}
+
+
+@register.filter
+def range2str(_range):
+
+    """ Return str version of range field"""
+
+    return "..".join(_range.split(","))

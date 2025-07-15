@@ -29,7 +29,7 @@ class Recipe(BaseRecipe):
     @property
     def urn(self):
 
-        return f"urn:bf:{ self.id }"
+        return f"urn:bf:{self.id}"
 
     @property
     def id(self):
@@ -116,6 +116,28 @@ class Recipe(BaseRecipe):
 
         return self.data['fermentables']
 
+    def list_hops(self):
+
+        return self.data['hops']
+
+    def list_ingredients(self):
+
+        """ List materials for this recipe as a list of 'Ingredient' objects.
+
+        TODO: add yeast and misc; get Kilo from settings?  """
+
+        ingredients = []
+
+        for ferm in self.list_fermentables():
+            ingredient.append({'amount': ferm.amount, 'unit': 'Kilo',
+                               'material': ferm.name})
+
+        for hop in self.list_hops():
+            ingredient.append({'amount': hop.amount, 'unit': 'Kilo',
+                               'material': hop.name})
+
+        return ingredients
+
     def get_total_duration(self):
 
         """ Return the total processing time for the recipe. This includes
@@ -130,7 +152,7 @@ class Recipe(BaseRecipe):
         duration = self.get_mash_time()
         duration += self.get_fermentation_time()
 
-        duration += Duration(f"{ total }m")
+        duration += Duration(f"{total}m")
 
         return duration
 

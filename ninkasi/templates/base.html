@@ -98,6 +98,26 @@
 	    </a>
 	  </li>
 	  <li>
+	    <a class="dropdown-item" href="{% url 'list' model='malt' %}">
+	      {% trans 'Malts' %}
+	    </a>
+	  </li>
+	  <li>
+	    <a class="dropdown-item" href="{% url 'list' model='maltproduct' %}">
+	      {% trans 'Malt Producs' %}
+	    </a>
+	  </li>
+	  <li>
+	    <a class="dropdown-item" href="{% url 'list' model='hop' %}">
+	      {% trans 'Hops' %}
+	    </a>
+	  </li>
+	  <li>
+	    <a class="dropdown-item" href="{% url 'list' model='hopproduct' %}">
+	      {% trans 'Hop Producs' %}
+	    </a>
+	  </li>
+	  <li>
 	    <a class="dropdown-item" href="{% url 'list' model='product' %}">
 	      {% trans 'Products' %}
 	    </a>
@@ -205,7 +225,7 @@
 	  {% trans 'Shopping list' %}
 	</a>
       </li>
-      
+
   </div>
 </nav>
 

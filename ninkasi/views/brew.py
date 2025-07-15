@@ -10,6 +10,7 @@ from .base import CreateView, UpdateView, DetailView
 from ..models.brew import Brew
 from ..models.batch import Batch
 from ..models.metaphase import MetaPhase
+from ..models.malt import MaltMap
 
 
 class BrewDetailView(DetailView):
@@ -72,6 +73,53 @@ class BrewImportPhasesView(DetailView):
         if request.GET.get('recipe'):
 
             self.get_object().import_phases(request.GET['recipe'])
+        else:
+            messages.error(self.request, _("Recipe to import not provided."))
+
+        return HttpResponseRedirect(self.success_url)
+
+
+class BrewImportMaterialsView(DetailView):
+
+    """ Get all brew materials from recipe """
+
+    model = Brew
+    template_name = "brew_importmaterials.html"
+
+    @property
+    def success_url(self):
+
+        return reverse("view", kwargs={'pk': self.get_object().pk,
+                                       'model': 'brew'})
+
+    def get_import_map(self):
+
+        """ Create suggested mapping """
+
+        recipe_id = self.request.GET['recipe_id']
+
+        recipe = self.object.batch.beer.get_recipe(recipe_id)
+
+        import_map = {}
+
+        for ingredient in recipe.list_fermentables():
+
+            if MaltMap.objects.filter(name=ingredient['name']).exists():
+
+                import_map[ingredient['name']] = MaltMap.objects.get(
+                    name=ingredient['name'])
+            else:
+                import_map[ingredient['name']] = None
+
+        return import_map
+
+    def post(self, request, *args, **kwargs):
+
+        """ Shortcut to import of phases from recipe provided """
+
+        if request.GET.get('recipe'):
+
+            self.get_object().import_materials(request.GET['recipe'])
         else:
             messages.error(self.request, _("Recipe to import not provided."))
 

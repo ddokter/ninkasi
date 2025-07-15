@@ -1,0 +1,55 @@
+{% extends 'base_listing.html' %}
+
+{% load i18n ninkasi_tags %}
+
+{% block content %}
+
+<div class="accordion" id="batches">
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button" type="button"
+	      data-bs-toggle="collapse" data-bs-target="#collapseBrewing"
+	      aria-expanded="true" aria-controls="collapseBrewing">
+        {% trans 'Brewing' %}
+      </button>
+    </h2>
+    <div id="collapseBrewing" class="accordion-collapse collapse show"
+	 data-bs-parent="#batches">
+      <div class="accordion-body">
+	{% listing '' view.list_brewing %}
+      </div>
+    </div>
+  </div>
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button collapsed" type="button"
+	      data-bs-toggle="collapse" data-bs-target="#collapsePlanned"
+	      aria-expanded="false" aria-controls="collapsePlanned">
+        {% trans 'Planned' %}
+      </button>
+    </h2>
+    <div id="collapsePlanned" class="accordion-collapse collapse"
+	 data-bs-parent="#batches">
+      <div class="accordion-body">
+	{% listing '' view.list_planned %}
+      </div>
+    </div>
+  </div>
+  <div class="accordion-item">
+    <h2 class="accordion-header">
+      <button class="accordion-button collapsed" type="button"
+	      data-bs-toggle="collapse" data-bs-target="#collapseArchived"
+	      aria-expanded="false" aria-controls="collapseArchived">
+        {% trans 'Archived' %}
+      </button>
+    </h2>
+    <div id="collapseArchived" class="accordion-collapse collapse"
+	 data-bs-parent="#batches">
+      <div class="accordion-body">
+	{% listing '' view.list_archived %}
+      </div>
+    </div>
+  </div>  
+</div>
+
+{% endblock %}

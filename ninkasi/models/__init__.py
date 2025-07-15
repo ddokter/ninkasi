@@ -17,5 +17,7 @@ from .product import Product  # noqa
 from .unit import Unit, Conversion  # noqa
 from .inventoryitem import InventoryItem  # noqa
 from .brand import Brand  # noqa
+from .hop import Hop, HopProduct  # noqa
+from .malt import Malt, MaltProduct  # noqa
 
 from .signal_processors import *  # noqa

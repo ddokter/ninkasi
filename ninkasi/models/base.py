@@ -5,12 +5,15 @@ from ..utils import class_implements
 
 class BaseModel(models.Model):
 
-    def get_real(self):
+    def get_real(self, done=[]):
 
         """See if there is an object there that is the actual
         implementation
 
         """
+
+        if self in done:
+            return self
 
         for obj in self._meta.related_objects:
 
@@ -18,7 +21,10 @@ class BaseModel(models.Model):
                 real = getattr(self, obj.name)
 
                 if class_implements(real.__class__, self.__class__):
-                    return real
+
+                    done.append(real)
+
+                    return real.get_real(done=done)
             except (ObjectDoesNotExist, AttributeError):
                 pass
 

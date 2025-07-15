@@ -9,6 +9,8 @@ from .material import Material, ParentedMaterial
 from ..milestones import MilestoneProviderModel
 from ..duration import Duration
 from .task import MilestoneScheduledTask
+from .unit import Unit
+from .malt import Malt
 
 
 class Brew(models.Model, OrderedContainer, MilestoneProviderModel):
@@ -215,6 +217,29 @@ class Brew(models.Model, OrderedContainer, MilestoneProviderModel):
                     milestone=milestone):
 
                 task.generate_tasks(**kwargs)
+
+    def import_materials(self, recipe_id):
+
+        """Import all materials from the brew recipe, that is in fact
+        the recipe of the beer for this batch.
+
+        TOTO: handle units in a better way
+
+        """
+
+        recipe = self.batch.beer.get_recipe(recipe_id)
+
+        for ingredient in recipe.list_fermentables():
+
+            try:
+                self.brewmaterial_set.create(
+                    amount=ingredient['amount'],
+                    unit=Unit.objects.get(name='Kilo'),
+                    material=Malt.objects.get_or_create(
+                        name=ingredient['name'])[0]
+                )
+            except:
+                pass
 
     class Meta:
 

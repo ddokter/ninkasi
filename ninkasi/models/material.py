@@ -1,8 +1,9 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from .base import BaseModel
 
 
-class Material(models.Model):
+class Material(BaseModel):
 
     """ Anything needed for a batch. Can be an ingredient, but also bottles
     or labels.  """
@@ -13,7 +14,12 @@ class Material(models.Model):
 
     def __str__(self):
 
-        return self.name
+        real = self.get_real()
+
+        if self == real:
+            return self.name
+        else:
+            return str(real)
 
     @property
     def list_categories(self):
@@ -41,7 +47,7 @@ class ParentedMaterial(models.Model):
 
     def __str__(self):
 
-        return f"{ self.material } { self.brand } { self.amount }"
+        return f"{self.material} {self.brand} {self.amount}"
 
     class Meta:
         abstract = True

@@ -48,7 +48,7 @@ def validate_range(value, _type=int):
         _type(rhv)
     except ValueError as exc:
         raise ValidationError(
-            _(f"Enter a valid tuple of { _type }s."), code="invalid",
+            _(f"Enter a valid tuple of {_type}s."), code="invalid",
             params={"value": value}
         ) from exc
 
@@ -146,6 +146,12 @@ class FloatRangeField(models.CharField):
     """ Store range of min,max floats """
 
     default_validators = [validate_float_range]
+
+    def __init__(self, *args, **kwargs):
+
+        kwargs['max_length'] = 50
+
+        super().__init__(*args, **kwargs)
 
 
 class URNMixin:

@@ -1,0 +1,21 @@
+{% extends 'base_detail.html' %}
+
+{% load i18n ninkasi_tags %}
+
+{% block content %}
+
+
+<dl class="row">
+  <dt class="col-sm-3">{% trans 'Base' %}</dt>
+  <dd class="col-sm-9">
+    <a href="{{ object.base|detail_url }}">{{ object.base }}</a>
+  </dd>
+</dl>
+
+
+<h2>{% trans 'Substitutes' %}</h2>
+
+{% sublisting '' object.substitutes '' %}
+
+  
+{% endblock content %}

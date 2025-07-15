@@ -1,6 +1,6 @@
 """ Hold batch model """
 
-from datetime import datetime
+from datetime import datetime, date
 from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
@@ -17,6 +17,11 @@ from .task import MilestoneScheduledTask
 
 
 DATE_MODE_VOCAB = [(0, _("Start")), (1, _("Delivery"))]
+
+
+STATUS_PLANNED = 1
+STATUS_BREWING = 2
+STATUS_ARCHIVED = 3
 
 
 class Batch(models.Model, OrderedContainer, MilestoneProviderModel):
@@ -73,6 +78,19 @@ class Batch(models.Model, OrderedContainer, MilestoneProviderModel):
         """ Return short name """
 
         return f"#{self.nr:08s}"
+
+    def get_status(self):
+
+        """ Return status of batch """
+
+        today = date.today()
+
+        if today < self.start_date:
+            return STATUS_PLANNED
+        elif today > self.delivery_date:
+            return STATUS_ARCHIVED
+        else:
+            return STATUS_BREWING
 
     @property
     def start_date_projected(self):
@@ -291,7 +309,7 @@ class Batch(models.Model, OrderedContainer, MilestoneProviderModel):
     class Meta:
 
         app_label = "ninkasi"
-        ordering = ["nr"]
+        ordering = ["date"]
         verbose_name_plural = _("Batches")
 
 

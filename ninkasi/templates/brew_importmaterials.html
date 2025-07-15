@@ -1,0 +1,22 @@
+{% extends 'base_detail.html' %}
+
+{% load i18n django_bootstrap5 ninkasi_tags %}
+
+{% block content %}
+
+{% bootstrap_messages %}
+
+<h2>{% trans 'Import malt from recipe' %}
+
+  <dl>
+    {% for key, val in import_map %}
+    <dt>{{ key }}</dt>
+    <dd>{{ val }}</dd>
+    {% endfor %}
+  </dl>
+
+</h2>
+
+{% listing '' view.list_qcs %}
+
+{% endblock content %}
