@@ -31,7 +31,7 @@
 	</div>
       </li>
       {% endfor %}
-    </ul>
+    </ul>    
   </div>
 </section>
 {% endif %}
@@ -57,7 +57,7 @@
   <div class="col-sm-4">
     <section class="tasks card border-danger">
       <div class="card-header">{% trans "Open tasks" %}</div>
-      <div class="card-body">
+      <div class="card-body" style="height: 350px; overflow-y: auto">
 	<ul class="list-group list-group-flush">
 	  {% for task in view.tasks_open %}
 	  <li class="list-group-item">
@@ -68,22 +68,47 @@
       </div>
     </section>
   </div>
+  
   <div class="col-sm-4">
-    
+    {% with brews=view.planned_brews %}
     <section class="card">
       <div class="card-header">{% trans "Planned brews" %}</div>
-      <ul class="list-group list-group-flush">
-	{% for brew in view.planned_brews %}
-	<li class="list-group-item">
-	  <a href="{{ brew|detail_url }}">{{ brew }}</a>
-
-	  <div class="float-end">
-	    {{ brew.date|date:"l j b" }}
-	  </div>
-	</li>
-	{% endfor %}
-      </ul>
+      <div class="card-body">
+	<ul class="list-group list-group-flush">
+	  {% for brew in brews|slice:":5" %}
+	  <li class="list-group-item">
+	    <a href="{{ brew|detail_url }}">{{ brew }}</a>
+	    
+	    <div class="float-end">
+	      {{ brew.date|date:"l j b" }}
+	    </div>
+	  </li>
+	  {% endfor %}
+	</ul>
+	
+	{% if brews|length > 5 %}
+	<a data-bs-toggle="collapse"
+	   href="#morebrews"
+	   aria-expanded="false"           
+	   aria-controls="morebrews"
+	   title="{% trans 'Read more' %}">
+	  {% trans 'More...' %}
+	</a>
+	<ul class="list-group list-group-flush collapse" id="morebrews">
+	  {% for brew in brews|slice:"5:" %}
+	  <li class="list-group-item">
+	    <a href="{{ brew|detail_url }}">{{ brew }}</a>
+	    
+	    <div class="float-end">
+	      {{ brew.date|date:"l j b" }}
+	    </div>
+	  </li>
+	  {% endfor %}
+	</ul>
+	{% endif %}
+      </div>
     </section>
+    {% endwith %}
   </div>
 </div>
   
