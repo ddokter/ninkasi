@@ -88,7 +88,11 @@
 </div>
   
 <section class="week card">
-  <div class="card-header">{% trans 'This week' %}</div>
+  <div class="card-header">{% trans 'This week' %}
+    <div class="float-end">
+      <a href="{% url 'agenda' %}">{% trans 'Agenda' %}</a>
+    </div>
+  </div>
   <div class="card-body">
     <p class="card-text">
       {% with week=view.get_current_week %}
