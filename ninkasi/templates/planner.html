@@ -32,7 +32,8 @@
       <th scope="col" />
       {% for day in month.days %}
       {% if day.month == month.month %}
-      <th scope="col">{{ day.day|stringformat:'02i' }}</th>
+      <th {% if day == month.today.date %} class="today" {% endif %}
+	  scope="col">{{ day.day|stringformat:'02i' }}</th>
       {% endif %}
       {% endfor %}
     </tr>
@@ -45,10 +46,11 @@
       {% for day, ddata in tdata.items %}
       {% if day.month == month.month %}
       {% if ddata.0 %}
-      <td style="background-color: {{ ddata.1 }}">
+      <td {% if day == month.today.date %}class="today"{% endif %}
+	  style="background-color: {{ ddata.1 }}">
       </td>
       {% else %}
-      <td>
+      <td {% if day == month.today.date %}class="today"{% endif %}>
       </td>
       {% endif %}
       {% endif %}

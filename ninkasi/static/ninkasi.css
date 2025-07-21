@@ -55,6 +55,16 @@ table.month td, th {
     width: 3%;
 }
 
+table.month td.today, th.today {
+    border-color: red;
+    border-top-width: 1px;
+    border-bottom-width: 1px;
+}
+
+table.month td:has(+ td.today), th:has(+ th.today) {
+    border-color: red;
+}
+
 th[scope=row] {
     white-space: nowrap;
 }
