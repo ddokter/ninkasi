@@ -18,11 +18,6 @@ class Recipe(models.Model, BaseRecipe, OrderedContainer):
     """Brew recipe for a given beer, including ingredients,
     processing aids, mash and fermentation profiles, etc.
 
-    A beer may be connected to more than one recipe. This may sound
-    weird, but imagine a strong beer that can be brewed on a given
-    brewhouse in one go, but on another one, with different geometry,
-    only with a double mash.
-
     """
 
     name = models.CharField(_("Name"), max_length=100)
@@ -37,7 +32,7 @@ class Recipe(models.Model, BaseRecipe, OrderedContainer):
     @property
     def urn(self):
 
-        return f"urn:django:{ self.id }"
+        return f"urn:django:{self.id}"
 
     @property
     def has_ingredients(self):
@@ -122,4 +117,4 @@ class RecipeIngredient(models.Model):
 
     def __str__(self):
 
-        return f"{ self.ingredient } { self.amount }"
+        return f"{self.ingredient} {self.amount}"

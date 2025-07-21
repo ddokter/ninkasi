@@ -6,17 +6,63 @@
 
 {% bootstrap_messages %}
 
-<h2>{% trans 'Import malt from recipe' %}
+{% with import_map=view.get_import_map %}
 
-  <dl>
-    {% for key, val in import_map %}
-    <dt>{{ key }}</dt>
-    <dd>{{ val }}</dd>
-    {% endfor %}
-  </dl>
+<h2>{% trans 'Import malt from recipe' %}</h2>
 
-</h2>
+<form action=""
+      method="POST"
+      enctype="multipart/form-data"
+      class="form">
 
-{% listing '' view.list_qcs %}
+    {% csrf_token %}
+
+    <table class="table table-bordered table-sm">
+      <thead>
+	<tr>
+	  <th scope="col">
+	    {% trans 'From' %}
+	  </th>
+	  <th scope="col">
+	    {% trans 'To' %}
+	  </th>
+	  <th scope="col">
+	    {% trans 'or create new' %}
+	  </th>
+	</tr>
+      </thead>
+      <tbody>
+	{% for key, val in import_map.items %}
+	<tr>
+	  <td>{{ key }}</td>
+	  <td>
+	    <select name="{{ key }}_to_malt" class="form-select" aria-label="">
+	      <option value="">--</option>
+	      {% for to_malt in view.list_to_malts %}
+	      {% if val == to_malt.id %}
+	      <option value="{{ to_malt.id }}" selected>{{ to_malt }}</option>
+	      {% else %}
+	      <option value="{{ to_malt.id }}">{{ to_malt }}</option>
+	      {% endif %}
+	      {% endfor %}
+	    </select>
+	  </td>
+	  <td>
+	    <input class="form-control" type="text"
+		   name="{{ key }}_new_malt"
+		   placeholder="{% trans 'new malt name' %}"
+		   aria-label="">
+	  </td>
+	</tr>
+	{% endfor %}
+      </tbody>
+    </table>
+
+    <button type="submit" class="btn btn-primary">
+      {% trans 'Save' %}
+    </button>
+</form>
+
+{% endwith %}
 
 {% endblock content %}

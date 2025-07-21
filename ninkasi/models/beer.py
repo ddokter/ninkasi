@@ -31,16 +31,27 @@ def list_styles():
 
 class Beer(models.Model):
 
-    """A beer is defined by it's name, style and description. A beer
-    can be further linked to one or more recipes.
+    """A beer is defined by it's name, style, description and parameters
+    that define it: color, bitterness, og and fg.
+
+    A beer can be further linked to one or more recipes. This may
+    sound counterintuitive, but imagine a strong beer that can be
+    brewed on a given brewhouse in one go, but on another, with
+    different geometry, only with a double mash. Another example is a
+    sour, that may be brewed using kettle souring, or alternatively
+    using a hybrid yeast, to produce the same beer.
+
     """
 
     name = models.CharField(_("Name"), max_length=100)
     style = URNField(max_length=100, registry='style', choices=list_styles)
-    description = models.TextField()
-
+    description = models.TextField(null=True, blank=True)
     recipes = URNListField(null=True, blank=True, registry='recipe',
                            choices=list_recipes)
+    # color = models.IntegerField()
+    # bitterness = models.IntegerField()
+    # og = models.FloatField()
+    # fg = models.FloatField()
 
     def get_recipe(self, _id):
 

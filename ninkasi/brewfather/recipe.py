@@ -1,9 +1,12 @@
+from itertools import chain
+from django.apps import apps
 from django.conf import settings
 from django.urls import reverse
 from ninkasi.api import Recipe as BaseRecipe
 from ninkasi.duration import Duration
 from .phase import (Phase, MashStep, FermentationStep, BoilStep, FilterStep,
                     WhirlpoolStep)
+from .ingredient import Ingredient
 
 
 BASE_URL = "https://web.brewfather.app/tabs/recipes/recipe/"
@@ -114,29 +117,39 @@ class Recipe(BaseRecipe):
 
     def list_fermentables(self):
 
-        return self.data['fermentables']
+        """ List ingredients that are fermentable according to BF """
+
+        Unit = apps.get_model("ninkasi", "Unit")
+
+        unit = Unit.objects.get(name="Kilo")
+
+        for fermentable in self.data['fermentables']:
+            yield Ingredient(data={'name': fermentable['name'],
+                                   'type': fermentable['type'],
+                                   'amount': fermentable['amount'],
+                                   'unit': unit})
 
     def list_hops(self):
 
-        return self.data['hops']
+        Unit = apps.get_model("ninkasi", "Unit")
+
+        unit = Unit.objects.get(name="Kilo")
+
+        for hop in self.data['hops']:
+            yield Ingredient(data={'name': hop['name'],
+                                   'type': hop['type'],
+                                   'amount': hop['amount'],
+                                   'unit': unit})
 
     def list_ingredients(self):
 
         """ List materials for this recipe as a list of 'Ingredient' objects.
 
-        TODO: add yeast and misc; get Kilo from settings?  """
+        TODO: add yeast and misc; get Kilo from settings?
+        TODO: get unit in a more secure way
+        """
 
-        ingredients = []
-
-        for ferm in self.list_fermentables():
-            ingredient.append({'amount': ferm.amount, 'unit': 'Kilo',
-                               'material': ferm.name})
-
-        for hop in self.list_hops():
-            ingredient.append({'amount': hop.amount, 'unit': 'Kilo',
-                               'material': hop.name})
-
-        return ingredients
+        return chain(self.list_fermentables(), self.list_hops())
 
     def get_total_duration(self):
 

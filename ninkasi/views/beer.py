@@ -29,8 +29,11 @@ class URNSelectMultiple(forms.SelectMultiple):
 
         """ Format for display in widget """
 
+        if not value:
+            return []
+
         try:
-            return [val.urn for val in value if getattr(val, "urn")]
+            return [val.urn for val in value if getattr(val, "urn", None)]
         except TypeError:
             return []
 

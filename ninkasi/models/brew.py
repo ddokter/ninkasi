@@ -218,7 +218,7 @@ class Brew(models.Model, OrderedContainer, MilestoneProviderModel):
 
                 task.generate_tasks(**kwargs)
 
-    def import_materials(self, recipe_id):
+    def XXX_import_materials(self, recipe_id):
 
         """Import all materials from the brew recipe, that is in fact
         the recipe of the beer for this batch.
@@ -231,19 +231,16 @@ class Brew(models.Model, OrderedContainer, MilestoneProviderModel):
 
         for ingredient in recipe.list_fermentables():
 
-            try:
-                self.brewmaterial_set.create(
-                    amount=ingredient['amount'],
-                    unit=Unit.objects.get(name='Kilo'),
-                    material=Malt.objects.get_or_create(
-                        name=ingredient['name'])[0]
-                )
-            except:
-                pass
+            self.brewmaterial_set.create(
+                amount=ingredient.amount,
+                unit=ingredient.unit,
+                material=Malt.objects.get_or_create(
+                    name=ingredient.name)[0]
+            )
 
     class Meta:
 
-        ordering = ["batch__nr", "date"]
+        ordering = ["date", "batch__nr"]
         verbose_name_plural = _("Brews")
 
 

@@ -10,7 +10,10 @@ from .base import CreateView, UpdateView, DetailView
 from ..models.brew import Brew
 from ..models.batch import Batch
 from ..models.metaphase import MetaPhase
-from ..models.malt import MaltMap
+from ..models.malt import MaltMap, Malt, MaltProduct
+
+# remove later
+from ..models.recipe import Recipe
 
 
 class BrewDetailView(DetailView):
@@ -92,22 +95,37 @@ class BrewImportMaterialsView(DetailView):
         return reverse("view", kwargs={'pk': self.get_object().pk,
                                        'model': 'brew'})
 
+    def list_to_malts(self):
+
+        return Malt.objects.all()
+
+    def list_import_malts(self):
+
+        """ Return a list of the ingredients to import. """
+
+        recipe_id = self.request.GET['recipe']
+
+        recipe = self.get_object().batch.beer.get_recipe(recipe_id)
+
+        return [
+            {'name': mp.name,
+             'amount': mp.amount,
+             'unit': mp.unit}
+            for mp in recipe.list_ingredients() if mp.type == "Grain"
+        ]
+
     def get_import_map(self):
 
         """ Create suggested mapping """
 
-        recipe_id = self.request.GET['recipe_id']
-
-        recipe = self.object.batch.beer.get_recipe(recipe_id)
-
         import_map = {}
 
-        for ingredient in recipe.list_fermentables():
+        for ingredient in self.list_import_malts():
 
-            if MaltMap.objects.filter(name=ingredient['name']).exists():
+            if MaltMap.objects.filter(from_malt=ingredient['name']).exists():
 
                 import_map[ingredient['name']] = MaltMap.objects.get(
-                    name=ingredient['name'])
+                    from_malt=ingredient['name']).to_malt.id
             else:
                 import_map[ingredient['name']] = None
 
@@ -115,13 +133,42 @@ class BrewImportMaterialsView(DetailView):
 
     def post(self, request, *args, **kwargs):
 
-        """ Shortcut to import of phases from recipe provided """
+        """ Map malts of remote recipe to Ninkasi base malts """
 
-        if request.GET.get('recipe'):
+        brew = self.get_object()
 
-            self.get_object().import_materials(request.GET['recipe'])
-        else:
-            messages.error(self.request, _("Recipe to import not provided."))
+        brew.brewmaterial_set.all().delete()
+
+        for imalt in self.list_import_malts():
+
+            if request.POST.get(f"{imalt['name']}_new_malt", None):
+                malt = Malt.objects.create(
+                    name=request.POST[f"{imalt['name']}_new_malt"]
+                )
+                MaltMap.objects.create(
+                    from_malt=imalt['name'], to_malt=malt
+                )
+                brew.brewmaterial_set.create(
+                    amount=imalt['amount'],
+                    unit=imalt['unit'],
+                    material=malt
+                )
+
+            if request.POST.get(f"{imalt['name']}_to_malt", None):
+
+                to_malt = Malt.objects.get(
+                    pk=int(request.POST[f"{imalt['name']}_to_malt"])
+                )
+
+                MaltMap.objects.update_or_create(
+                    from_malt=imalt['name'],
+                    to_malt=to_malt
+                )
+                brew.brewmaterial_set.create(
+                    amount=imalt['amount'],
+                    unit=imalt['unit'],
+                    material=to_malt
+                )
 
         return HttpResponseRedirect(self.success_url)
 

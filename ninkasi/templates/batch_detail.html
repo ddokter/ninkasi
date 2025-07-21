@@ -15,7 +15,7 @@
 
 
 {% block warnings %}
-{% with status=object.get_status %}
+{% with status=object.get_messages %}
 {% if status %}
 {% for mesg in status %}
 <div class="alert alert-{{ mesg.0 }}" role="alert">
