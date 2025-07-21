@@ -182,8 +182,7 @@ class BrewChecks(BrewDetailView):
 
     def list_qcs(self):
 
-        """Specify target form for the brew. This is defined by the
-        brew phases. Each form needs to be saved seperately.
+        """List all checks for this brew.
 
         """
 
