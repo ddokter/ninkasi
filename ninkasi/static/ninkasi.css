@@ -86,3 +86,13 @@ table.calendar {
 table.schedule td.highlighted {
     background-color:#FF6961;
 }
+
+.btn-sm [data-lucide] {
+  width: 1em;
+  height: 1em;
+  stroke-width: 4px;  
+}
+
+.lucide {
+  stroke-width: 2px;
+}

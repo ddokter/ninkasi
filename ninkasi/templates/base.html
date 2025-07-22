@@ -12,19 +12,22 @@
       crossorigin="anonymous">
 <link rel="stylesheet"
       href="{% static 'ninkasi.css' %}" type="text/css">
-
 {% block extra_css %}
 {% endblock %}
 {% endblock %}
 
 {% block bootstrap5_extra_script %}
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>
+    lucide.createIcons();
+</script>
 <!--script type="text/javascript" src="{% static 'ninkasi.js' %}"></script-->
 {% endblock %}
 
 {% block bootstrap5_content %}
 <nav class="navbar navbar-dark bg-dark navbar-expand-lg">
   <a class="navbar-brand" href="{% url 'home' %}">
-    <i class="fas fa-beer-mug-empty"></i>
+    <i data-lucide="beer"></i>
     Ninkasi
   </a>
   <button class="navbar-toggler" type="button" data-toggle="collapse"
