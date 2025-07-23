@@ -19,9 +19,15 @@ def str2range(val):
     return val.replace('-', ',').replace('%', '')
 
 
+# Map hop from hopslist to Hop model, using converter.
+#
 PROP_MAPPING = {
-    "Alpha Acid Composition": ["alpha_acid", str2range]
+    "Alpha Acid Composition": ["alpha_acid", str2range],
+    "Beta Acid Composition": ["beta_acid", str2range],
 }
+
+
+SUBS = {}
 
 
 class Command(BaseCommand):
@@ -39,13 +45,18 @@ class Command(BaseCommand):
 
         # print(soup.prettify())
 
-        for hop in soup.find_all("li", class_="listing-item"):
+        for hop in soup.find_all("li", class_="listing-item")[:5]:
 
-            hops.append(hop.a.attrs['href'])
+            try:
+                self.handle_hop(hop.a.attrs['href'], options)
+            except IndexError:
+                print(f"Problem handling {hop}")
 
-        self.handle_hop(hops[0])
+        # Now that all hops are there, create substitute listings
+        #
+        self.handle_subs(options)
 
-    def handle_hop(self, href):
+    def handle_hop(self, href, options):
 
         """ Handle one single hop """
 
@@ -56,6 +67,9 @@ class Command(BaseCommand):
         content = soup.article
 
         hop_title = content.h1.contents[0]
+
+        if options['verbosity'] > 1:
+            print(f"Handling hop {hop_title}")
 
         hop_descr = []
 
@@ -68,20 +82,52 @@ class Command(BaseCommand):
 
         props = {}
 
-        for prop in content.find_all("table")[1].find_all("tr"):
+        table = content.find("table", attrs={"width": "620"})
 
-            try:
-                props[prop.td.contents[0]] = prop.find_all("td")[1].contents[0]
-            except IndexError:
-                pass
+        if not table:
+            return False
 
         defaults = {'name': hop_title, 'description': hop_descr}
 
-        for prop in props:
-            if prop in PROP_MAPPING:
+        for prop in table.find_all("tr"):
 
-                key, converter = PROP_MAPPING[prop]
+            try:
+                prop_name = prop.td.contents[0]
+                prop_val = prop.find_all("td")[1].contents[0]
 
-                defaults[key] = converter(props[prop])
+                if prop_name in PROP_MAPPING:
 
-        Hop.objects.update_or_create(defaults=defaults, name=hop_title)
+                    key, converter = PROP_MAPPING[prop_name]
+
+                    defaults[key] = converter(prop_val)
+
+                elif prop_name == "Substitutes":
+
+                    SUBS[hop_title] = [a.contents[0] for
+                                       a in prop.find_all("a")]
+            except IndexError:
+                pass
+
+        return Hop.objects.update_or_create(defaults=defaults, name=hop_title)
+
+    def handle_subs(self, options):
+
+        """ Handle hop alternatives """
+
+        for hop_name in SUBS:
+
+            if options['verbosity'] > 1:
+                print(f"Handling subs for {hop_name}")
+
+            if Hop.objects.filter(name=hop_name).exists():
+
+                hop = Hop.objects.get(name=hop_name)
+
+                for sub_name in SUBS[hop_name]:
+
+                    try:
+                        if options['verbosity'] > 1:
+                            print(f"  Found sub {sub_name}")
+                        hop.substitutes.add(Hop.objects.get(name=sub_name))
+                    except Hop.DoesNotExist:
+                        print(f"Substitute {sub_name} not found")

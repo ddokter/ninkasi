@@ -404,4 +404,7 @@ def range2str(_range):
 
     """ Return str version of range field"""
 
-    return "..".join(_range.split(","))
+    if _range:
+        return "-".join(_range.split(","))
+    else:
+        return _range

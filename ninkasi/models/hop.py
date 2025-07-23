@@ -12,6 +12,7 @@ HOP_FORM_VOCAB = [(0, _("Flower")),
 class HopBase(Ingredient):
 
     alpha_acid = FloatRangeField()
+    beta_acid = FloatRangeField(null=True, blank=True)
 
     class Meta:
         abstract = True
