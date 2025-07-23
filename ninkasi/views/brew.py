@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.utils.translation import gettext_lazy as _
 from django.http import HttpResponseRedirect
 from django.forms import inlineformset_factory, HiddenInput
@@ -180,10 +181,36 @@ class BrewChecks(BrewDetailView):
 
     template_name = "brew_checks.html"
 
+    @property
+    def default_time(self):
+
+        return datetime.now()
+
+    @property
+    def success_url(self):
+
+        return reverse("brew_qualitychecks",
+                       kwargs={'pk': self.get_object().pk})
+
     def list_qcs(self):
 
         """List all checks for this brew.
 
         """
 
-        return self.object.brewqualitycheck_set.all()
+        return self.get_object().brewqualitycheck_set.all()
+
+    def post(self, request, *args, **kwargs):
+
+        """ Set check values """
+
+        brew = self.get_object()
+
+        for qc in self.list_qcs():
+
+            if request.POST.get(f"{qc.id}_value", None):
+                qc.actual = request.POST.get(f"{qc.id}_value")
+                qc.time = request.POST.get(f"{qc.id}_timestamp")
+                qc.save()
+
+        return HttpResponseRedirect(self.success_url)

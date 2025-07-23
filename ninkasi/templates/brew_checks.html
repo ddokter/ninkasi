@@ -24,6 +24,52 @@
 
 </h2>
 
-{% listing '' view.list_qcs %}
+<form action=""
+      method="POST"
+      enctype="multipart/form-data"
+      class="form">
+
+  {% csrf_token %}
+
+  <table class="table table-bordered table-sm">
+    <thead>
+      <tr>
+	<th scope="col">
+	  {% trans 'Check' %}
+	</th>
+	<th scope="col">
+	  {% trans 'Value' %}
+	</th>
+	<th scope="col">
+	  {% trans 'Time' %}
+	</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for check in view.list_qcs %}
+      <tr>
+	<th scope="row">{{ check }}</th>
+	<td>
+	  <input class="form-control" type="text"
+		 name="{{ check.id }}_value"
+		 value="{{ check.actual }}"
+		 aria-label="{% trans 'Actual value' %}">
+	</td>
+	<td>
+	  <input class="form-control"
+		 name="{{ check.id }}_timestamp"
+		 value="{{ check.time|default_if_none:view.default_time|date:"Y-m-d H:i:s" }}"
+		 type="datetime-local"/>
+	</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <button type="submit" class="btn btn-primary">
+    {% trans 'Save' %}
+  </button>
+
+</form>
 
 {% endblock content %}

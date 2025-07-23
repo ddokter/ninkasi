@@ -19,10 +19,11 @@
 
 * Make metaphase measurements into targets for brew/batch
 
-* Tanks should go into a registry for listing types, for example when
-  one needs to add a tank of a certain type.
-
 * Batch materials should follow from deliverables and ingredients.
 
 * When a task is defined, it should also generate tasks based on what
   is already there, like brews, etc.
+
+* make h10nized version of durationfield: -10h => minus ten hours
+
+* Make entry of checks more easy: one form for all values.

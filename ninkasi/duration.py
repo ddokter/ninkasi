@@ -52,7 +52,21 @@ class Duration:
 
     def __str__(self):
 
-        return f"{self.amount:.2f}{ self.unit }"
+        return f"{self.amount:.2f}{self.unit}"
+
+    def h10nized(self):
+
+        """ Return a humanly readable version """
+
+        parts = []
+
+        if self.amount < 0:
+
+            parts.append("minus")
+
+        parts.append
+
+        return " ".join(parts)
 
     def convert(self, unit):
 
@@ -72,7 +86,7 @@ class Duration:
 
         """ Calculate a duration from two dates """
 
-        return Duration(f"{ (end - start).total_seconds() / 60 }m")
+        return Duration(f"{(end - start).total_seconds() / 60}m")
 
     def as_timedelta(self):
 
@@ -128,7 +142,7 @@ class Duration:
     def abs(self):
         """ Return abs for amount """
 
-        return f"{abs(self.amount):.2f}{ self.unit }"
+        return f"{abs(self.amount):.2f}{self.unit}"
 
     def h10n(self):
 
@@ -145,4 +159,4 @@ class Duration:
             amount = self.convert(DURATION_UNITS[idx + 1])
             idx += 1
 
-        return Duration(f"{ amount }{ DURATION_UNITS[idx] }")
+        return Duration(f"{amount}{DURATION_UNITS[idx]}")
