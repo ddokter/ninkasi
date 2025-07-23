@@ -58,7 +58,7 @@
 	<td>
 	  <input class="form-control"
 		 name="{{ check.id }}_timestamp"
-		 value="{{ check.time|default_if_none:view.default_time|date:"Y-m-d H:i:s" }}"
+		 value="{{ check.time|default_if_none:view.default_time|date:"Y-m-d H:i" }}"
 		 type="datetime-local"/>
 	</td>
       </tr>
