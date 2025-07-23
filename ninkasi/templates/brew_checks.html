@@ -52,7 +52,7 @@
 	<td>
 	  <input class="form-control" type="text"
 		 name="{{ check.id }}_value"
-		 value="{{ check.actual }}"
+		 value="{{ check.actual|default_if_none:'' }}"
 		 aria-label="{% trans 'Actual value' %}">
 	</td>
 	<td>
