@@ -80,7 +80,7 @@ class Batch(models.Model, OrderedContainer, MilestoneProviderModel):
 
         """ Return short name """
 
-        return f"#{self.nr:08s}"
+        return f"#{self.nr.zfill(8)}"
 
     def get_status(self):
 
