@@ -198,7 +198,7 @@ class BrewChecks(BrewDetailView):
 
         """
 
-        return self.get_object().brewqualitycheck_set.all()
+        return self.get_object().list_qualitychecks()
 
     def post(self, request, *args, **kwargs):
 
@@ -211,6 +211,31 @@ class BrewChecks(BrewDetailView):
             if request.POST.get(f"{qc.id}_value", None):
                 qc.actual = request.POST.get(f"{qc.id}_value")
                 qc.time = request.POST.get(f"{qc.id}_timestamp")
+                qc.notes = request.POST.get(f"{qc.id}_notes")
                 qc.save()
 
         return HttpResponseRedirect(self.success_url)
+
+
+class BrewTasks(BrewDetailView):
+
+    """ View on all tasks associated with this brew """
+
+    template_name = "brew_tasks.html"
+
+    def list_tasks(self):
+
+        """ List all tasks for the brew """
+
+        return self.object.task.all()
+
+
+class BrewMeasurements(BrewDetailView):
+
+    """ Show measurements for the brew """
+
+    template_name = "brew_measurements.html"
+
+    def list_measurements(self):
+
+        return self.measurements.all()

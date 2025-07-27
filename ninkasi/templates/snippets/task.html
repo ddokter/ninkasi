@@ -13,14 +13,15 @@
   {% priority task fmt='s' %} <a href="{{ task|detail_url }}">
     {% if task.is_done %}
     <del>{{ task }}</del>
-    <i class="fas fa-check"></i>
+    <i data-lucide="check"></i>
     {% else %}
     {{ task }}
-    <a class="btn btn-outline-default btn-sm rounded-circle"
+    <a class="btn btn-outline-primary btn-sm rounded-circle"
+       role="button"
        href=".?fixtask={{ task.id }}"
        data-toggle="tooltip" data-placement="right"
        title="{% trans 'Set task status to done' %}">
-      <span class="fas fa-check" />
+      <span data-lucide="check"></span>
     </a>
     {% endif %}
   </a>
@@ -35,7 +36,7 @@
     {{ task.get_deadline }}
     {% endif %}
     {% if task.is_due and not task.is_done %}
-    <i class="fas fa-exclamation-triangle"></i>
+    <i data-lucide="triangle-alert"></i>
     {% endif %}
   </div>
   <div class="clearfix"></div>

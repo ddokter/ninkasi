@@ -10,25 +10,6 @@
 {% include 'snippets/brew_tabs.html' %}
 {% endwith %}
 
-{% for form in view.get_formset %}
-<h2>{{ form.title }}</h2>
-<form action="."
-      method="POST" 
-      enctype="multipart/form-data"
-      class="form">
-
-    {% csrf_token %}
-    {{ form.media }}
-    {% bootstrap_form form %}
-    
-    {% buttons %}
-    <button type="submit" class="btn btn-primary">
-      {% trans 'Save' %}
-    </button>    
-    {% endbuttons %}
-</form>
-{% endfor %}
-
 
 <h2>{% trans 'Measurements' %}
 
@@ -37,8 +18,8 @@
      href="{% url 'inline_create' 'brew' object.id 'measurement' %}"
      data-toggle="tooltip" data-placement="right"
      title="{% trans 'Add measurement' %}">
-    <span class="fas fa-plus" />
-    <span class="fas fa-scale-balanced" />
+    <span data-lucide="plus"></span>
+    <span data-lucide="scale"></span>
   </a>
   {% endif %}
 

@@ -43,6 +43,13 @@
     <section class="tasks card">
       <div class="card-header">{% trans "Today's tasks" %}</div>
       <div class="card-body">
+	{% with tasks=view.tasks_today %}
+	{% if tasks|length == 0 %}
+	<div class="alert alert-success">
+	  Relax. Take it easy. Have a homebrew.
+	  <span data-lucide="thumbs-up"></span>
+	</div>
+	{% else %}
 	<ul class="list-group">
 	  {% for task in view.tasks_today %}
 	  <li class="list-group-item">
@@ -50,6 +57,8 @@
 	  </li>
 	  {% endfor %}
 	</ul>
+	{% endif %}
+	{% endwith %}
       </div>
     </section>
   </div>
@@ -115,7 +124,10 @@
 <section class="week card">
   <div class="card-header">{% trans 'This week' %}
     <div class="float-end">
-      <a href="{% url 'agenda' %}">{% trans 'Agenda' %}</a>
+      <a href="{% url 'agenda' %}">
+	<i data-lucide="calendar-days"></i>
+	{% trans 'Agenda' %}
+      </a>
     </div>
   </div>
   <div class="card-body">

@@ -3,6 +3,22 @@ from django.utils.translation import gettext_lazy as _
 from .base import BaseModel
 
 
+class MaterialManager(models.Manager):
+
+    """Given that material is a base class, allow for real base
+    objects only"""
+
+    def real_only(self):
+
+        """ Return only real scheduled tasks, no subs """
+
+        for obj in Material.objects.all():
+
+            if obj.get_real() == obj:
+
+                yield obj
+
+
 class Material(BaseModel):
 
     """ Anything needed for a batch. Can be an ingredient, but also bottles
@@ -11,6 +27,8 @@ class Material(BaseModel):
     name = models.CharField(_("Name"), max_length=100)
     description = models.TextField(_("Description"), null=True, blank=True)
     category = models.ManyToManyField("Category", blank=True)
+
+    objects = MaterialManager()
 
     def __str__(self):
 

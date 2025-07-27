@@ -23,11 +23,11 @@
 	 aria-controls="steps_{{ phase.id }}">
 	<i class="show" data-toggle="tooltip" data-placement="right"
 	   title="{% trans 'Show steps' %}">
-	  <span class="fas fa-caret-down"></span>
+	  <span data-lucide="chevron-down"></span>
 	</i>
 	<i class="hide" data-toggle="tooltip" data-placement="right"
 	   title="{% trans 'Hide steps' %}">
-	  <span class="fas fa-caret-up"></span>
+	  <span data-lucide="chevron-up"></span>
 	</i>
       </a>
       {% endif %}
@@ -40,7 +40,7 @@
 	   href="{% url 'movephase' view.ctype object.id phase.id %}?dir=-1"
 	   data-toggle="tooltip" data-placement="right"
 	   title="{% trans 'Move up' %}">
-	  <span class="fas fa-arrow-up" />
+	  <span data-lucide="arrow-up"></span>
 	</a>
 	{% endif %}
 	{% if not phase == object.list_phases.last %}
@@ -48,7 +48,7 @@
 	   href="{% url 'movephase' view.ctype object.id phase.id %}?dir=1"
 	   data-toggle="tooltip" data-placement="right"
 	   title="{% trans 'Move down' %}">
-	  <span class="fas fa-arrow-down" />
+	  <span data-lucide="arrow-down"></span>
 	</a>
 	{% endif %}
 	
@@ -77,8 +77,7 @@
 	{% if step.steplog %}
 	<i class="text-warning" data-toggle="tooltip" data-placement="top"
 	   title="{{ step.steplog }}">
-	  <span class="fas fa-exclamation-triangle">
-	  </span>
+	  <span data-lucide="triangle-alert"></span>
 	</i>
 	{% endif %}
       </td>
@@ -92,11 +91,11 @@
 		{% endif %}
 		data-bs-toggle="modal" data-bs-target="#{{ phase.id }}_log">
 	  {% if step.steplog %}
-	  <span class="fas fa-pencil" />
+	  <span data-lucide="pencil"></span>
 	  {% else %}
-	  <span class="fas fa-plus" />
+	  <span data-lucide="plus"></span>
 	  {% endif %}
-	  <span class="fas fa-book" />
+	  <span data-lucide="notebook"></span>
 	</button>
 	
 	<div class="modal fade" id="{{ phase.id }}_log" tabindex="-1"
@@ -133,7 +132,7 @@
   <tfoot>
     <tr>
       <th colspan="1" scope="row">{% trans 'Total' %}</th>
-      <td>{{ object.get_total_duration.h10n }}</td>
+      <td>{{ object.get_total_duration.h10nized }}</td>
     </tr>
   </tfoot>
 </table>

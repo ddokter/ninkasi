@@ -2,8 +2,10 @@
 
 from datetime import datetime, date
 from django.db import models
+from django.db.models import Sum
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
@@ -14,6 +16,7 @@ from .material import Material, ParentedMaterial
 from .fields import Duration, ColorField
 from ..milestones import MilestoneProviderModel
 from .task import MilestoneScheduledTask
+from .inventoryitem import InventoryItem
 
 
 DATE_MODE_VOCAB = [(0, _("Start")), (1, _("Delivery"))]
@@ -219,6 +222,21 @@ class Batch(models.Model, OrderedContainer, MilestoneProviderModel):
             for material in brew.list_brewmaterials():
                 materials.append(material)
 
+        for deliverable in self.list_deliverables():
+            for material in deliverable.product.list_productmaterials():
+
+                material.batch = self
+                materials.append(material)
+
+        for material in materials:
+
+            try:
+                material.stock = InventoryItem.objects.filter(
+                    material=material.material).aggregate(
+                        Sum("amount"))['amount__sum']
+            except AttributeError:
+                pass
+
         return materials
 
     def list_tanks(self):
@@ -305,6 +323,14 @@ class Batch(models.Model, OrderedContainer, MilestoneProviderModel):
                     milestone=milestone):
 
                 task.generate_tasks(date=date, time=time, **kwargs)
+
+    def is_related(self):
+
+        return self.original.exists() or self.spawned.exists()
+
+    def get_related(self):
+
+        return self.original.all() | self.spawned.all()
 
     class Meta:
 
@@ -401,3 +427,21 @@ class BatchQualityCheck(models.Model):
 
         return (self.actual <= self.projected + self.margin and
                 self.actual >= self.projected - self.margin)
+
+
+class Batch2Batch(models.Model):
+
+    """ Relate batches """
+
+    MERGE = 0
+    SPLIT = 1
+
+    original = models.ForeignKey(Batch,
+                                 related_name='original',
+                                 on_delete=models.CASCADE)
+    spawned = models.ForeignKey(Batch,
+                                related_name='spawned',
+                                on_delete=models.CASCADE)
+    relation = models.SmallIntegerField(choices=[(MERGE, MERGE),
+                                                 (SPLIT, SPLIT)])
+    date = models.DateTimeField(default=timezone.now)

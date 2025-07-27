@@ -29,22 +29,22 @@ class QualityCheck(models.Model):
 
     """
 
+    description = models.TextField(_("Description"), null=True, blank=True)
     quantity = models.ForeignKey("Quantity", on_delete=models.CASCADE)
     milestone = MilestoneField(max_length=100, choices=milestone_vocab)
     offset = DurationField(default="0m", help_text=OFFSET_HELP)
     constant = models.FloatField(null=True, blank=True,
                                  help_text=CONSTANT_HELP)
-    margin = models.FloatField(null=True, blank=True,
-                               help_text=_("Allow margin"))
+    margin = models.FloatField(default=0, help_text=_("Allow margin"))
 
     def __str__(self):
 
         """ Return readable quality check """
 
-        _str = f"{ self.quantity } @ { self.milestone }"
+        _str = f"{self.quantity} @ {self.milestone}"
 
         if self.offset.amount:
 
-            _str += f" { self.offset.get_sign() } { self.offset }"
+            _str += f" {self.offset.get_sign()} {self.offset}"
 
         return _str

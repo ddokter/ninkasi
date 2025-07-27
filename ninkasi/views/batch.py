@@ -10,7 +10,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
 from django.contrib import messages
 from .base import CreateView, DetailView, ListingView
-from ..models.batch import Batch
+from ..models.batch import Batch, Batch2Batch
 from ..models.beer import Beer
 from ..models.metaphase import MetaPhase
 from ..models.measurement import Measurement
@@ -32,6 +32,38 @@ class BatchCreateView(CreateView):
             return {'beer': Beer.objects.get(pk=self.kwargs['beer'])}
 
         return {}
+
+
+class BatchSplitView(BatchCreateView):
+
+    @property
+    def action_url(self):
+
+        return reverse('split_batch', kwargs={'batch': self.kwargs['batch']})
+
+    def get_initial(self):
+
+        """ Take some values from original batch """
+
+        original = Batch.objects.get(pk=self.kwargs['batch'])
+
+        return {'beer': original.beer}
+
+    def form_valid(self, form):
+
+        res = super().form_valid(form)
+
+        spawned = self.object
+
+        original = Batch.objects.get(pk=self.kwargs['batch'])
+
+        # Store original and spawned
+        Batch2Batch.objects.create(
+            original=original,
+            spawned=spawned,
+            relation=Batch2Batch.SPLIT)
+
+        return res
 
 
 class BatchDetailView(DetailView):
@@ -257,27 +289,6 @@ class BatchMaterials(BatchDetailView):
     """ View on all tasks associated with this batch """
 
     template_name = "batch_materials.html"
-
-    def list_materials(self):
-
-        """List all needed materials, not just the ones specified on
-        the batch through BatchMaterials.
-
-        """
-
-        materials = []
-
-        for pmaterial in self.object.list_batchmaterials():
-
-            materials.append(pmaterial)
-
-        for deliverable in self.object.list_deliverables():
-
-            for pmaterial in deliverable.product.list_productmaterials():
-
-                materials.append(pmaterial)
-
-        return materials
 
 
 class BatchChecks(BatchDetailView):

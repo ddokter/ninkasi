@@ -14,6 +14,8 @@
 
     {% csrf_token %}
 
+    <input type="hidden" name="success_url" value="{{ view.success_url }}" />
+    
     <div class="btn-group" role="group" aria-label="Form controls">    
       <button type="submit" class="btn btn-primary">
 	{% trans 'Yes' %}

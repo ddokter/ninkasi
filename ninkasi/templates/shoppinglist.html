@@ -8,41 +8,39 @@
 
 
 <form action=""
-      method="GET" 
+      method="GET"
       class="form">
 
   {% csrf_token %}
 
-  <div class="mb-3">
-    <label for="date" class="form-label">{% trans 'date' %}</label>
+  <div class="input-group mb-3">
     <input type="date" class="form-control" name="date"
 	   id="date" aria-describedby="dateHelp">
-    <div id="dateHelp" class="form-text">
-      {% trans 'Get shopping list untill this date' %}
-    </div>
-  </div>  
-
-  <div class="btn-group" role="group" aria-label="Form controls">    
     <button type="submit" class="btn btn-primary">
       {% trans 'Set end date' %}
     </button>
   </div>
-
 </form>
 
 {% with data=view.get_list %}
-<table class="table table-bordered table-sm month">
+<table class="table table-bordered table-striped table-sm">
   <thead>
     <tr>
       <th scope="col">{% trans 'Product' %}</th>
       <th scope="col">{% trans 'Amount' %}</th>
+      <th scope="col">{% trans 'Stock' %}</th>      
+      <th scope="col">{% trans 'Needed for' %}</th>
+      <th scope="col">{% trans 'By date' %}</th>
     </tr>
   </thead>
   <tbody>
     {% for rec in data %}
     <tr>
-      <td scope="row">{{ rec.material }}</td>
-      <td scope="row">{{ rec.amount }}{{ rec.unit }}</td>
+      <td>{{ rec.material }}</td>
+      <td>{{ rec.amount }}{{ rec.unit }}</td>
+      <td>{{ rec.stock }}</td>
+      <td>{{ rec.batch }}</td>
+      <td>{{ rec.batch.start_date }}</td>
     </tr>
     {% endfor %}
   </tbody>

@@ -19,7 +19,7 @@
       {% if url|url_is_remote %}
       <a href="{{ url }}" target="_NEW">
 	{{ item|safe }}
-	<i class="fas fa-up-right-from-square"></i>
+	<i data-lucide="external-link"></i>
       </a>
       {% else %}
       <a href="{{ url }}">{{ item|safe }}</a>      

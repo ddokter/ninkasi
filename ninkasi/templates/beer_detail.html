@@ -7,8 +7,8 @@
 <a class="btn btn-outline-success btn-sm"
    href="{% url 'create_batch' %}{{ object.pk }}"
    data-toggle="tooltip" data-placement="right" title="{% trans 'Add batch' %}">
-  <span class="fas fa-plus" />
-  <span class="fas fa-hashtag" />
+  <span data-lucide="plus"></span>
+  {% icon 'batch' %}
 </a>
 {% endif %}
 {% endblock %}

@@ -4,10 +4,8 @@
     - proteinrest
     - saccharification
     - mash out
-* add option to relate one batch to another for slurry use
 
-* make shopping list, based on inventory, for planned batches.
-  - configurable for a given date.
+* add option to relate one batch to another for slurry use
 
 * add warning when inventory not sufficient for planned brews
 
@@ -19,11 +17,7 @@
 
 * Make metaphase measurements into targets for brew/batch
 
-* Batch materials should follow from deliverables and ingredients.
-
-* When a task is defined, it should also generate tasks based on what
+* When a task is created, it should also generate tasks based on what
   is already there, like brews, etc.
 
 * make h10nized version of durationfield: -10h => minus ten hours
-
-* Make entry of checks more easy: one form for all values.

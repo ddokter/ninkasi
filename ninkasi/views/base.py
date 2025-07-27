@@ -398,7 +398,10 @@ class ListingView(GenericMixin, FormView, CTypeMixin):
     def list_items(self):
 
         """ Return the items to be shown in the actual list """
-        items = self.model.objects.all()
+
+        method = self.kwargs.get('method', 'all')
+
+        items = getattr(self.model.objects, method)()
 
         if getattr(self.model, "_prefetch_related", None):
             items = items.prefetch_related(*self.model._prefetch_related)
@@ -462,5 +465,8 @@ class InlineDeleteView(InlineActionMixin, DeleteView):
 
     @property
     def success_url(self):
+
+        if 'success_url' in self.request.POST:
+            return self.request.POST['success_url']
 
         return self.request.META.get('HTTP_REFERER')

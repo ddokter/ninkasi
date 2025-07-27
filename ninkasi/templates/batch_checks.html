@@ -16,9 +16,9 @@
   <a class="btn btn-outline-success btn-sm"
      href="{% url 'inline_create' 'batch' object.id 'batchqualitycheck' %}"
      data-toggle="tooltip" data-placement="right"
-     title="{% trans 'Add measurement' %}">
-    <span class="fas fa-plus" />
-    <span class="fas fa-check-square" />
+     title="{% trans 'Add quality check' %}">
+    <span data-lucide="plus"></span>
+    {% icon 'qualitycheck' %}
   </a>
   {% endif %}
 

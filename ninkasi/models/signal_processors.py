@@ -20,22 +20,18 @@ def brew_post_save(sender, instance, **kwargs):
         instance.batch.date = instance.date
         instance.batch.save()
 
-    for check in QualityCheck.objects.filter(
-            milestone__in=instance.list_milestones()):
+    qcs = QualityCheck.objects.filter(milestone__in=instance.list_milestones())
+
+    for phase in instance.list_phases():
+        qcs |= phase.get_metaphase().list_qualitychecks()
+
+    for check in qcs:
 
         # recreate qcs
         #
-        defaults = {'qc': check}
-
-        if check.constant:
-            defaults['projected'] = check.constant
-
-        if check.margin:
-            defaults['margin'] = check.margin
-
         instance.brewqualitycheck_set.update_or_create(
             qc=check,
-            defaults=defaults)
+            defaults={'qc': check})
 
     instance.generate_tasks()
 

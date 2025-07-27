@@ -1,3 +1,4 @@
+from django.apps import apps
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -16,6 +17,22 @@ class InventoryItem(models.Model):
                               null=True, blank=True
                               )
     batchnr = models.CharField(_("Batch Nr"), max_length=100)
+
+    def list_batches(self):
+
+        """ Track batches of brews that use this item. """
+
+        BatchMaterial = apps.get_model("ninkasi", "BatchMaterial")
+
+        batches = [bm.batch for bm in BatchMaterial.objects.filter(
+            batchnr=self.batchnr)]
+
+        BrewMaterial = apps.get_model("ninkasi", "BrewMaterial")
+
+        batches.extend([bm.batch for bm in BrewMaterial.objects.filter(
+            batchnr=self.batchnr)])
+
+        return batches
 
     def __str__(self):
 

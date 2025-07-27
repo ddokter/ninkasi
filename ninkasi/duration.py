@@ -54,20 +54,6 @@ class Duration:
 
         return f"{self.amount:.2f}{self.unit}"
 
-    def h10nized(self):
-
-        """ Return a humanly readable version """
-
-        parts = []
-
-        if self.amount < 0:
-
-            parts.append("minus")
-
-        parts.append
-
-        return " ".join(parts)
-
     def convert(self, unit):
 
         """ Convert to the value asked """
@@ -144,9 +130,9 @@ class Duration:
 
         return f"{abs(self.amount):.2f}{self.unit}"
 
-    def h10n(self):
+    def sanitize(self):
 
-        """ Provide a humanized version of the duration """
+        """ Provide a sanitized version of the duration """
 
         amount = self.amount
         idx = DURATION_UNITS.index(self.unit)
@@ -160,3 +146,20 @@ class Duration:
             idx += 1
 
         return Duration(f"{amount}{DURATION_UNITS[idx]}")
+
+    def h10nized(self):
+
+        """ Return a humanly readable version """
+
+        duration = self.sanitize()
+
+        parts = []
+
+        if duration.amount < 0:
+
+            parts.append("minus")
+
+        parts.append(str(duration.amount))
+        parts.append(duration.unit)
+
+        return " ".join(parts)

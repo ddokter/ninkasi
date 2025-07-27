@@ -45,7 +45,7 @@ class Command(BaseCommand):
 
         # print(soup.prettify())
 
-        for hop in soup.find_all("li", class_="listing-item")[:5]:
+        for hop in soup.find_all("li", class_="listing-item"):
 
             try:
                 self.handle_hop(hop.a.attrs['href'], options)

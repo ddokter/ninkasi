@@ -28,8 +28,8 @@
       <a class="btn btn-sm btn-outline-success dropdown-toggle" href="#"
 	 role="button" id="phase-dropdown" data-toggle="dropdown"
 	 aria-haspopup="true" aria-expanded="false" title="{% trans 'Add step' %}">
-	<span class="fas fa-plus" />
-	<span class="fas fa-shoe-prints" />
+	<span data-lucide="plus" />
+	<span data-lucide="footprints" />
       </a>
       <div class="dropdown-menu" aria-labelledby="phase-dropdown">
 	{% for step, name in view.step_vocab %}
@@ -66,7 +66,7 @@
 	       href="{% url 'phase_movestep' object.id step.id %}?dir=-1"
 	       data-toggle="tooltip" data-placement="right"
 	       title="{% trans 'Move up' %}">
-	      <span class="fas fa-arrow-up" />
+	      <span data-lucide="arrow-up" />
 	    </a>
 	    {% endif %}
 	    {% if not forloop.last %}
@@ -74,7 +74,7 @@
 	       href="{% url 'phase_movestep' object.id step.id %}?dir=1"
 	       data-toggle="tooltip" data-placement="right"
 	       title="{% trans 'Move down' %}">
-	      <span class="fas fa-arrow-down" />
+	      <span data-lucide="arrow-down" />
 	    </a>
 	    {% endif %}
             {% if user|push:step|has_obj_perm:'change' %}

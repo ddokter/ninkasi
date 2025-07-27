@@ -5,13 +5,7 @@
 {% block bootstrap5_title %}Ninkasi - Beer QA{% endblock %}
 
 {% block bootstrap5_extra_head %}
-<link rel="stylesheet"
-      xxhref="https://use.fontawesome.com/releases/v5.6.3/css/all.css"
-      href="/static/fontawesome-free/css/all.css"
-      xxintegrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/"
-      crossorigin="anonymous">
-<link rel="stylesheet"
-      href="{% static 'ninkasi.css' %}" type="text/css">
+<link rel="stylesheet" href="{% static 'ninkasi.css' %}" type="text/css">
 {% block extra_css %}
 {% endblock %}
 {% endblock %}
@@ -91,7 +85,7 @@
 	</a>
 	<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 	  <li>
-	    <a class="dropdown-item" href="{% url 'list' model='material' %}">
+	    <a class="dropdown-item" href="{% url 'list' model='material' method='real_only' %}">
 	      {% trans 'General' %}
 	    </a>
 	  </li>
@@ -147,7 +141,7 @@
 	<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
 	  <li>
 	    <a class="dropdown-item"
-	       href="{% url 'list' model='scheduledtask' %}">
+	       href="{% url 'list' model='scheduledtask' method='real_only' %}">
 	      {% trans 'Scheduled' %}
 	    </a>
 	  </li>
@@ -196,26 +190,6 @@
 	  </a>
       </li>
 
-      {% if request.user.is_authenticated %}
-      <li class="nav-item dropdown">
-	<a class="nav-link dropdown-toggle"
-	   data-toggle="dropdown">
-	  {{ request.user }}
-	  <span class="caret"></span>
-	</a>
-	<div class="dropdown-menu">
-	  <a class="dropdown-item" href="{% url 'logout' %}">
-	    {% trans 'Logout' %}
-	  </a>
-	</div>
-      </li>
-      {% else %}
-      <li class="nav-item">
-	<a class="nav-link" href="{% url 'login' %}">
-	  {% trans 'Login' %}
-	</a>
-      </li>
-      {% endif %}
 
       <li class="nav-item">
 	<a class="nav-link" href="{% url 'shoppinglist' %}">
@@ -224,6 +198,30 @@
       </li>
 
   </div>
+
+  <ul class="nav justify-content-end">
+    {% if request.user.is_authenticated %}
+    <li class="nav-item dropdown">
+      <a class="nav-link dropdown-toggle"
+	 data-toggle="dropdown">
+	{{ request.user }}
+	<span class="caret"></span>
+      </a>
+      <div class="dropdown-menu">
+	<a class="dropdown-item" href="{% url 'logout' %}">
+	  <span data-lucide="log-out"></span>{% trans 'Logout' %}
+	</a>
+      </div>
+    </li>
+    {% else %}
+    <li class="nav-item">
+      <a class="nav-link" href="{% url 'login' %}">
+	<span data-lucide="log-in"></span>{% trans 'Login' %}
+      </a>
+    </li>
+    {% endif %}
+  </ul>
+  
 </nav>
 
 <div class="container">

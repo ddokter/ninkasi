@@ -22,7 +22,7 @@ class ShoppingListView(TemplateView):
 
         _filter = {'date__gt': today}
 
-        if 'date' in self.request.GET:
+        if self.request.GET.get('date', None):
 
             date = datetime.strptime(self.request.GET.get('date'),
                                      "%Y-%m-%d").date()

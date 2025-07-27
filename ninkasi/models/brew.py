@@ -24,6 +24,7 @@ class Brew(models.Model, OrderedContainer, MilestoneProviderModel):
 
     batch = models.ForeignKey("Batch", on_delete=models.CASCADE)
     brewhouse = models.ForeignKey("Brewhouse", on_delete=models.CASCADE)
+    volume_projected = models.FloatField(_("Planned volume"))
     date = models.DateTimeField(_("Time"))
     material = models.ManyToManyField(Material, through="BrewMaterial")
 
@@ -33,6 +34,8 @@ class Brew(models.Model, OrderedContainer, MilestoneProviderModel):
     checks = models.ManyToManyField("QualityCheck", through="BrewQualityCheck")
 
     # sample = GenericRelation("Sample")
+
+    task = GenericRelation("MilestoneTaskSub")
 
     def get_parent(self):
 
@@ -126,36 +129,16 @@ class Brew(models.Model, OrderedContainer, MilestoneProviderModel):
         return total
 
     @property
-    def volume_projected(self):
-
-        """Check quality checks projected volume. If none exists,
-        take the brewhouse volume.
-
-        """
-
-        if self.list_qualitychecks().filter(
-                actual__isnull=False,
-                qc__milestone="ninkasi.brew.end",
-                qc__quantity__name="Volume").exists():
-            return self.list_qualitychecks().filter(
-                actual__isnull=False,
-                qc__milestone="ninkasi.brew.end",
-                qc__quantity__name="Volume"
-            ).first().projected or 0
-
-        return self.brewhouse.volume
-
-    @property
     def volume(self):
 
         """The brew volume is the volume of the last measurement
         taken, if there is one. Otherwise 0 will be returned.
         """
 
-        if self.list_qualitychecks().filter(
+        if self.brewqualitycheck_set.filter(
                 actual__isnull=False,
                 qc__quantity__name="Volume").exists():
-            return self.list_qualitychecks().filter(
+            return self.brewqualitycheck_set.filter(
                 actual__isnull=False,
                 qc__quantity__name="Volume"
             ).last().actual
@@ -218,26 +201,6 @@ class Brew(models.Model, OrderedContainer, MilestoneProviderModel):
 
                 task.generate_tasks(**kwargs)
 
-    def XXX_import_materials(self, recipe_id):
-
-        """Import all materials from the brew recipe, that is in fact
-        the recipe of the beer for this batch.
-
-        TOTO: handle units in a better way
-
-        """
-
-        recipe = self.batch.beer.get_recipe(recipe_id)
-
-        for ingredient in recipe.list_fermentables():
-
-            self.brewmaterial_set.create(
-                amount=ingredient.amount,
-                unit=ingredient.unit,
-                material=Malt.objects.get_or_create(
-                    name=ingredient.name)[0]
-            )
-
     class Meta:
 
         ordering = ["date", "batch__nr"]
@@ -250,15 +213,22 @@ class BrewMaterial(ParentedMaterial):
 
     brew = models.ForeignKey(Brew, on_delete=models.CASCADE)
 
+    @property
+    def batch(self):
+
+        """Provide batch, so as to have a uniform interface for both
+        brew- and batchmaterials"""
+
+        return self.brew.batch
+
 
 class BrewQualityCheck(models.Model):
 
-    """ Define measurements to take during this phase """
+    """Define checks that need to be performed for a given
+    brew. These appear in the checks tab for the brew."""
 
     brew = models.ForeignKey(Brew, on_delete=models.CASCADE)
     qc = models.ForeignKey("QualityCheck", on_delete=models.CASCADE)
-    projected = models.FloatField(blank=True, null=True)
-    margin = models.FloatField(default=0)
     time = models.DateTimeField(blank=True, null=True)
     actual = models.FloatField(blank=True, null=True)
     notes = models.TextField(_("Notes"), null=True, blank=True)
@@ -279,8 +249,8 @@ class BrewQualityCheck(models.Model):
 
         """ See whether the values are ok."""
 
-        if not self.projected and self.actual:
-            return False
+        if not (self.qc.constant and self.actual):
+            return True
 
-        return (self.actual <= self.projected + self.margin and
-                self.actual >= self.projected - self.margin)
+        return (self.actual <= self.qc.constant + self.qc.margin and
+                self.actual >= self.qc.constant - self.qc.margin)

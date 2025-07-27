@@ -1,0 +1,8 @@
+{% extends 'snippets/byline.html' %}
+
+{% load i18n %}
+
+{% block content %}
+{% trans 'Batchnr' %}: {{ obj.batchnr }}
+{% trans 'In stock' %}: {{ obj.amount }} {{ obj.unit }}
+{% endblock %}

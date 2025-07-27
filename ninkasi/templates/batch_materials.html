@@ -16,7 +16,7 @@
        href="{% url 'inline_create' 'batch' object.pk 'batchmaterial' %}"
        data-toggle="tooltip" data-placement="right"
        title="{% trans 'Add material' %}">
-      <span class="fas fa-plus" />
+      <span data-lucide="plus"></span>
     </a>
     {% endif %}
   </h2>
@@ -32,14 +32,14 @@
     </tr>
   </thead>
 
-  {% for material in view.list_materials %}
+  {% for material in object.list_batchmaterials %}
   <tr>
     <td>{{ material.material }}</td>
     <td>{{ material.amount }}{{ material.unit }}</td>
     <td>{{ material.brand }}</td>
     <td>{{ material.batchnr }}</td>
     <td>
-      {% if material.batch == object %}
+      {% if material|ctname == 'batchmaterial' %}
       {% if user|push:material|has_obj_perm:'change' %}
       {% edit_action material %}
       {% endif %}

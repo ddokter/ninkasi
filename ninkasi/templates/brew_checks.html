@@ -17,8 +17,8 @@
      href="{% url 'inline_create' 'brew' object.id 'brewqualitycheck' %}"
      data-toggle="tooltip" data-placement="right"
      title="{% trans 'Add measurement' %}">
-    <span class="fas fa-plus" />
-    <span class="fas fa-check-square" />
+    <span data-lucide="plus"></span>
+    <span data-lucide="clipboard-check"></span>
   </a>
   {% endif %}
 
@@ -32,35 +32,40 @@
   {% csrf_token %}
 
   <table class="table table-bordered table-sm">
-    <thead>
-      <tr>
-	<th scope="col">
-	  {% trans 'Check' %}
-	</th>
-	<th scope="col">
-	  {% trans 'Value' %}
-	</th>
-	<th scope="col">
-	  {% trans 'Time' %}
-	</th>
-      </tr>
-    </thead>
     <tbody>
       {% for check in view.list_qcs %}
       <tr>
-	<th scope="row">{{ check }}</th>
+	<th scope="row"
+	    class="{% if not check.is_ok %}
+		   table-danger
+		   {% else %}
+		   table-success
+		   {% endif %}">
+	  <span data-lucide="clipboard-check"></span>{{ check }}
+	  {% if check.description %}
+	  <em>{{ check.description }}</em>
+	  {% endif %}
+	</th>
 	<td>
 	  <input class="form-control" type="text"
 		 name="{{ check.id }}_value"
+		 placeholder="{% trans 'Measured value' %}"
 		 value="{{ check.actual|default_if_none:'' }}"
 		 aria-label="{% trans 'Actual value' %}">
 	</td>
 	<td>
 	  <input class="form-control"
 		 name="{{ check.id }}_timestamp"
+		 placeholder="{% trans 'Time of measurement' %}"
 		 value="{{ check.time|default_if_none:view.default_time|date:"Y-m-d H:i" }}"
 		 type="datetime-local"/>
 	</td>
+	<td>
+	  <textarea class="form-control"
+		    placeholder="{% trans 'Notes' %}"
+		    name="{{ check.id }}_notes"
+		    rows="3">{{ check.notes|default_if_none:'' }}</textarea>	  
+	</td>	
       </tr>
       {% endfor %}
     </tbody>

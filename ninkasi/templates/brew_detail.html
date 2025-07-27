@@ -9,8 +9,8 @@
    href="{% url 'create_sample' %}{{ object.pk }}"
    data-toggle="tooltip" data-placement="right"
    title="{% trans 'Add sample' %}">
-  <span class="fas fa-plus" />
-  <span class="fas fa-vial" />
+  <span data-lucide="plus"></span>
+  <span data-lucide="test-tube-diagonal"></span>
 </a>
 {% endif %}
 
@@ -31,7 +31,7 @@
     {% if object.volume_projected > object.volume %}
     <i class="text-warning" data-toggle="tooltip" data-placement="top"
 	     title="{% trans 'Brew volume too low' %}">
-      <span class="fas fa-exclamation-triangle">
+      <span data-lucide="triangle-alert">
       </span>
     </i>
     {% endif %}
@@ -53,14 +53,14 @@
      href="{% url 'inline_create' 'brew' object.pk 'brewmaterial' %}"
      data-toggle="tooltip" data-placement="right"
      title="{% trans 'Add material' %}">
-    <span class="fas fa-plus" />
+    <span data-lucide="plus"></span>
   </a>
   <span class="dropdown show">
     <a class="btn btn-sm btn-outline-info dropdown-toggle" href="#"
        role="button" id="import-materials-dropdown" data-bs-toggle="dropdown"
        aria-haspopup="true" aria-expanded="false"
        title="{% trans 'Import recipe materials' %}">
-      <span class="fas fa-arrow-left" />
+      <span data-lucide="import"></span>
       {% trans 'Import from recipe' %}      
     </a>
     <div class="dropdown-menu" aria-labelledby="import-materials-dropdown">
@@ -84,6 +84,7 @@
       <th>Amount</th>
       <th>Brand</th>      
       <th>Batch Nr.</th>
+      <th />
     </tr>
   </thead>
   <tbody>
@@ -94,6 +95,14 @@
     <td>{{ material.amount }}</td>
     <td>{{ material.brand }}</td>    
     <td>{{ material.batchnr }}</td>
+    <td>
+      {% if user|push:material|has_obj_perm:'change' %}
+      {% inline_edit_action material object %}
+      {% endif %}
+      {% if user|push:material|has_obj_perm:'delete' %}
+      {% inline_delete_action material object %}
+      {% endif %}
+    </td>
   </tr>
   {% endfor %}
   </tbody>
@@ -129,7 +138,7 @@
 	 role="button" id="phase-dropdown" data-bs-toggle="dropdown"
 	 aria-haspopup="true" aria-expanded="false"
 	 title="{% trans 'Add phase' %}">
-	<span class="fas fa-plus" />
+	<span data-lucide="plus"></span>
       </a>
       <div class="dropdown-menu" aria-labelledby="phase-dropdown">
 	{% for phase in view.phase_vocab %}
@@ -146,6 +155,7 @@
 	 role="button" id="import-dropdown" data-bs-toggle="dropdown"
 	 aria-haspopup="true" aria-expanded="false"
 	 title="{% trans 'Import recipe' %}">
+	<span data-lucide="import"></span>
 	{% trans 'Import from recipe' %}
       </a>
       <div class="dropdown-menu" aria-labelledby="phase-dropdown">

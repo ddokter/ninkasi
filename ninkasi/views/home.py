@@ -44,7 +44,8 @@ class Home(TemplateView, Calendar):
 
         for day in self.get_current_week()['days']:
 
-            data[day] = list(ScheduledTask.objects.for_date(day))
+            data[day] = [task.get_real() for task in
+                         ScheduledTask.objects.for_date(day)]
 
         return data
 

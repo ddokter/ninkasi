@@ -3,17 +3,6 @@
 {% load i18n ninkasi_tags %}
 
 
-{% block extra_actions %}
-
-<!--a class="btn btn-outline-success btn-sm"
-   href="{% url 'transfer' view.ct_id object.id %}"
-   data-toggle="tooltip" data-placement="right" title="{% trans 'Transfer' %}">
-  <span class="fas fa-left-right" />
-</a-->
-
-{% endblock %}
-
-
 {% block warnings %}
 {% with status=object.get_messages %}
 {% if status %}
@@ -24,6 +13,19 @@
 {% endfor %}
 {% endif %}
 {% endwith %}
+{% endblock %}
+
+
+
+{% block extra_actions %}
+{% if user|push:object|has_obj_perm:'change' %}
+<a class="btn btn-outline-success btn-sm"
+   href="{% url 'split_batch' object.pk %}"
+   data-toggle="tooltip" data-placement="right"
+   title="{% trans 'Split batch' %}">
+  <span data-lucide="split"></span>
+</a>
+{% endif %}
 {% endblock %}
 
 
@@ -42,12 +44,17 @@
 {% endwith %}
 
 <dl class="row">
+  {% if object.is_related %}
+  <dt class="col-sm-3">{% trans 'Related to' %}</dt>
+  <dd>{{ object.get_related }}</dd>
+  {% endif %}
+  
   <dt class="col-sm-3">Volume (planned/actual)</dt>
   <dd class="col-sm-9">{{ object.volume_projected }} / {{ object.volume }}
     {% if object.volume_projected > object.volume %}
     <i class="text-danger" data-toggle="tooltip" data-placement="top"
 	     title="{% trans 'Brew volume too low' %}">
-      <span class="fas fa-exclamation-triangle">
+      <span data-lucide="triangle-alert">
       </span>
     </i>
     {% endif %}
@@ -62,7 +69,7 @@
     {% if not object.list_phases.exists %}
     <i class="text-danger" data-toggle="tooltip" data-placement="top"
 	     title="{% trans 'No phases are defined, so default is shown' %}">
-      <span class="fas fa-exclamation-triangle">
+      <span data-lucide="triangle-alert">
       </span>
     </i>
     {% endif %}
@@ -74,7 +81,7 @@
     {% if object.start_date_projected < object.start_date %}
     <i class="text-danger" data-toggle="tooltip" data-placement="top"
 	     title="{% trans 'Start date too late' %}">
-      <span class="fas fa-exclamation-triangle">
+      <span data-lucide="triangle-alert">
       </span>
     </i>
     {% endif %}
@@ -86,11 +93,11 @@
     {% if object.delivery_date_projected < object.delivery_date %}
     <i class="text-warning" data-toggle="tooltip" data-placement="top"
 	     title="{% trans 'Delivery too late' %}">
-      <span class="fas fa-exclamation-triangle">
+      <span data-lucide="triangle-alert">
       </span>
     </i>
     {% endif %}
-  </dd>  
+  </dd>
 </dl>
 
 
@@ -102,7 +109,7 @@
        href="{% url 'inline_create' 'batch' object.pk 'deliverable' %}"
        data-toggle="tooltip" data-placement="right"
        title="{% trans 'Add deliverable' %}">
-      <span class="fas fa-plus" />
+      <span data-lucide="plus" />
     </a>
     {% endif %}
 
@@ -131,13 +138,17 @@
       <tr>
 	<th>{% trans 'Total' %}</th>
 	<th />
-	<th>
+	<th
+	  {% if object.total_product_volume > object.volume %}
+	  class="table-danger"
+	  {% endif %}>
+
 	  {{ object.total_product_volume }}
 
 	  {% if object.total_product_volume > object.volume %}
-          <i class="text-danger" data-toggle="tooltip" data-placement="top"
+	  <i class="text-danger" data-toggle="tooltip" data-placement="top"
 	     title="{% trans 'Batch volume too low' %}">
-	    <span class="fas fa-exclamation-triangle">
+	    <span data-lucide="triangle-alert">
 	    </span>
 	  </i>
 	  {% endif %}
@@ -156,11 +167,10 @@
     <a class="btn btn-outline-success btn-sm"
        href="{% url 'create_brew' %}{{ object.pk }}"
        data-toggle="tooltip" data-placement="right" title="{% trans 'Add brew' %}">
-      <span class="fas fa-plus" />
-      <span class="fas fa-beer-mug-empty" />
+      <span data-lucide="plus" />
+      <span data-lucide="beer" />
     </a>
     {% endif %}
-
   </h2>
 
   <table class="table table-striped">
@@ -182,13 +192,13 @@
 	<td>{{ brew.volume }}</td>
 	<td>
 	  <div class="float-right">
-            {% if user|push:brew|has_obj_perm:'change' %}
-            {% edit_action brew %}
-            {% endif %}
-            {% if user|push:brew|has_obj_perm:'delete' %}
-            {% delete_action brew %}
-            {% endif %}
-	  </div>	 
+	    {% if user|push:brew|has_obj_perm:'change' %}
+	    {% inline_edit_action brew object %}
+	    {% endif %}
+	    {% if user|push:brew|has_obj_perm:'delete' %}
+	    {% inline_delete_action brew object %}
+	    {% endif %}
+	  </div>
 	</td>
       </tr>
       {% endfor %}
@@ -224,7 +234,18 @@
 
   {% with dates=view.get_calendar %}
   {% if dates %}
-  <h2>Tank planning</h2>
+  <h2>Tank planning
+
+    {% if user|push:'batchcontainer'|has_model_perm:'add' %}
+    <a class="btn btn-outline-success btn-sm"
+       href="{% url 'inline_create' 'batch' object.pk 'batchcontainer' %}"
+       data-toggle="tooltip" data-placement="right"
+       title="{% trans 'Add tank' %}">
+      <span data-lucide="plus" />
+    </a>
+    {% endif %}
+
+  </h2>
 
   <table class="table table-bordered table-sm schedule">
     <thead>
@@ -281,7 +302,7 @@
 	 role="button" id="phase-dropdown" data-bs-toggle="dropdown"
 	 aria-haspopup="true" aria-expanded="false"
 	 title="{% trans 'Add phase' %}">
-	<span class="fas fa-plus" />
+	<span data-lucide="plus" />
       </a>
       <div class="dropdown-menu" aria-labelledby="phase-dropdown">
 	{% for phase in view.phase_vocab %}
@@ -311,9 +332,9 @@
     </span>
     {% endif %}
   </h2>
-  
+
   {% include 'snippets/schema.html' %}
 
 </section>
-  
+
 {% endblock content %}

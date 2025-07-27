@@ -47,21 +47,21 @@ table.calendar td {
     height: 80px;
 }
 
-table.calendar td, th {
+table.calendar td, table.month th {
     width: 14%;
 }
 
-table.month td, th {
+table.month td, table.month th {
     width: 3%;
 }
 
-table.month td.today, th.today {
+table.month td.today, table.month th.today {
     border-color: red;
     border-top-width: 1px;
     border-bottom-width: 1px;
 }
 
-table.month td:has(+ td.today), th:has(+ th.today) {
+table.month td:has(+ td.today), table.month th:has(+ th.today) {
     border-color: red;
 }
 

@@ -1,0 +1,51 @@
+{% extends 'base_detail.html' %}
+
+{% load i18n ninkasi_tags %}
+
+{% block content %}
+
+<dl class="row">
+  <dt class="col-sm-3">{% trans 'Volume' %}</dt>
+  <dd class="col-sm-9">{{ object.volume }}{{ object.unit }}</dd>
+</dl>
+
+<h2>Materials
+  {% if user|push:'productmaterial'|has_model_perm:'add' %}
+  <a class="btn btn-outline-success btn-sm"
+     href="{% url 'inline_create' 'product' object.pk 'productmaterial' %}"
+     data-toggle="tooltip" data-placement="right"
+     title="{% trans 'Add material' %}">
+    <span data-lucide="plus"></span>
+  </a>  
+  {% endif %}
+</h2>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th>Material</th>
+      <th>Amount</th>
+      <th />
+    </tr>
+  </thead>
+  <tbody>
+  {% for material in object.list_productmaterials %}
+  <tr>
+    <td>{{ material.material }}</td>
+    <td>{{ material.amount }}</td>
+    <td>
+      {% if user|push:material|has_obj_perm:'change' %}
+      {% inline_edit_action material object %}
+      {% endif %}
+      {% if user|push:material|has_obj_perm:'delete' %}
+      {% inline_delete_action material object %}
+      {% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+</section>
+
+{% endblock content %}

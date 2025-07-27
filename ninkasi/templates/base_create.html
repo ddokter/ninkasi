@@ -49,9 +49,9 @@
 	      aria-controls="formset_collapse_{{ forloop.counter0 }}"
               title="{% trans 'Show subformset' %}">
 	{% if formset.expanded %}
-	<span class="fas fa-angle-up" />
+	<span data-lucide="chevron-up"></span>
 	{% else %}
-        <span class="fas fa-angle-down" />
+        <span data-lucide="chevron-down"></span>
 	{% endif %}
       </button>
     </h2>

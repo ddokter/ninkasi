@@ -24,7 +24,17 @@ STATUS_VOCAB = [(0, _("Open")),
 class ScheduledTaskManager(models.Manager):
 
     """ Taskmanager that can generate on the fly tasks in case of repeated
-    tasks """
+    tasks. """
+
+    def real_only(self):
+
+        """ Return only real scheduled tasks, no subs """
+
+        for task in ScheduledTask.objects.all():
+
+            if task.get_real() == task:
+
+                yield task
 
     def for_date(self, _date):
 
@@ -37,7 +47,8 @@ class ScheduledTaskManager(models.Manager):
         for task in RepeatedScheduledTask.objects.filter(date__lt=_date):
             if task.is_due_date(_date):
 
-                task.generate_tasks(date=_date)
+                if not task.date == _date:
+                    task.generate_tasks(date=_date)
 
         return self.get_queryset().filter(date=_date)
 
@@ -82,12 +93,7 @@ class Task(BaseModel):
 
     def __str__(self):
 
-        real = self.get_real()
-
-        if self == real:
-            return self.name
-
-        return f"{str(real)}"
+        return self.name
 
     def get_details(self):
 
@@ -173,8 +179,10 @@ class MilestoneScheduledTask(Task, TaskFactory):
 
     def generate_tasks(self, **kwargs):
 
-        """ Generate tasks based on the given (meta) milestone. The kwargs must
-        contain a date and may contain a time. """
+        """Generate tasks based on the given milestone. 'kwargs' must
+        contain a date and may contain a time field.
+
+        """
 
         if 'date' not in kwargs:
             raise KeyError("'date' must be specified in kwargs")
@@ -251,8 +259,24 @@ class RepeatedScheduledTask(ScheduledTask, TaskFactory):
                     abs((self.date - _date).days) %
                     (7 * self.frequency_modifier) == 0):
                 return True
+            else:
+                return False
 
-        # TODO: implement monthly and yearly
+        if self.frequency == 2:
+            if ((self.date.day == _date.day) and
+                (abs(self.date.month - _date.month) %
+                 self.frequency_modifier) == 0):
+                return True
+            else:
+                return False
+
+        if self.frequency == 3:
+            if ((self.date.day == _date.day) and
+                (self.date.month == _date.month) and
+                (abs(self.date.year - _date.year) %
+                 self.frequency_modifier) == 0):
+                return True
+
         return False
 
     def generate_tasks(self, **kwargs):
@@ -281,6 +305,24 @@ class RepeatedTaskSub(ScheduledTask):
     factory = models.ForeignKey(RepeatedScheduledTask,
                                 on_delete=models.CASCADE)
 
+    @property
+    def name(self):
+
+        return self.factory.name
+
+    @name.setter
+    def name(self, value):
+        pass
+
+    @property
+    def description(self):
+
+        return self.factory.description
+
+    @description.setter
+    def description(self, value):
+        pass
+
     def __str__(self):
 
         return str(self.factory)
@@ -288,7 +330,11 @@ class RepeatedTaskSub(ScheduledTask):
 
 class MilestoneTaskSub(ScheduledTask):
 
-    """ Parented task created through planned milestone """
+    """Parented task created through planned milestone. The parent is
+    the milestone provider, the factory is the milestone scheduled
+    task.
+
+    """
 
     factory = models.ForeignKey(MilestoneScheduledTask,
                                 on_delete=models.CASCADE)

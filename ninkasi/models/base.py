@@ -8,23 +8,25 @@ class BaseModel(models.Model):
     def get_real(self, done=[]):
 
         """See if there is an object there that is the actual
-        implementation
+        implementation.
 
         """
 
         if self in done:
             return self
 
+        _done = done.copy()
+
         for obj in self._meta.related_objects:
 
             try:
                 real = getattr(self, obj.name)
 
-                if class_implements(real.__class__, self.__class__):
+                if isinstance(real, self.__class__):
 
-                    done.append(real)
+                    _done.append(real)
 
-                    return real.get_real(done=done)
+                    return real.get_real(done=_done)
             except (ObjectDoesNotExist, AttributeError):
                 pass
 

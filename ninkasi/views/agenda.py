@@ -15,17 +15,14 @@ class AgendaView(TemplateView, Calendar):
 
     def get_data(self):
 
-        """ Generate data for calendar. Loop over tanks and brewhouses,
-        and display the calendar. """
+        """ Show data for calendar. This may generate tasks on the fly, for
+        repeated scheduled tasks."""
 
         data = {}
 
         for day in self.month['days']:
 
-            data[day] = list(ScheduledTask.objects.filter(date=day))
-
-            for task in RepeatedScheduledTask.objects.filter(date__lt=day):
-                if task.is_due_date(day):
-                    data[day].append(task)
+            data[day] = [task.get_real() for task in
+                         ScheduledTask.objects.for_date(day)]
 
         return data
