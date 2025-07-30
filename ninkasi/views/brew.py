@@ -100,7 +100,7 @@ class BrewImportMaterialsView(DetailView):
 
         return Malt.objects.all()
 
-    def list_import_malts(self):
+    def list_import_materials(self):
 
         """ Return a list of the ingredients to import. """
 
@@ -112,7 +112,7 @@ class BrewImportMaterialsView(DetailView):
             {'name': mp.name,
              'amount': mp.amount,
              'unit': mp.unit}
-            for mp in recipe.list_ingredients() if mp.type == "Grain"
+            for mp in recipe.list_ingredients()
         ]
 
     def get_import_map(self):
@@ -121,7 +121,7 @@ class BrewImportMaterialsView(DetailView):
 
         import_map = {}
 
-        for ingredient in self.list_import_malts():
+        for ingredient in self.list_import_materials():
 
             if MaltMap.objects.filter(from_malt=ingredient['name']).exists():
 

@@ -115,7 +115,7 @@ class Recipe(BaseRecipe):
 
         return phases
 
-    def list_fermentables(self):
+    def list_malts(self):
 
         """ List ingredients that are fermentable according to BF """
 
@@ -124,21 +124,57 @@ class Recipe(BaseRecipe):
         unit = Unit.objects.get(name="Kilo")
 
         for fermentable in self.data['fermentables']:
-            yield Ingredient(data={'name': fermentable['name'],
-                                   'type': fermentable['type'],
-                                   'amount': fermentable['amount'],
-                                   'unit': unit})
+
+            if fermentable['type'] == "Grain":
+                yield Ingredient(data={'name': fermentable['name'],
+                                       'type': fermentable['type'],
+                                       'itype': 'malt',
+                                       'percentage': fermentable['percentage'],
+                                       'amount': fermentable['amount'],
+                                       'unit': unit})
 
     def list_hops(self):
 
         Unit = apps.get_model("ninkasi", "Unit")
 
-        unit = Unit.objects.get(name="Kilo")
+        unit = Unit.objects.get(name="Gram")
 
         for hop in self.data['hops']:
             yield Ingredient(data={'name': hop['name'],
                                    'type': hop['type'],
+                                   'itype': 'hop',
                                    'amount': hop['amount'],
+                                   'unit': unit})
+
+    def list_yeasts(self):
+
+        for yeast in self.data['yeasts']:
+            yield Ingredient(data={'name': yeast['name'],
+                                   'itype': 'yeast',
+                                   'type': yeast['type'],
+                                   'amount': yeast['amount'],
+                                   'unit': yeast['unit']})
+
+    def list_other(self):
+
+        Unit = apps.get_model("ninkasi", "Unit")
+
+        unit = Unit.objects.get(name="Gram")
+
+        for fermentable in self.data['fermentables']:
+
+            if fermentable['type'] != "Grain":
+                yield Ingredient(data={'name': fermentable['name'],
+                                       'type': fermentable['type'],
+                                       'itype': 'malt',
+                                       'amount': fermentable['amount'],
+                                       'unit': unit})
+
+        for misc in self.data['miscs']:
+            yield Ingredient(data={'name': misc['name'],
+                                   'type': misc['type'],
+                                   'itype': 'misc',
+                                   'amount': misc['amount'],
                                    'unit': unit})
 
     def list_ingredients(self):
@@ -149,7 +185,8 @@ class Recipe(BaseRecipe):
         TODO: get unit in a more secure way
         """
 
-        return chain(self.list_fermentables(), self.list_hops())
+        return chain(self.list_fermentables(), self.list_hops(),
+                     self.list_yeasts())
 
     def get_total_duration(self):
 
