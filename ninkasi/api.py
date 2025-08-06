@@ -45,6 +45,11 @@ class Recipe(Base):
     recipe models must implement the methods described here.
     """
 
+    INGREDIENT_CAT_MALT = 0
+    INGREDIENT_CAT_HOP = 1
+    INGREDIENT_CAT_YEAST = 2
+    INGREDIENT_CAT_OTHER = 3    
+    
     @property
     def urn(self):
 
@@ -59,9 +64,21 @@ class Recipe(Base):
 
         """ Return a list of BasePhase objects, ordered """
 
-    def list_materials(self):
+    def list_malts(self):
 
-        """ Return a list of all ingredients """
+        """ Return a list of all malts """
+
+    def list_hops(self):
+
+        """ Return a list of all hops """
+
+    def list_yeasts(self):
+
+        """ Return a list of yeasts """
+
+    def list_other(self):
+
+        """ Return a list of all 'other' ingredients """
 
     @property
     def final_gravity(self):

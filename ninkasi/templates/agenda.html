@@ -46,15 +46,15 @@
       {% for day in week %}
       <td {% if day == month.today.date %}class="table-primary"{% endif %}>
 	{% if day.month != month.month %}
-	<span class="badge rounded-pill text-bg-secondary">
+	<span class="badge rounded text-bg-secondary opacity-25">
 	  {{ day.day }}
 	</span>
 	{% elif day == month.today.date %}
-	<span class="badge rounded text-bg-warning">
+	<span class="badge rounded text-bg-primary">
 	  {{ day.day }}
 	</span>	
 	{% else %}
-	<span class="badge rounded text-bg-primary">
+	<span class="badge rounded text-bg-secondary">
 	  {{ day.day }}
 	</span>
 	{% endif %}

@@ -63,3 +63,6 @@ class MaltMap(models.Model):
 
     from_malt = models.CharField(max_length=100)
     to_malt = models.ForeignKey("Malt", on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ['from_malt', 'to_malt']

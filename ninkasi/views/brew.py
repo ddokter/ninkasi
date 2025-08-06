@@ -1,4 +1,5 @@
 from datetime import datetime
+from django.apps import apps
 from django.utils.translation import gettext_lazy as _
 from django.http import HttpResponseRedirect
 from django.forms import inlineformset_factory, HiddenInput
@@ -12,9 +13,8 @@ from ..models.brew import Brew
 from ..models.batch import Batch
 from ..models.metaphase import MetaPhase
 from ..models.malt import MaltMap, Malt, MaltProduct
-
-# remove later
-from ..models.recipe import Recipe
+from ..models.hop import Hop
+from ..models.yeast import Yeast
 
 
 class BrewDetailView(DetailView):
@@ -100,37 +100,76 @@ class BrewImportMaterialsView(DetailView):
 
         return Malt.objects.all()
 
-    def list_import_materials(self):
+    def list_to_hops(self):
 
-        """ Return a list of the ingredients to import. """
+        return Hop.objects.all()
 
-        recipe_id = self.request.GET['recipe']
+    def list_to_yeasts(self):
 
-        recipe = self.get_object().batch.beer.get_recipe(recipe_id)
-
-        return [
-            {'name': mp.name,
-             'amount': mp.amount,
-             'unit': mp.unit}
-            for mp in recipe.list_ingredients()
-        ]
+        return Yeast.objects.all()
 
     def get_import_map(self):
 
         """ Create suggested mapping """
 
         import_map = {}
+        recipe_id = self.request.GET['recipe']
 
-        for ingredient in self.list_import_materials():
+        recipe = self.get_object().batch.beer.get_recipe(recipe_id)
 
-            if MaltMap.objects.filter(from_malt=ingredient['name']).exists():
+        for ingredient in recipe.list_malts():
 
-                import_map[ingredient['name']] = MaltMap.objects.get(
-                    from_malt=ingredient['name']).to_malt.id
+            if MaltMap.objects.filter(from_malt=ingredient.name).exists():
+
+                import_map[ingredient] = MaltMap.objects.get(
+                    from_malt=ingredient.name).to_malt.id
             else:
-                import_map[ingredient['name']] = None
+                import_map[ingredient.name] = None
+
+        for ingredient in recipe.list_hops():
+            if Hop.objects.filter(name=ingredient.name).exists():
+                import_map[ingredient] = Hop.objects.get(
+                    name=ingredient.name).id
+
+        for ingredient in recipe.list_yeasts():
+            if Yeast.objects.filter(name=ingredient.name).exists():
+                import_map[ingredient] = Yeast.objects.get(
+                    name=ingredient.name).id
+
+        # for ingredient in recipe.list_other():
+        #    if Hop.objects.filter(name=ingredient.name).exists():
+        #        import_map[ingredient.name] = Hop.objects.get(
+        #            name=ingredient.name)
 
         return import_map
+
+    def get(self, request, *args, **kwargs):
+
+        """If the recipe is native, the ingredients can just be
+        imported without conversion to local stuff."""
+
+        recipe_id = self.request.GET['recipe']
+
+        self.recipe = self.get_object().batch.beer.get_recipe(recipe_id)
+
+        native = apps.get_model("ninkasi", "Recipe")
+
+        if isinstance(self.recipe, native):
+
+            brew = self.get_object()
+
+            brew.brewmaterial_set.all().delete()
+
+            for ingredient in self.recipe.list_ingredients():
+                brew.brewmaterial_set.create(
+                    amount=ingredient.amount,
+                    unit=ingredient.unit,
+                    material=ingredient.ingredient
+                )
+
+            return HttpResponseRedirect(self.success_url)
+        else:
+            return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
 

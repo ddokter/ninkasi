@@ -24,6 +24,9 @@
 	    {% trans 'From' %}
 	  </th>
 	  <th scope="col">
+	    {% trans 'Category' %}
+	  </th>	  
+	  <th scope="col">
 	    {% trans 'To' %}
 	  </th>
 	  <th scope="col">
@@ -34,23 +37,41 @@
       <tbody>
 	{% for key, val in import_map.items %}
 	<tr>
-	  <td>{{ key }}</td>
+	  <td>{{ key.name }}</td>
+	  <td>{{ key.get_category_display }}</td>
 	  <td>
-	    <select name="{{ key }}_to_malt" class="form-select" aria-label="">
+	    <select name="{{ key.name }}_to" class="form-select"
+		    aria-label="">
 	      <option value="">--</option>
-	      {% for to_malt in view.list_to_malts %}
-	      {% if val == to_malt.id %}
-	      <option value="{{ to_malt.id }}" selected>{{ to_malt }}</option>
-	      {% else %}
-	      <option value="{{ to_malt.id }}">{{ to_malt }}</option>
-	      {% endif %}
+	      {% if key.category == 0 %}
+	      {% for malt in view.list_to_malts %}
+	      <option value="{{ malt.id }}"
+		      {% if val == malt.id %}selected{% endif %}>
+		{{ malt }}
+	      </option>
 	      {% endfor %}
+	      {% elif key.category == 1 %}
+	      {% for hop in view.list_to_hops %}
+	      <option value="{{ hop.id }}"
+		      {% if val == hop.id %}selected{% endif %}>
+		{{ hop }}
+	      </option>
+	      {% endfor %}
+	      {% elif key.category == 2 %}
+	      {% for yeast in view.list_to_yeasts %}	      
+	      <option value="{{ yeast.id }}"
+		      {% if val == yeast.id %}selected{% endif %}>
+		{{ yeast }}
+	      </option>
+	      {% endfor %}
+	      {% endif %}
+	      
 	    </select>
 	  </td>
 	  <td>
 	    <input class="form-control" type="text"
-		   name="{{ key }}_new_malt"
-		   placeholder="{% trans 'new malt name' %}"
+		   name="{{ key }}_new"
+		   placeholder="{% trans 'Create new' %}"
 		   aria-label="">
 	  </td>
 	</tr>

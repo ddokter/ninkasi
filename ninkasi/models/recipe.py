@@ -13,6 +13,14 @@ from .ingredient import Ingredient
 from ..ordered import OrderedContainer
 
 
+CAT_VOCAB = (
+    (BaseRecipe.INGREDIENT_CAT_MALT, _("Malt")),
+    (BaseRecipe.INGREDIENT_CAT_HOP, _("Hop")),
+    (BaseRecipe.INGREDIENT_CAT_YEAST, _("Yeast")),
+    (BaseRecipe.INGREDIENT_CAT_OTHER, _("Other"))
+)
+
+
 class Recipe(models.Model, BaseRecipe, OrderedContainer):
 
     """Brew recipe for a given beer, including ingredients,
@@ -46,6 +54,30 @@ class Recipe(models.Model, BaseRecipe, OrderedContainer):
         return self.recipeingredient_set.filter(**_filter).prefetch_related(
             "ingredient",
             "unit")
+
+    def list_malts(self):
+
+        """ List all malt ingredients """
+
+        return self.list_ingredients(_filter={'category': 0})
+
+    def list_hops(self):
+
+        """ List all malt ingredients """
+
+        return self.list_ingredients(_filter={'category': 1})
+
+    def list_yeasts(self):
+
+        """ List all malt ingredients """
+
+        return self.list_ingredients(_filter={'category': 2})
+
+    def list_other(self):
+
+        """ List all malt ingredients """
+
+        return self.list_ingredients(_filter={'category': 3})
 
     def get_grist_weight(self):
 
@@ -114,6 +146,12 @@ class RecipeIngredient(models.Model):
     # addition = models.ForeignKey("RecipeStep", on_delete=models.SET_NULL,
     #                             blank=True, null=True)
     addition_time = models.FloatField(blank=True, null=True)
+    category = models.SmallIntegerField(choices=CAT_VOCAB)
+
+    @property
+    def name(self):
+
+        return self.ingredient.name
 
     def __str__(self):
 

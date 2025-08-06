@@ -140,6 +140,12 @@ class IntRangeField(models.CharField):
 
     default_validators = [validate_int_range]
 
+    def __init__(self, *args, **kwargs):
+
+        kwargs['max_length'] = 50
+
+        super().__init__(*args, **kwargs)
+
 
 class FloatRangeField(models.CharField):
 

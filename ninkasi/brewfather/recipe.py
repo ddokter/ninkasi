@@ -128,7 +128,7 @@ class Recipe(BaseRecipe):
             if fermentable['type'] == "Grain":
                 yield Ingredient(data={'name': fermentable['name'],
                                        'type': fermentable['type'],
-                                       'itype': 'malt',
+                                       'category': self.INGREDIENT_CAT_MALT,
                                        'percentage': fermentable['percentage'],
                                        'amount': fermentable['amount'],
                                        'unit': unit})
@@ -142,7 +142,7 @@ class Recipe(BaseRecipe):
         for hop in self.data['hops']:
             yield Ingredient(data={'name': hop['name'],
                                    'type': hop['type'],
-                                   'itype': 'hop',
+                                   'category': self.INGREDIENT_CAT_HOP,
                                    'amount': hop['amount'],
                                    'unit': unit})
 
@@ -150,7 +150,7 @@ class Recipe(BaseRecipe):
 
         for yeast in self.data['yeasts']:
             yield Ingredient(data={'name': yeast['name'],
-                                   'itype': 'yeast',
+                                   'category': self.INGREDIENT_CAT_YEAST,
                                    'type': yeast['type'],
                                    'amount': yeast['amount'],
                                    'unit': yeast['unit']})
@@ -166,14 +166,14 @@ class Recipe(BaseRecipe):
             if fermentable['type'] != "Grain":
                 yield Ingredient(data={'name': fermentable['name'],
                                        'type': fermentable['type'],
-                                       'itype': 'malt',
+                                       'category': self.INGREDIENT_CAT_OTHER,
                                        'amount': fermentable['amount'],
                                        'unit': unit})
 
         for misc in self.data['miscs']:
             yield Ingredient(data={'name': misc['name'],
                                    'type': misc['type'],
-                                   'itype': 'misc',
+                                   'category': self.INGREDIENT_CAT_OTHER,
                                    'amount': misc['amount'],
                                    'unit': unit})
 
