@@ -18,6 +18,11 @@
     {% else %}
     <a class="nav-link" href="{% url 'brew_qualitychecks' pk=object.id %}">
       {% trans 'Checks' %}
+      {% if view.open_checks %}
+      <span class="text-warning" data-lucide="triangle-alert"></span>
+      {% elif view.faulty_checks %}
+      <span class="text-danger" data-lucide="triangle-alert"></span>
+      {% endif %}      
     </a>
     {% endif %}
   </li>
@@ -40,6 +45,12 @@
     {% else %}
     <a class="nav-link" href="{% url 'brew_tasks' pk=object.id %}">
       {% trans 'Tasks' %}
+      {% if view.nr_of_tasks %}
+      <span class="badge rounded-pill bg-danger">
+	{{ view.nr_of_tasks }}
+	<span class="visually-hidden">{% trans 'Open tasks' %}</span>
+      </span>
+      {% endif %}
     </a>
     {% endif %}
   </li>

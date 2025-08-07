@@ -24,6 +24,26 @@ class BrewDetailView(DetailView):
     model = Brew
     can_log = True
 
+    def nr_of_tasks(self):
+
+        """ show nr of tasks open """
+
+        return self.object.task.filter(status=0).count()
+
+    def open_checks(self):
+
+        return self.object.list_qualitychecks().filter(actual__isnull=True)
+
+    def faulty_checks(self):
+
+        for check in self.object.list_qualitychecks().filter(
+                actual__isnull=False):
+
+            if not check.is_ok:
+                return False
+
+        return True
+
     def phase_vocab(self):
 
         """ List phases defined for this system """

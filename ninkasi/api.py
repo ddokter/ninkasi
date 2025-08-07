@@ -1,7 +1,6 @@
 """ API definitions for Ninkasi """
 
 from django.apps import apps
-from django.utils.text import camel_case_to_spaces
 from .ordered import OrderedContainer
 
 
@@ -16,7 +15,21 @@ class Base:
     """
 
 
-class Style(Base):
+class URNBase(Base):
+
+    """Base classs for models that may have a remote data peer.  This
+    can be used to define models within Ninkasi that really take their
+    data from elsewhere, like BrewFather, etc.
+
+    """
+
+    @property
+    def urn(self):
+
+        """ Unique identifier, including protocol """
+
+
+class Style(URNBase):
 
     """Base style class, defining what Ninkasi expects of a
     beerstyle. All models must implement the methods described here.
@@ -33,27 +46,21 @@ class Style(Base):
 
         """ Return color range as tuple of int's """
 
-    @property
-    def urn(self):
 
-        """ Style identifier """
+class Recipe(URNBase):
 
+    """Base recipe class, defining what Ninkasi expects of a
+    recipe. All recipe models must implement the methods described
+    here. Other than most brewing apps, Ninkasi doesn't use
+    'fermentables' as a ingredient category. It uses 'malts' and
+    'other'.
 
-class Recipe(Base):
-
-    """ Base recipe class, defining what Ninkasi expects of a recipe. All
-    recipe models must implement the methods described here.
     """
 
     INGREDIENT_CAT_MALT = 0
     INGREDIENT_CAT_HOP = 1
     INGREDIENT_CAT_YEAST = 2
-    INGREDIENT_CAT_OTHER = 3    
-    
-    @property
-    def urn(self):
-
-        """ identifier """
+    INGREDIENT_CAT_OTHER = 3
 
     @property
     def volume(self):
@@ -100,25 +107,19 @@ class Recipe(Base):
         """ Arguments must be milestone and Quantity object """
 
 
-class Batch(Base):
+class Hop(URNBase):
 
-    """ Base batch class
-    """
-
-    @property
-    def urn(self):
-
-        """ identifier """
+    """ Hop may be remote """
 
     @property
-    def name(self):
+    def alpha_acid(self):
 
-        """ Return batch name """
+        """ Essential feature for hops """
 
     @property
-    def volume(self):
+    def beta_acid(self):
 
-        """ Return batch volume for this recipe """
+        """ Secondary feature for hops """
 
 
 class Phase(OrderedContainer):
@@ -191,7 +192,8 @@ class Step:
 
 class MetaPhase:
 
-    """ Define phases that may be used throughout Ninkasi """
+    """Define phases that may be used throughout Ninkasi. The phase
+    consists of consecutive steps."""
 
     steps = []
 

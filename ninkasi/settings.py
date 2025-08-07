@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'django_bootstrap5',
     'ninkasi',
     'ninkasi.brewfather',
-    'ninkasi.bjcp'
+    'ninkasi.hopslist'
 ]
 
 
@@ -101,16 +101,16 @@ APV_NS = 'django.contrib.auth.password_validation'
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': f"{ APV_NS }.UserAttributeSimilarityValidator",
+        'NAME': f"{APV_NS}.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': f"{ APV_NS }.MinimumLengthValidator",
+        'NAME': f"{APV_NS}.MinimumLengthValidator",
     },
     {
-        'NAME': f"{ APV_NS }..CommonPasswordValidator",
+        'NAME': f"{APV_NS}..CommonPasswordValidator",
     },
     {
-        'NAME': f"{ APV_NS }..NumericPasswordValidator",
+        'NAME': f"{APV_NS}..NumericPasswordValidator",
     },
 ]
 

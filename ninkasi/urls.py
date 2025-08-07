@@ -10,6 +10,7 @@ from .views.batch import (BatchCreateView, BatchDetailView, BatchTasks,
                           BatchSplitView)
 from .views.recipe import RecipeDetailView, RecipeListingView
 from .views.style import StyleListingView
+from .views.hop import HopListingView
 from .views.sample import SampleCreateView, SampleUpdateView
 # from .views.measurement import MeasurementCreateView
 from .views.brew import (BrewDetailView, BrewCreateView, BrewUpdateView,
@@ -32,7 +33,7 @@ urlpatterns = [
 
     path('brewfather/', include('ninkasi.brewfather.urls')),
 
-    path('bjcp/', include('ninkasi.bjcp.urls')),
+    path('hopslist/', include('ninkasi.hopslist.urls')),
 
     path('login/',
          LoginView.as_view(),
@@ -121,6 +122,10 @@ urlpatterns = [
     path('style/list',
          StyleListingView.as_view(),
          name="list_styles"),
+
+    path('hop/list',
+         HopListingView.as_view(),
+         name="list_hops"),
 
     path('sample/add/',
          SampleCreateView.as_view(),

@@ -39,6 +39,13 @@ class NinkasiConfig(AppConfig):
         ResourceRegistry.register("recipe", "django",
                                   ModelResource(recipe_model))
 
+        # Hops may also be remote
+        #
+        hop_model = apps.get_model("ninkasi", "hop")
+
+        ResourceRegistry.register("hop", "django",
+                                  ModelResource(hop_model))
+
         # register milestone providers
         #
         for model_name, model in self.models.items():

@@ -32,8 +32,19 @@
       <th scope="col" />
       {% for day in month.days %}
       {% if day.month == month.month %}
-      <th {% if day == month.today.date %} class="today" {% endif %}
-	  scope="col">{{ day.day|stringformat:'02i' }}</th>
+      {% if day == month.today.date %}
+      <th class="table-primary" scope="col">
+	<span class="badge rounded text-bg-primary">
+	  {{ day.day|stringformat:'02i' }}
+	</span>
+      </th>
+      {% else %}
+      <th scope="col">
+	<span class="badge rounded text-bg-secondary">
+	  {{ day.day }}
+	</span>
+      </th>      
+      {% endif %}
       {% endif %}
       {% endfor %}
     </tr>
@@ -46,11 +57,11 @@
       {% for day, ddata in tdata.items %}
       {% if day.month == month.month %}
       {% if ddata.0 %}
-      <td {% if day == month.today.date %}class="today"{% endif %}
+      <td {% if day == month.today.date %}class="table-primary"{% endif %}
 	  style="background-color: {{ ddata.1 }}">
       </td>
       {% else %}
-      <td {% if day == month.today.date %}class="today"{% endif %}>
+      <td {% if day == month.today.date %}class="table-primary"{% endif %}>
       </td>
       {% endif %}
       {% endif %}
