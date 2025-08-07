@@ -25,6 +25,16 @@ def _call(url):
         raise APIConnectionException from exc
 
 
+def table_with_alpha_acid(tag):
+
+    """The Hopslist detail pages are somewhat erratic, so we need to
+    find the table that has a header with 'Alpha Acid Composition'
+
+    """
+
+    return tag.name == "table" and tag.find(string="Alpha Acid Composition")
+
+
 def list_hops():
 
     """ Get all hops from Hopslist """
@@ -71,12 +81,12 @@ def get_hop(_id):
 
     props = {}
 
-    table = content.find("table", attrs={"width": "620"})
-
-    if not table:
-        return False
+    table = content.find(table_with_alpha_acid)
 
     defaults = {'name': hop_title, 'description': hop_descr}
+
+    if not table:
+        return Hop(defaults)
 
     for prop in table.find_all("tr"):
 

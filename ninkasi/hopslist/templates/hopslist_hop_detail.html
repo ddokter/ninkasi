@@ -4,21 +4,28 @@
 
 {% block content %}
 
+<p class="lead">
+{{ object.description }}
+</p>
+
 <dl class="row">
   <dt class="col-sm-3">{% trans 'Alpha acid' %}</dt>
   <dd class="col-sm-9">{{ object.alpha_acid }}</dd>
   <dt class="col-sm-3">{% trans 'Beta acid' %}</dt>
   <dd class="col-sm-9">{{ object.beta_acid }}</dd>
-  <dt class="col-sm-3">{% trans 'Substitutes' %}</dt>
-  <dd class="col-sm-9">
-    <ul class="list-group">
-    {% for sub in object.subs %}
-    <li class="list-group-item">
-      <a href="{{ sub|detail_url }}">{{ sub }}</a>
-    </li>
-    {% endfor %}
-    </ul>
-  </dd>  
 </dl>
+
+<h2>{% trans 'Substitutes' %}</h2>
+  
+<ul class="list-group">
+  {% for sub in object.subs %}
+  <li class="list-group-item">
+    {% icon 'hop' %}
+    <a href="{{ sub|detail_url }}">
+      {{ sub }}
+    </a>
+  </li>
+  {% endfor %}
+</ul>
 
 {% endblock content %}

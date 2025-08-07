@@ -30,7 +30,7 @@ class Hop(BaseHop):
 
     def __str__(self):
 
-        return self.name
+        return self.data['name']
 
     @property
     def urn(self):
@@ -52,17 +52,14 @@ class Hop(BaseHop):
 
     @property
     def alpha_acid(self):
-        key, converter = PROP_MAPPING['alpha_acid']
-        return converter(self.data[key])
+
+        return str2range(self.data['Alpha Acid Composition'])
 
     @property
     def beta_acid(self):
-        key, converter = PROP_MAPPING['beta_acid']
-        return converter(self.data[key])
+
+        return str2range(self.data['Beta Acid Composition'])
 
     def __getattr__(self, name):
 
-        if name not in self.data:
-            return super().__getattr__(name)
-
-        return self.data[name]
+        return super().__getattribute__('data')[name]
