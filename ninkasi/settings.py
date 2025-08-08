@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'django_bootstrap5',
     'ninkasi',
     'ninkasi.brewfather',
-    'ninkasi.hopslist'
+    'ninkasi.hopslist',
+    'ninkasi.bjcp'
 ]
 
 
