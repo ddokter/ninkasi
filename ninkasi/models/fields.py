@@ -78,6 +78,11 @@ def validate_duration(value):
         )
 
 
+class QuantityField(models.CharField):
+
+    """ Define quantities in terms of amount and unit """
+
+
 class DurationField(models.CharField):
 
     """ Store tuple of float, str for duration and unit. Unit

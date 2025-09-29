@@ -1,5 +1,4 @@
 from django.urls import reverse
-from ninkasi.api import Hop as BaseHop
 
 
 def str2range(val):
@@ -17,7 +16,7 @@ PROP_MAPPING = {
 }
 
 
-class Hop(BaseHop):
+class Hop():
 
     """ Hopslist hop
     """
@@ -63,3 +62,15 @@ class Hop(BaseHop):
     def __getattr__(self, name):
 
         return super().__getattribute__('data')[name]
+
+    def save(self, **kwargs):
+
+        pass
+
+    def delete(self, **kwargs):
+
+        pass
+
+    class Meta:
+
+        managed = False

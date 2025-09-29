@@ -1,43 +1,20 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from .base import BaseModel
+from .base import GetRealMixin
 
 
-class MaterialManager(models.Manager):
-
-    """Given that material is a base class, allow for real base
-    objects only"""
-
-    def real_only(self):
-
-        """ Return only real scheduled tasks, no subs """
-
-        for obj in Material.objects.all():
-
-            if obj.get_real() == obj:
-
-                yield obj
-
-
-class Material(BaseModel):
+class Material(models.Model, GetRealMixin):
 
     """ Anything needed for a batch. Can be an ingredient, but also bottles
-    or labels.  """
+    caps, or labels.  """
 
     name = models.CharField(_("Name"), max_length=100)
     description = models.TextField(_("Description"), null=True, blank=True)
     category = models.ManyToManyField("Category", blank=True)
 
-    objects = MaterialManager()
-
     def __str__(self):
 
-        real = self.get_real()
-
-        if self == real:
-            return self.name
-        else:
-            return str(real)
+        return self.name
 
     @property
     def list_categories(self):

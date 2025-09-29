@@ -137,10 +137,13 @@ class InlineActionMixin:
 
         """
 
-        return {
+        initial = {
             self.fk_field: self.parent,
             'content_type': ContentType.objects.get_for_model(self.parent).id,
-            'object_id': self.parent.id}
+            'object_id': self.parent.id
+        }
+
+        return initial
 
     @property
     def fk_field(self):

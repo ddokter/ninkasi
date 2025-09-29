@@ -10,6 +10,8 @@ from django.conf import settings
 from ninkasi.api import Phase as BasePhase
 from ninkasi.duration import Duration
 from .task import TaskFactory, MilestoneScheduledTask
+from .unit import Unit
+from .ingredient import Ingredient
 
 
 class Phase(BasePhase, models.Model, TaskFactory):
@@ -43,6 +45,10 @@ class Phase(BasePhase, models.Model, TaskFactory):
     def __hash__(self):
 
         return self.pk
+
+    def list_ingredients(self):
+
+        return self.phaseingredient_set.all()
 
     def list_steps(self, raw=False):
 
@@ -128,8 +134,8 @@ class Phase(BasePhase, models.Model, TaskFactory):
         """Generate any defined tasks if need be for the phase's
         milestones"""
 
-        milestones = [f"ninkasi.{ self.name }.start",
-                      f"ninkasi.{ self.name }.end"]
+        milestones = [f"ninkasi.{self.name}.start",
+                      f"ninkasi.{self.name}.end"]
 
         self.tasks.all().delete()
 
@@ -139,7 +145,7 @@ class Phase(BasePhase, models.Model, TaskFactory):
                     milestone=milestones[0]):
 
                 start = self.parent.get_phase_start(self.id)
-                kwargs['name'] = f"{ task.name } - { self.parent }"
+                kwargs['name'] = f"{task.name} - {self.parent}"
                 kwargs['parent'] = self.parent
 
                 if start:
@@ -154,3 +160,30 @@ class Phase(BasePhase, models.Model, TaskFactory):
         app_label = "ninkasi"
         ordering = ["order"]
         verbose_name_plural = _("Phases")
+
+
+class PhaseIngredient(models.Model):
+
+    """Ingredients are related to a recipe phase with a given amount,
+    but also a time to add. This allows for hop gifts to be specified,
+    but also for example steeping malts.
+
+    """
+
+    # TODO: make sure that there is a conversion from given unit to
+    # ingredient's default unit
+
+    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
+    amount = models.FloatField(_("Amount"))
+    unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
+    addition_time = models.FloatField(default=0)
+    phase = models.ForeignKey("Phase", on_delete=models.CASCADE)
+
+    @property
+    def name(self):
+
+        return self.ingredient.name
+
+    def __str__(self):
+
+        return f"{self.ingredient} {self.amount}"

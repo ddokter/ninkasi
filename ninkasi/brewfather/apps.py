@@ -1,6 +1,12 @@
 from django.apps import AppConfig
-from ninkasi.resource import ResourceRegistry
-from .resource import RecipeResource
+from ninkasi.modules import ModuleRegistry
+
+
+class BrewFatherModule():
+
+    name = "ninkasi.brewfather"
+    title = "BrewFather"
+    href = "#"
 
 
 class BrewFatherConfig(AppConfig):
@@ -10,4 +16,6 @@ class BrewFatherConfig(AppConfig):
 
     def ready(self):
 
-        ResourceRegistry.register("recipe", "bf", RecipeResource())
+        module = BrewFatherModule()
+
+        ModuleRegistry.register(module)

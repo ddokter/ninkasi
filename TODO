@@ -21,3 +21,5 @@
   is already there, like brews, etc.
 
 * make h10nized version of durationfield: -10h => minus ten hours
+
+* Each add on should be an importer. Get rid of URN stuff. Sigh...

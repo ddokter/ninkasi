@@ -6,6 +6,7 @@
 
 {% block bootstrap5_extra_head %}
 <link rel="stylesheet" href="{% static 'ninkasi.css' %}" type="text/css">
+<link rel="stylesheet" href="{% static 'chosen-js/chosen.css' %}" type="text/css">
 {% block extra_css %}
 {% endblock %}
 {% endblock %}
@@ -15,7 +16,11 @@
 <script>
     lucide.createIcons();
 </script>
-<!--script type="text/javascript" src="{% static 'ninkasi.js' %}"></script-->
+<script type="text/javascript" src="{% static 'jquery/dist/jquery.js' %}">
+</script>
+<script type="text/javascript" src="{% static 'chosen-js/chosen.jquery.js' %}">
+</script>
+<script type="text/javascript" src="{% static 'ninkasi.js' %}"></script>
 {% endblock %}
 
 {% block bootstrap5_content %}
@@ -33,51 +38,12 @@
   <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
     <ul class="navbar-nav mr-auto">
 
-      <li class="nav-item dropdown {% if view.view_name.0 == 'system' %}active{% endif %}">
-	<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
-	   role="button" data-bs-toggle="dropdown" aria-haspopup="true"
-	   aria-expanded="false">
-	  {% trans 'System' %}
+      <li class="nav-item">
+	<a class="nav-link" data-bs-toggle="offcanvas"
+	   href="#modules" role="button" aria-controls="modules">
+	  <i data-lucide="menu" aria-label="{% trans 'Modules' %}"></i>
 	</a>
-	<ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-	  <li>
-	    <a class="dropdown-item" href="{% url 'list' model='tank' %}">
-	      {% trans 'Tanks' %}
-	    </a>
-	  </li>
-	  <li>
-	    <a class="dropdown-item" href="{% url 'list' model='brewhouse' %}">
-	      {% trans 'Brewhouses' %}
-	    </a>
-	  </li>
-	  <li>
-	    <a class="dropdown-item" href="{% url 'list' model='unit' %}">
-	      {% trans 'Units' %}
-	    </a>
-	  </li>
-	  <li>
-	    <a class="dropdown-item" href="{% url 'list' model='quantity' %}">
-	      {% trans 'Quantities' %}
-	    </a>
-	  </li>
-	  <li>
-	    <a class="dropdown-item" href="{% url 'list' model='metaphase' %}">
-	      {% trans 'Phases' %}
-	    </a>
-	  </li>
-	  <li>
-	    <a class="dropdown-item" href="{% url 'list' model='category' %}">
-	      {% trans 'Categories' %}
-	    </a>
-	  </li>
-	  <li>
-	    <a class="dropdown-item" href="{% url 'list' model='style' %}">
-	      {% trans 'Styles' %}
-	    </a>
-	  </li>
-	</ul>
       </li>
-
       <li class="nav-item dropdown {% if view.view_name.0 == 'material' %}active{% endif %}">
 	<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
 	   role="button" data-bs-toggle="dropdown" aria-haspopup="true"
@@ -122,11 +88,6 @@
 	  <li>
 	    <a class="dropdown-item" href="{% url 'list' model='brand' %}">
 	      {% trans 'Brands' %}
-	    </a>
-	  </li>
-	  <li>
-	    <a class="dropdown-item" href="{% url 'list' model='inventoryitem' %}">
-	      {% trans 'Inventory' %}
 	    </a>
 	  </li>
 	</ul>
@@ -231,6 +192,79 @@
   {% breadcrumbs %}
   {% endblock %}
 
+
+  <div class="offcanvas offcanvas-start" tabindex="-1" id="modules"
+       aria-labelledby="modulesTitle">
+    <div class="offcanvas-header">
+      <h5 class="offcanvas-title" id="modulesTitle">Offcanvas</h5>
+      <button type="button" class="btn-close"
+	      data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+      <div>
+	Ninkasi modules
+      </div>
+      
+      <ul class="list-group">
+	<li class="list-group-item">
+	  <div class="module">
+	    <a href="{% url 'list' model='inventoryitem' %}">
+	      <i data-lucide="warehouse"></i>{% trans 'Inventory' %}
+	    </a>
+	  </div>
+	</li>
+
+	{% list_modules %}
+	
+      </ul>
+      
+      <div class="dropdown mt-3">
+	<button class="btn btn-secondary dropdown-toggle" type="button"
+		data-bs-toggle="dropdown">
+	  <i data-lucide="settings"></i>
+          {% trans 'System config' %}
+	</button>
+	<ul class="dropdown-menu">
+	  <li>
+	    <a class="dropdown-item" href="{% url 'list' model='tank' %}">
+	      {% trans 'Tanks' %}
+	    </a>
+	  </li>
+	  <li>
+	    <a class="dropdown-item" href="{% url 'list' model='brewhouse' %}">
+	      {% trans 'Brewhouses' %}
+	    </a>
+	  </li>
+	  <li>
+	    <a class="dropdown-item" href="{% url 'list' model='unit' %}">
+	      {% trans 'Units' %}
+	    </a>
+	  </li>
+	  <li>
+	    <a class="dropdown-item" href="{% url 'list' model='quantity' %}">
+	      {% trans 'Quantities' %}
+	    </a>
+	  </li>
+	  <li>
+	    <a class="dropdown-item" href="{% url 'list' model='metaphase' %}">
+	      {% trans 'Phases' %}
+	    </a>
+	  </li>
+	  <li>
+	    <a class="dropdown-item" href="{% url 'list' model='category' %}">
+	      {% trans 'Categories' %}
+	    </a>
+	  </li>
+	  <li>
+	    <a class="dropdown-item" href="{% url 'list' model='style' %}">
+	      {% trans 'Styles' %}
+	    </a>
+	  </li>
+	</ul>
+      </div>
+    </div>
+  </div>
+  
   <h1>
     {% block title %}{% endblock %}
     <div role="toolbar" class="d-inline">

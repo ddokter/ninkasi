@@ -1,0 +1,21 @@
+{% extends 'snippets/byline.html' %}
+
+{% load i18n %}
+
+{% block content %}
+<ul class="list-inline">
+  <li class="list-inline-item">
+    {% trans 'Style' %}: {{ obj.style }}
+  </li>
+  <li class="list-inline-item">
+    {% trans 'ABV' %}: {{ obj.abv }}
+  </li>
+  <li class="list-inline-item">
+    {% trans 'IBU' %}: {{ obj.bitterness }}
+  </li>
+  <li class="list-inline-item">
+    {% trans 'EBC' %}: {{ obj.color }}
+  </li>
+</ul>
+    
+{% endblock %}

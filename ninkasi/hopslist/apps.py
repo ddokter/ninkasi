@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 from ninkasi.resource import ResourceRegistry
-from .resource import HopResource
+# from .resource import HopResource
 
 
 class HopslistConfig(AppConfig):
@@ -10,4 +10,5 @@ class HopslistConfig(AppConfig):
 
     def ready(self):
 
-        ResourceRegistry.register("hop", "hopslist", HopResource())
+        # ResourceRegistry.register("hop", "hopslist", HopResource())
+        pass

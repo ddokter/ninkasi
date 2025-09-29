@@ -1,38 +1,16 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from django.conf import settings
-from ninkasi.resource import ResourceRegistry
-from .fields import URNField, URNListField
 
 
-def list_recipes():
-
-    """List all recipes from all resources that provide them"""
-
-    recipes = []
-
-    for res in ResourceRegistry.get_resources("recipe"):
-        recipes.extend((recipe.urn, recipe.name) for recipe in res.list())
-
-    return recipes
-
-
-def list_styles():
-
-    """ List all styles from all resources """
-
-    styles = []
-
-    for res in ResourceRegistry.get_resources("style"):
-        styles.extend((style.urn, style.name) for style in res.list())
-
-    return styles
+COLOR_HELP = _("Specify color in EBC")
+BITTERNESS_HELP = _("Specify as IBU")
+OG_HELP = _("Gravity in SG, e.g. 1.048")
 
 
 class Beer(models.Model):
 
     """A beer is defined by it's name, style, description and parameters
-    that define it: color, bitterness, og and fg.
+    that define it: color, bitterness, og and abv.
 
     A beer can be further linked to one or more recipes. This may
     sound counterintuitive, but imagine a strong beer that can be
@@ -44,31 +22,12 @@ class Beer(models.Model):
     """
 
     name = models.CharField(_("Name"), max_length=100)
-    style = URNField(max_length=100, registry='style', choices=list_styles)
+    style = models.ForeignKey("Style", on_delete=models.CASCADE)
     description = models.TextField(null=True, blank=True)
-    recipes = URNListField(null=True, blank=True, registry='recipe',
-                           choices=list_recipes)
-    # color = models.IntegerField()
-    # bitterness = models.IntegerField()
-    # og = models.FloatField()
-    # fg = models.FloatField()
-
-    def get_recipe(self, _id):
-
-        """ Return the recipe by it's id. Convert to str to be on the safe
-        side. """
-
-        for recipe in self.recipes:
-            if str(recipe.id) == str(_id):
-                return recipe
-
-        return None
-
-    def get_recipes_display(self):
-
-        """ Override generated method """
-
-        return ", ".join([str(recipe) for recipe in self.recipes])
+    color = models.IntegerField(help_text=COLOR_HELP)
+    bitterness = models.IntegerField(help_text=BITTERNESS_HELP)
+    og = models.FloatField(help_text=OG_HELP)
+    abv = models.FloatField()
 
     def __str__(self):
 
@@ -79,6 +38,12 @@ class Beer(models.Model):
         """ All batches for this beer """
 
         return self.batch_set.all()
+
+    def list_recipes(self):
+
+        """ List all related recipes """
+
+        return self.recipe_set.all()
 
     class Meta:
 

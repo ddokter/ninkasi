@@ -1,3 +1,11 @@
+.chosen-container {
+    width: 100% !important;
+}
+
+.chosen-single, .chosen-choices {
+    border: 0px !important;
+}
+
 td.tank.full {
     background-color: red;
 }
@@ -81,4 +89,8 @@ table.schedule td.highlighted {
 
 .lucide {
   stroke-width: 2px;
+}
+
+.badge a {
+    color: white !important;
 }

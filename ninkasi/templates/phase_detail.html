@@ -20,13 +20,51 @@
 <p>{{ object.descr }}</p>
 {% endif %}
 
+<section>
+<h2>{% trans 'Ingredients' %}
+
+  {% if user|push:'phaseingredient'|has_model_perm:'add' %}
+  <a class="btn btn-outline-success btn-sm"
+     href="{% url 'inline_create' 'phase' object.pk 'phaseingredient' %}"
+     data-toggle="tooltip" data-placement="right"
+     title="{% trans 'Add ingredient' %}">
+    <span data-lucide="plus" />
+  </a>
+  {% endif %}
+</h2>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th>{% trans 'Amount' %}</th>
+      <th>{% trans 'Name' %}</th>
+      <th>{% trans 'Addition time' %}</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for ingredient in object.list_ingredients %}
+  <tr>
+    <td>{{ ingredient.ingredient }}
+      {% for cat in ingredient.ingredient.categories %}
+      <span class="badge badge-pill badge-info">{{ cat }}</span>
+      {% endfor %}
+    </td>
+    <td>{{ ingredient.amount }}</td>
+    <td>{{ ingredient.name }} </td>
+    <td>{{ ingredient.percentage }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</section>
 
 <section>
   <h2>{% trans 'Steps' %}
     {% if user|push:'step'|has_obj_perm:'add' %}
     <span class="dropdown show">
       <a class="btn btn-sm btn-outline-success dropdown-toggle" href="#"
-	 role="button" id="phase-dropdown" data-toggle="dropdown"
+	 role="button" id="phase-dropdown" data-bs-toggle="dropdown"
 	 aria-haspopup="true" aria-expanded="false" title="{% trans 'Add step' %}">
 	<span data-lucide="plus" />
 	<span data-lucide="footprints" />

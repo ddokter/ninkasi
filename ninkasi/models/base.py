@@ -3,7 +3,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from ..utils import class_implements
 
 
-class BaseModel(models.Model):
+class GetRealMixin:
 
     def get_real(self, done=[]):
 
@@ -31,6 +31,3 @@ class BaseModel(models.Model):
                 pass
 
         return self
-
-    class Meta:
-        abstract = True

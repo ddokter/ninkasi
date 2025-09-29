@@ -1,0 +1,9 @@
+{% for module in modules %}
+<li class="list-group-item">
+  <div class="module">
+    <a href="{{ module.href }}">
+      <i data-lucide=""></i>{{ module.name }}
+    </a>
+  </div>
+  </li>
+{% endfor %}

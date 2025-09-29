@@ -7,7 +7,7 @@ from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from .fields import DurationField, MilestoneField
-from .base import BaseModel
+from .base import GetRealMixin
 from ..milestones import MilestoneRegistry
 
 
@@ -68,7 +68,7 @@ class TaskFactory:
         no orphaned or useless tasks stay around."""
 
 
-class Task(BaseModel):
+class Task(models.Model, GetRealMixin):
 
     """Base class for tasks. Any actual task should be a subclass, so
     the get_real method may be used to get the actual task.

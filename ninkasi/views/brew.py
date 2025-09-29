@@ -15,6 +15,7 @@ from ..models.metaphase import MetaPhase
 from ..models.malt import MaltMap, Malt, MaltProduct
 from ..models.hop import Hop
 from ..models.yeast import Yeast
+from ..models.other import Other
 
 
 class BrewDetailView(DetailView):
@@ -128,6 +129,10 @@ class BrewImportMaterialsView(DetailView):
 
         return Yeast.objects.all()
 
+    def list_to_others(self):
+
+        return Other.objects.all()
+
     def get_import_map(self):
 
         """ Create suggested mapping """
@@ -139,27 +144,44 @@ class BrewImportMaterialsView(DetailView):
 
         for ingredient in recipe.list_malts():
 
+            ingredient.category = "malt"
+
             if MaltMap.objects.filter(from_malt=ingredient.name).exists():
 
                 import_map[ingredient] = MaltMap.objects.get(
                     from_malt=ingredient.name).to_malt.id
             else:
-                import_map[ingredient.name] = None
+                import_map[ingredient] = None
 
         for ingredient in recipe.list_hops():
+
+            ingredient.category = "hop"
+
             if Hop.objects.filter(name=ingredient.name).exists():
                 import_map[ingredient] = Hop.objects.get(
                     name=ingredient.name).id
+            else:
+                import_map[ingredient] = None
 
         for ingredient in recipe.list_yeasts():
+
+            ingredient.category = "yeast"
+
             if Yeast.objects.filter(name=ingredient.name).exists():
                 import_map[ingredient] = Yeast.objects.get(
                     name=ingredient.name).id
+            else:
+                import_map[ingredient] = None
 
-        # for ingredient in recipe.list_other():
-        #    if Hop.objects.filter(name=ingredient.name).exists():
-        #        import_map[ingredient.name] = Hop.objects.get(
-        #            name=ingredient.name)
+        for ingredient in recipe.list_other():
+
+            ingredient.category = "other"
+
+            if Other.objects.filter(name=ingredient.name).exists():
+                import_map[ingredient.name] = Other.objects.get(
+                    name=ingredient.name)
+            else:
+                import_map[ingredient] = None
 
         return import_map
 
@@ -199,22 +221,26 @@ class BrewImportMaterialsView(DetailView):
 
         brew.brewmaterial_set.all().delete()
 
-        for imalt in self.list_import_malts():
+        for material in self.get_import_map():
 
-            if request.POST.get(f"{imalt['name']}_new_malt", None):
-                malt = Malt.objects.create(
-                    name=request.POST[f"{imalt['name']}_new_malt"]
-                )
-                MaltMap.objects.create(
-                    from_malt=imalt['name'], to_malt=malt
-                )
-                brew.brewmaterial_set.create(
-                    amount=imalt['amount'],
-                    unit=imalt['unit'],
-                    material=malt
-                )
+            if request.POST.get(f"{imalt['name']}_new", None):
 
-            if request.POST.get(f"{imalt['name']}_to_malt", None):
+                if material.category == 'malt':
+
+                    malt = Malt.objects.create(
+                        name=request.POST[f"{imalt['name']}_new_malt"]
+                    )
+                    MaltMap.objects.create(
+                        from_malt=imalt['name'], to_malt=malt
+                    )
+
+                    brew.brewmaterial_set.create(
+                        amount=imalt['amount'],
+                        unit=imalt['unit'],
+                        material=malt
+                    )
+
+            elif request.POST.get(f"{imalt['name']}_to", None):
 
                 to_malt = Malt.objects.get(
                     pk=int(request.POST[f"{imalt['name']}_to_malt"])

@@ -5,79 +5,75 @@ from django.db import models
 from django.apps import apps
 from django.utils.translation import gettext_lazy as _
 from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.contenttypes.models import ContentType
 from django.conf import settings
 from ninkasi.resource import Resource, ResourceRegistry, NotFoundInResource
 from ..api import Recipe as BaseRecipe
 from .unit import Unit
 from .ingredient import Ingredient
 from ..ordered import OrderedContainer
-
-
-CAT_VOCAB = (
-    (BaseRecipe.INGREDIENT_CAT_MALT, _("Malt")),
-    (BaseRecipe.INGREDIENT_CAT_HOP, _("Hop")),
-    (BaseRecipe.INGREDIENT_CAT_YEAST, _("Yeast")),
-    (BaseRecipe.INGREDIENT_CAT_OTHER, _("Other"))
-)
+from .malt import Malt
+from .hop import Hop
+from .yeast import Yeast
+from .other import Other
+from .phase import PhaseIngredient
 
 
 class Recipe(models.Model, BaseRecipe, OrderedContainer):
 
-    """Brew recipe for a given beer, including ingredients,
-    processing aids, mash and fermentation profiles, etc.
+    """Brew recipe for a given beer, including ingredients, processing
+    aids, mash and fermentation profiles, etc.  The Recipe is also an
+    ordered container for it's phases.
+
+    A recipe is related to one brewhouse, since that determines
+    amounts of ingredients. It is also related to a Beer
 
     """
+
+    brewhouse = models.ForeignKey("Brewhouse", on_delete=models.CASCADE)
+    beer = models.ForeignKey("Beer", on_delete=models.CASCADE)
 
     name = models.CharField(_("Name"), max_length=100)
     volume = models.SmallIntegerField(_("Volume"))
     ingredient = models.ManyToManyField(Ingredient, through="RecipeIngredient")
+
     phase = GenericRelation("Phase")
 
     def __str__(self):
 
         return self.name
 
-    @property
-    def urn(self):
+    def list_ingredients(self, clazz=None):
 
-        return f"urn:django:{self.id}"
+        qry = PhaseIngredient.objects.filter(phase__in=self.list_phases())
 
-    @property
-    def has_ingredients(self):
-
-        return self.recipeingredient_set.exists()
-
-    def list_ingredients(self, _filter={}):
-
-        """ List all ingredients, use filter if there """
-
-        return self.recipeingredient_set.filter(**_filter).prefetch_related(
-            "ingredient",
-            "unit")
+        for res in qry:
+            if res.ingredient.get_real().__class__ == clazz:
+                yield res
 
     def list_malts(self):
 
         """ List all malt ingredients """
 
-        return self.list_ingredients(_filter={'category': 0})
+        return self.list_ingredients(clazz=Malt)
 
     def list_hops(self):
 
         """ List all malt ingredients """
 
-        return self.list_ingredients(_filter={'category': 1})
+        return self.list_ingredients(clazz=Hop)
 
     def list_yeasts(self):
 
         """ List all malt ingredients """
 
-        return self.list_ingredients(_filter={'category': 2})
+        return self.list_ingredients(clazz=Yeast)
 
     def list_other(self):
 
         """ List all malt ingredients """
 
-        return self.list_ingredients(_filter={'category': 3})
+        return self.list_ingredients(clazz=Other)
 
     def get_grist_weight(self):
 
@@ -132,7 +128,7 @@ class RecipeIngredient(models.Model):
 
     """Ingredients are related to a recipe with a given amount, but
     also a time to add. This allows for hop gifts to be specified, but
-    also for example steeping malts
+    also for example steeping malts.
 
     """
 
@@ -142,11 +138,8 @@ class RecipeIngredient(models.Model):
     amount = models.FloatField(_("Amount"))
     unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
     recipe = models.ForeignKey("Recipe", on_delete=models.CASCADE)
-    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
-    # addition = models.ForeignKey("RecipeStep", on_delete=models.SET_NULL,
-    #                             blank=True, null=True)
     addition_time = models.FloatField(blank=True, null=True)
-    category = models.SmallIntegerField(choices=CAT_VOCAB)
+    ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
 
     @property
     def name(self):

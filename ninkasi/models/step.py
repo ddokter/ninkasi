@@ -3,7 +3,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from .fields import DurationField, Duration
-from .base import BaseModel
+from .base import GetRealMixin
 from ninkasi.api import Step as BaseStep
 
 
@@ -16,7 +16,7 @@ DURATION_VOCAB = [
 DURATION_TO_MINUTES = [1, 60, 60 * 24]
 
 
-class Step(BaseModel, BaseStep):
+class Step(models.Model, BaseStep, GetRealMixin):
 
     """Step in the schema for a recipe, batch or brew. Steps for a
     batch are inherited from the recipe, but more steps may be
@@ -42,12 +42,7 @@ class Step(BaseModel, BaseStep):
         if self.name:
             return self.name
 
-        return f"{ self.name } { self.temperature } &deg;C"
-
-    class Meta:
-
-        app_label = "ninkasi"
-        ordering = ["order"]
+        return f"{self.name} {self.temperature} &deg;C"
 
     @property
     def total_duration(self):
@@ -91,6 +86,11 @@ class Step(BaseModel, BaseStep):
                 and self.duration == thing.duration
                 and self.temperature == thing.temperature)
 
+    class Meta:
+
+        app_label = "ninkasi"
+        ordering = ["order"]
+
 
 class MashStep(Step):
 
@@ -130,7 +130,7 @@ class StepLog(models.Model):
 
     def __str__(self):
 
-        return f"{ self.start_time } - { self.end_time }"
+        return f"{self.start_time} - {self.end_time}"
 
     def get_duration(self):
 

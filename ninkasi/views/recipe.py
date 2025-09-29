@@ -19,24 +19,3 @@ class RecipeDetailView(DetailView):
         """ List phases defined for this system """
 
         return MetaPhase.objects.filter(parents__model="recipe")
-
-
-class RecipeListingView(ListingView):
-
-    """ Override base listing to show all resources for recipe's
-
-    """
-
-    model = Recipe
-
-    def list_items(self):
-
-        """ Fetch all recipe's from all resources """
-
-        recipes = []
-
-        for resource in ResourceRegistry.get_resources('recipe'):
-
-            recipes.extend(resource.list())
-
-        return recipes

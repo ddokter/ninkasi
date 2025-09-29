@@ -11,6 +11,7 @@ from django.utils.safestring import mark_safe
 from django.utils import timezone
 from django.forms import models as model_forms
 from markdown import markdown
+from ninkasi.modules import ModuleRegistry
 from ninkasi.utils import get_model_name, get_listing_label
 from ninkasi.models.task import ScheduledTask
 from ninkasi.models.step import StepLog
@@ -18,6 +19,14 @@ from ninkasi.views.base import InlineCreateView
 
 
 register = Library()
+
+
+@register.inclusion_tag("snippets/modules.html", takes_context=True)
+def list_modules(context):
+
+    context.update({'modules': ModuleRegistry.list()})
+
+    return context
 
 
 @register.filter

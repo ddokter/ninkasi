@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from .ingredient import Ingredient
 from .fields import FloatRangeField
+from ninkasi.resource import ResourceRegistry
 
 
 HOP_FORM_VOCAB = [(0, _("Flower")),
@@ -9,16 +10,7 @@ HOP_FORM_VOCAB = [(0, _("Flower")),
                   (2, _("Pellet Cryo"))]
 
 
-class HopBase(Ingredient):
-
-    alpha_acid = FloatRangeField()
-    beta_acid = FloatRangeField(null=True, blank=True)
-
-    class Meta:
-        abstract = True
-
-
-class Hop(HopBase):
+class Hop(Ingredient):
 
     """Hop class, defining the family of hop and the ranges of
     essential features like alpha acid. The Hop family is typically
@@ -27,14 +19,16 @@ class Hop(HopBase):
 
     """
 
-    substitutes = models.ManyToManyField("Hop")
+    alpha_acid = FloatRangeField()
+    beta_acid = FloatRangeField(null=True, blank=True)
+    substitutes = models.ManyToManyField("Hop", null=True, blank=True)
 
     class Meta:
         app_label = "ninkasi"
         ordering = ["name"]
 
 
-class HopProduct(HopBase):
+class HopProduct(Ingredient):
 
     """Specific product of a hop family. This is defined by a brand,
     but not the same as an actual batch of that product."""

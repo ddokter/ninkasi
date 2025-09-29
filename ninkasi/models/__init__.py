@@ -19,5 +19,7 @@ from .inventoryitem import InventoryItem  # noqa
 from .brand import Brand  # noqa
 from .hop import Hop, HopProduct  # noqa
 from .malt import Malt, MaltProduct  # noqa
+from .yeast import Yeast, YeastProduct  # noqa
+from .other import Other, OtherProduct  # noqa
 
 from .signal_processors import *  # noqa

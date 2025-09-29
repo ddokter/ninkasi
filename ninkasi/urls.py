@@ -8,7 +8,7 @@ from .views.batch import (BatchCreateView, BatchDetailView, BatchTasks,
                           BatchImportPhasesView, BatchMeasurements,
                           BatchMaterials, BatchChecks, BatchListingView,
                           BatchSplitView)
-from .views.recipe import RecipeDetailView, RecipeListingView
+from .views.recipe import RecipeDetailView
 from .views.style import StyleListingView
 from .views.hop import HopListingView
 from .views.sample import SampleCreateView, SampleUpdateView
@@ -18,7 +18,6 @@ from .views.brew import (BrewDetailView, BrewCreateView, BrewUpdateView,
                          BrewImportMaterialsView, BrewMeasurements)
 from .views.phase import (PhaseMoveStepView, PhaseView, AddPhaseView,
                           MovePhaseView)
-from .views.beer import BeerCreateView, BeerUpdateView
 from .views.tank import TankListingView
 from .views.home import Home
 from .views.task import FixTask
@@ -115,10 +114,6 @@ urlpatterns = [
          RecipeDetailView.as_view(),
          name="view"),
 
-    path('recipe/list',
-         RecipeListingView.as_view(),
-         name="list_recipes"),
-
     path('style/list',
          StyleListingView.as_view(),
          name="list_styles"),
@@ -174,14 +169,6 @@ urlpatterns = [
     path('brew/<int:pk>/tasks',
          BrewTasks.as_view(),
          name="brew_tasks"),
-
-    path('beer/add/',
-         BeerCreateView.as_view(),
-         name="create_beer"),
-
-    path('beer/<int:pk>/edit',
-         BeerUpdateView.as_view(),
-         name="edit_beer"),
 
     path('phase/<int:pk>',
          PhaseView.as_view(),

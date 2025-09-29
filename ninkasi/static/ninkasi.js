@@ -121,4 +121,10 @@ $(document).ready(function() {
 		return false; // prevent text selection in IE
             });
     });
+
+
+    $('select[name$="ingredient"]').each(function() {
+        $(this).chosen({inherit_select_classes:true});
+    });
+
 });

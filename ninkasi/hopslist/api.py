@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 from django.conf import settings
 from ninkasi.utils import cache
 from ninkasi.api import APIConnectionException
-from .hop import Hop
+from ninkasi.models.hop import Hop
 
 
 BASE_URL = "https://www.hopslist.com/hops/"
@@ -47,22 +47,15 @@ def list_hops():
 
         name = ALPHANUMERIC_ONLY.sub('', hop.a.contents[0])
 
-        yield Hop({'name': name, 'url': hop.a.attrs['href']})
+        yield {'name': name, 'url': hop.a.attrs['href']}
 
 
 @cache(time=3600)
-def get_hop(_id):
+def get_hop(url):
 
-    """ Get one hop. Sadly the hops hold diverse URL's, so we need to
-    get the list in any case. """
+    """ Get one hop. """
 
-    for hop in list_hops():
-
-        if hop.id == _id:
-
-            break
-
-    response = _call(hop.data['url'])
+    response = _call(url)
 
     soup = BeautifulSoup(response.text, 'html.parser')
 
@@ -97,7 +90,7 @@ def get_hop(_id):
             if prop_name == "Substitutes":
 
                 defaults['subs'] = [
-                    Hop({'name': ALPHANUMERIC_ONLY.sub('', a.contents[0])})
+                    {'name': ALPHANUMERIC_ONLY.sub('', a.contents[0])}
                     for a in prop.find_all("a")]
             else:
                 defaults[prop_name] = prop_val

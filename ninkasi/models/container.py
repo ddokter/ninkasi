@@ -1,9 +1,9 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from .base import BaseModel
+from .base import GetRealMixin
 
 
-class Container(BaseModel):
+class Container(models.Model, GetRealMixin):
 
     """ Anything that can hold a batch of beer. May be a brewhouse,
     but also a tank, like CCT or BBT. The container is used to define

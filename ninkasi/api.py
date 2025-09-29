@@ -112,6 +112,11 @@ class Hop(URNBase):
     """ Hop may be remote """
 
     @property
+    def name(self):
+
+        """ A hop with no name is no hop """
+
+    @property
     def alpha_acid(self):
 
         """ Essential feature for hops """

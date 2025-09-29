@@ -14,13 +14,15 @@ class Calendar:
 
         """
 
+        today = datetime.now()
+
         if self.request.GET.get('go', None):
 
             year, month = self.request.GET['go'].split('-')
 
             now = date(int(year), int(month), 1)
         else:
-            now = datetime.now()
+            now = today
 
         if now.month == 12:
             _next = date(now.year + 1, 1, 1)
@@ -49,7 +51,7 @@ class Calendar:
         return {
             'title': now.strftime("%B %Y"),
             'days': days,
-            'today': now,
+            'today': today,
             'weeks': weeks,
             'next': _next.strftime("%Y-%m"),
             'prev': _prev.strftime("%Y-%m"),
@@ -65,7 +67,7 @@ class Calendar:
         now = date.today()
         dates = [now + timedelta(days=i)
                  for i in range(0 - now.weekday(), 7 - now.weekday())]
-        
+
         return {
             'title': now.isocalendar()[1],
             'days': dates,
@@ -73,4 +75,3 @@ class Calendar:
             'month': now.month,
             'year': now.year
             }
-        

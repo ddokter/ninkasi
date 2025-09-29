@@ -54,9 +54,9 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=100, verbose_name='Name')),
-                ('style', ninkasi.models.fields.URNField(choices=ninkasi.models.beer.list_styles, max_length=100)),
+                ('style', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='ninkasi.style')),
                 ('description', models.TextField()),
-                ('recipes', ninkasi.models.fields.URNListField(blank=True, choices=ninkasi.models.beer.list_recipes, null=True)),
+                ('recipes', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='ninkasi.recipe')),
             ],
             options={
                 'ordering': ['name'],

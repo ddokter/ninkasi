@@ -37,27 +37,30 @@
       <tbody>
 	{% for key, val in import_map.items %}
 	<tr>
-	  <td>{{ key.name }}</td>
-	  <td>{{ key.get_category_display }}</td>
+	  <td>
+	    {% icon key.category %}
+	    {{ key.name }}
+	  </td>
+	  <td>{{ key.category }}</td>
 	  <td>
 	    <select name="{{ key.name }}_to" class="form-select"
 		    aria-label="">
 	      <option value="">--</option>
-	      {% if key.category == 0 %}
+	      {% if key.category == 'malt' %}
 	      {% for malt in view.list_to_malts %}
 	      <option value="{{ malt.id }}"
 		      {% if val == malt.id %}selected{% endif %}>
 		{{ malt }}
 	      </option>
 	      {% endfor %}
-	      {% elif key.category == 1 %}
+	      {% elif key.category == 'hop' %}
 	      {% for hop in view.list_to_hops %}
 	      <option value="{{ hop.id }}"
 		      {% if val == hop.id %}selected{% endif %}>
 		{{ hop }}
 	      </option>
 	      {% endfor %}
-	      {% elif key.category == 2 %}
+	      {% elif key.category == 'yeast' %}
 	      {% for yeast in view.list_to_yeasts %}	      
 	      <option value="{{ yeast.id }}"
 		      {% if val == yeast.id %}selected{% endif %}>

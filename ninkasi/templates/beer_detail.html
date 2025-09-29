@@ -15,6 +15,8 @@
 
 {% block after_content %}
 
+{% sublisting 'Recipes' object.list_recipes 'recipe' %}
+
 {% sublisting 'Batches' object.list_batches 'batch' %}
 
 {% endblock after_content %}
